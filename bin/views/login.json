@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
     "type": "View",
     "props": {
@@ -102,3 +103,6 @@
     ],
     "loadList3D": []
 }
+=======
+{"type":"View","props":{"y":0,"x":0,"width":750,"runtime":"scripts/views/LoginView.ts","height":1334},"compId":2,"child":[{"type":"Rect","props":{"y":-370,"x":0,"width":750,"lineWidth":1,"height":2000,"fillColor":"#ffffff"},"compId":13},{"type":"Box","props":{"y":0,"x":0,"width":750,"name":"viewLoad","height":1334},"compId":3,"child":[{"type":"Label","props":{"y":1130,"x":512,"width":70,"var":"loadText","valign":"middle","text":"0%","strokeColor":"#08084b","stroke":0,"name":"lblPres","height":26,"fontSize":26,"color":"#000000","bold":false,"align":"center"},"compId":7},{"type":"Label","props":{"y":1130,"x":190,"valign":"middle","text":"一个好玩的游戏正在加载中","strokeColor":"#08084b","stroke":0,"name":"lblPres","fontSize":26,"color":"#000000","bold":false,"align":"center"},"compId":11},{"type":"Image","props":{"y":450,"x":190,"skin":"loading/jjy_logo.png","name":"logo"},"compId":12},{"type":"ProgressBar","props":{"y":1090,"x":173,"visible":true,"var":"loadBar","value":0,"skin":"loading/load_progress.png","name":"barPres"},"compId":4}]}],"loadList":["loading/jjy_logo.png","loading/load_progress.png"],"loadList3D":[]}
+>>>>>>> ae20126149c1533096e91146fcd485df93a188a7

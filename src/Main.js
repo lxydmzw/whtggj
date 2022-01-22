@@ -4839,8 +4839,13 @@ class GameConfig {
 }
 GameConfig.width = 1334;
 GameConfig.height = 750;
+<<<<<<< HEAD
 GameConfig.scaleMode = "fixedheight";
 GameConfig.screenMode = "horizontal";
+=======
+GameConfig.scaleMode = "fixedwidth";
+GameConfig.screenMode = "none";
+>>>>>>> ae20126149c1533096e91146fcd485df93a188a7
 GameConfig.alignV = "top";
 GameConfig.alignH = "left";
 GameConfig.startScene = "views/login.scene";

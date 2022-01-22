@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
 	"version":"LAYAMATERIAL:02",
 	"props":{
@@ -58,4 +59,66 @@
 		],
 		"defines":[]
 	}
+=======
+{
+	"version":"LAYAMATERIAL:02",
+	"props":{
+		"type":"Laya.UnlitMaterial",
+		"name":"qt_tt1",
+		"renderStates":[
+			{
+				"cull":2,
+				"blend":0,
+				"srcBlend":1,
+				"dstBlend":0,
+				"depthWrite":true,
+				"depthTest":515
+			}
+		],
+		"enableVertexColor":false,
+		"alphaTest":false,
+		"alphaTestValue":0.01,
+		"renderQueue":2000,
+		"albedoIntensity":2.36,
+		"textures":[
+			{
+				"name":"albedoTexture",
+				"path":"../qt_tt1.jpg",
+				"constructParams":[
+					64,
+					64,
+					0,
+					true
+				],
+				"propertyParams":{
+					"filterMode":1,
+					"wrapModeU":0,
+					"wrapModeV":0,
+					"anisoLevel":1
+				}
+			}
+		],
+		"vectors":[
+			{
+				"name":"tilingOffset",
+				"value":[
+					1,
+					1,
+					0,
+					0
+				]
+			},
+			{
+				"name":"albedoColor",
+				"value":[
+					0.5,
+					0.5,
+					0.5,
+					0.5
+				]
+			}
+		],
+		"defines":[]
+	}
+>>>>>>> ae20126149c1533096e91146fcd485df93a188a7
 }
