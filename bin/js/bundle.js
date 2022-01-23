@@ -2221,6 +2221,7 @@
 			this.soundSkin = "ui/qq_ui/homeView/btn_shengying_";
 			this.vibrateSkin = "ui/qq_ui/homeView/btn_zhengdong_";
 			this.isSkinClick = false;
+			this.exitDialogShow = false;
 		}
 		onAwake() {
 			super.onAwake();
@@ -2260,7 +2261,70 @@
 			this.btnCollect = this.getChild("btnCollect", bottomPanel);
 			this.qq_UpdateData();
 		}
+		hideExitDialog() {
+	        this.exitDialogShow = false;
+	        this.exitDialog.close();
+	    }
+	    showExitDialog() {
+	        this.exitDialog = new Laya.Dialog();
+	        var bg = new Laya.Image("res/bg_exit.png");
+	        this.exitDialog.addChild(bg);
+	        let btnConfirm = new Laya.Image("res/confirm_select.png");
+	        btnConfirm.pos(18, 285);
+	        this.exitDialog.addChild(btnConfirm);
+
+
+	        let btnCancel = new Laya.Image("res/cancel_select.png");
+	        btnCancel.pos(195, 285);
+	        this.exitDialog.addChild(btnCancel);
+
+	        this.btnSz = new Laya.Image("res/sz.png");
+	        this.btnSz.scaleX = 0.3;
+	        this.btnSz.scaleY = 0.3;
+	        this.btnSz.pos(100, 300);
+	        this.exitDialog.addChild(this.btnSz);
+	        this.exitDialog.popup();
+	        this.exitDialogShow = true;
+	    }
+	    onKeyUp(e) {
+	        if (this.exitDialogShow) {
+	            switch (e.keyCode) {
+	                case 37:
+	                case 21:
+	                case 39:
+	                case 22:
+	                    if (this.btnSz.x == 260) {
+	                        this.btnSz.pos(100, 300);
+	                    } else {
+	                        this.btnSz.pos(260, 300);
+	                    }
+	                    break;
+	                case 13:
+	                case 23:
+	                case 66:
+	                    this.hideExitDialog();
+	                    if (this.btnSz.x == 100) {//确定
+	                        if (window["PlatformClass"] != null) {
+	                            let platform = window["PlatformClass"].createClass('cn.popapps.game.JSBridge');
+	                            platform.call("exit");
+	                        } else {
+	                            console.log("NO Platform");
+	                        }
+	                    }
+
+	                    break;
+	            }
+	        } else {
+	            switch (e.keyCode) {
+	                case 8:
+	                case 4:
+	                    this.showExitDialog();
+	                    break;
+	            }
+	        }
+	    }
 		initEvent() {
+			Laya.stage.on(Laya.Event.KEY_UP,this,this.onKeyUp);
 			LayaSample.utils.addClickEvent(this.btnVibrate, this, this.onVibrateClick);
 			LayaSample.utils.addClickEvent(this.btnSound, this, this.onSoundClick);
 			LayaSample.utils.addClickEvent(this.btnPlay, this, this.onPlayGameClick);

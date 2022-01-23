@@ -38,6 +38,14 @@ P 0587871F vscroll$up.png
 P 5FD17798 vscroll.png
 P DDDDFB9E vslider$bar.png
 P 01BAE7F5 vslider.png
+D res
+P 225C9A4F bg_exit.png
+P 905CD5C9 bg_tomenu.png
+P 1CDF530B cancel_select.png
+P 8908E63C confirm_select.png
+R 390C350E play_tips.png
+P 7F9FFA87 start.png
+P AB8A2D46 sz.png
 D sound
 R 1DC3ABD8 destroy.wav
 R FF0B6E8D hit.wav
