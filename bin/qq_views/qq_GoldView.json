@@ -2,9 +2,9 @@
     "type": "Scene",
     "props": {
         "zOrder": 3,
-        "width": 750,
+        "width": 1334,
         "runtime": "scripts/views/qq_goldView.ts",
-        "height": 1334
+        "height": 750
     },
     "compId": 2,
     "child": [

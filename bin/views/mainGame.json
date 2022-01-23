@@ -187,12 +187,12 @@
             "type": "Image",
             "props": {
                 "x": 0,
-                "width": 750,
+                "width": 1334,
                 "var": "caiDaiBg",
                 "top": 0,
                 "skin": "ui/screen_speed.png",
                 "left": 0,
-                "height": 1334,
+                "height": 750,
                 "alpha": 0
             },
             "compId": 205

@@ -1,1 +1,25 @@
-{"type":"View","props":{"width":750,"runtime":"scripts/views/newGuide.ts","height":1334},"compId":2,"child":[{"type":"Image","props":{"x":0,"var":"newGui","skin":"ui/ydao.png","bottom":500},"compId":3}],"loadList":["ui/ydao.png"],"loadList3D":[]}
+{
+    "type": "View",
+    "props": {
+        "width": 1334,
+        "runtime": "scripts/views/newGuide.ts",
+        "height": 750
+    },
+    "compId": 2,
+    "child": [
+        {
+            "type": "Image",
+            "props": {
+                "x": 0,
+                "var": "newGui",
+                "skin": "ui/ydao.png",
+                "bottom": 500
+            },
+            "compId": 3
+        }
+    ],
+    "loadList": [
+        "ui/ydao.png"
+    ],
+    "loadList3D": []
+}

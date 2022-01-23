@@ -1,1 +1,379 @@
-{"type":"View","props":{"width":750,"runtime":"scripts/views/qq_ResurrectView.ts","height":1334},"compId":2,"child":[{"type":"Image","props":{"y":-14,"width":750,"skin":"ui/common/mask_black.png","sizeGrid":"3,3,3,3","name":"bg","left":0,"height":2000,"alpha":0.7},"compId":47},{"type":"Box","props":{"y":196,"x":-0.5,"visible":false,"name":"rank"},"compId":25},{"type":"WXOpenDataViewer","props":{"y":206,"x":0,"width":750,"visible":false,"name":"rankPanel","iconSign":"wx","height":92,"alpha":1,"runtime":"laya.ui.WXOpenDataViewer"},"compId":26},{"type":"Box","props":{"y":75,"x":0,"width":750,"visible":false,"name":"score","height":172},"compId":27,"child":[{"type":"Label","props":{"y":73,"width":750,"valign":"middle","text":"99999","name":"lblScore","fontSize":99,"color":"#ffffff","align":"center"},"compId":15},{"type":"Label","props":{"x":285,"text":"当前分数","name":"lblName","fontSize":45,"color":"#ffffff"},"compId":16}]},{"type":"Box","props":{"y":487,"x":397,"width":365,"visible":true,"pivotY":205,"pivotX":192,"name":"goonTime","height":387},"compId":42,"child":[{"type":"Sprite","props":{"y":147,"x":147,"width":294,"visible":false,"texture":"ui/qq_ui/resurrectView/bar_load_full2.png","pivotY":147,"pivotX":147,"name":"bar2","height":294},"compId":38},{"type":"Sprite","props":{"y":147,"x":147,"width":294,"visible":false,"texture":"ui/qq_ui/resurrectView/bar_load_full1.png","pivotY":147,"pivotX":147,"name":"bar1","height":294},"compId":39},{"type":"FontClip","props":{"y":0,"x":0,"width":294,"value":"+","valign":"middle","text":"10","skin":"ui/qq_ui/resurrectView/pic_shuzidaoshu.png","sheet":"0123456789+","name":"lbTimer","height":294,"fontSize":121,"color":"#ffffff"},"compId":41}]},{"type":"Button","props":{"y":883,"x":180,"visible":false,"stateNum":1,"name":"Share"},"compId":34},{"type":"Button","props":{"x":375,"width":444,"stateNum":1,"skin":"ui/qq_ui/resurrectView/btn_shipingfuhuo.png","pivotY":61,"pivotX":222,"name":"Video","height":122,"bottom":400},"compId":35},{"type":"Box","props":{"x":135,"width":480,"name":"bottomPanel","height":76,"cacheAs":"normal","bottom":257},"compId":10,"child":[{"type":"Button","props":{"y":30,"x":240,"width":160,"stateNum":1,"skin":"ui/qq_ui/resurrectView/btn_skip.png","pivotY":20.5,"pivotX":80,"name":"Skip","height":41},"compId":49}]},{"type":"Box","props":{"x":67,"name":"appLite","bottom":550},"compId":111,"child":[{"type":"Image","props":{"y":-121,"x":4,"width":616,"skin":"ui/common/cell_5.png","height":720},"compId":112},{"type":"List","props":{"y":-121,"x":22,"width":580,"name":"appList","height":700},"compId":113,"child":[{"type":"Script","props":{"panel":"@node:111","list":"@node:113","category":2,"cate":2,"appWidth":184,"appPrefab":"@Prefab:prefab/appItem.prefab","appHeight":244,"runtime":"scripts/uiComp/AppLite.ts"},"compId":127}]}]},{"type":"Box","props":{"width":750,"name":"NativeBanner","height":281,"centerX":0,"bottom":0},"compId":115,"child":[{"type":"Image","props":{"top":0,"skin":"ui/appNativeNew1/bg_1.jpg","right":0,"name":"bg","left":0,"bottom":0},"compId":116},{"type":"Button","props":{"stateNum":1,"skin":"ui/appNativeNew1/bti_banner_guanbi.png","name":"btnClose","centerY":-118,"centerX":352},"compId":117},{"type":"Image","props":{"width":340,"skin":"ui/common/bg_mask1.png","name":"icon","height":224,"centerY":0,"centerX":-172},"compId":118},{"type":"Label","props":{"wordWrap":true,"width":292,"text":"点击视频观看领取现金","overflow":"visible","name":"appName","height":89,"fontSize":42,"font":"Arial","color":"#fbf5f4","centerY":-62,"centerX":174,"bold":true,"align":"left"},"compId":119},{"type":"Label","props":{"wordWrap":true,"width":323,"valign":"middle","text":"搞笑娱乐视频搞笑娱乐视频搞笑娱乐视频","overflow":"visible","name":"appCrip","height":129,"fontSize":28,"font":"Arial","color":"#fffdfd","centerY":57,"centerX":191,"bold":true,"align":"left"},"compId":120},{"type":"Image","props":{"y":244.5,"x":681,"skin":"ui/appNativeNew1/jiaobiao2.png"},"compId":122},{"type":"Script","props":{"touch":"@node:116","isShow":true,"category":1,"banner":"@node:115","runtime":"scripts/uiComp/AppNative.ts"},"compId":126}]}],"loadList":["ui/common/mask_black.png","ui/qq_ui/resurrectView/bar_load_full2.png","ui/qq_ui/resurrectView/bar_load_full1.png","ui/qq_ui/resurrectView/pic_shuzidaoshu.png","ui/qq_ui/resurrectView/btn_shipingfuhuo.png","ui/qq_ui/resurrectView/btn_skip.png","ui/common/cell_5.png","prefab/appItem.prefab","ui/appNativeNew1/bg_1.jpg","ui/appNativeNew1/bti_banner_guanbi.png","ui/common/bg_mask1.png","ui/appNativeNew1/jiaobiao2.png"],"loadList3D":[]}
+{
+    "type": "View",
+    "props": {
+        "width": 1334,
+        "runtime": "scripts/views/qq_ResurrectView.ts",
+        "height": 750
+    },
+    "compId": 2,
+    "child": [
+        {
+            "type": "Image",
+            "props": {
+                "y": -14,
+                "width": 750,
+                "skin": "ui/common/mask_black.png",
+                "sizeGrid": "3,3,3,3",
+                "name": "bg",
+                "left": 0,
+                "height": 2000,
+                "alpha": 0.7
+            },
+            "compId": 47
+        },
+        {
+            "type": "Box",
+            "props": {
+                "y": 196,
+                "x": -0.5,
+                "visible": false,
+                "name": "rank"
+            },
+            "compId": 25
+        },
+        {
+            "type": "WXOpenDataViewer",
+            "props": {
+                "y": 206,
+                "x": 0,
+                "width": 750,
+                "visible": false,
+                "name": "rankPanel",
+                "iconSign": "wx",
+                "height": 92,
+                "alpha": 1,
+                "runtime": "laya.ui.WXOpenDataViewer"
+            },
+            "compId": 26
+        },
+        {
+            "type": "Box",
+            "props": {
+                "y": 75,
+                "x": 0,
+                "width": 750,
+                "visible": false,
+                "name": "score",
+                "height": 172
+            },
+            "compId": 27,
+            "child": [
+                {
+                    "type": "Label",
+                    "props": {
+                        "y": 73,
+                        "width": 750,
+                        "valign": "middle",
+                        "text": "99999",
+                        "name": "lblScore",
+                        "fontSize": 99,
+                        "color": "#ffffff",
+                        "align": "center"
+                    },
+                    "compId": 15
+                },
+                {
+                    "type": "Label",
+                    "props": {
+                        "x": 285,
+                        "text": "当前分数",
+                        "name": "lblName",
+                        "fontSize": 45,
+                        "color": "#ffffff"
+                    },
+                    "compId": 16
+                }
+            ]
+        },
+        {
+            "type": "Box",
+            "props": {
+                "y": 487,
+                "x": 397,
+                "width": 365,
+                "visible": true,
+                "pivotY": 205,
+                "pivotX": 192,
+                "name": "goonTime",
+                "height": 387
+            },
+            "compId": 42,
+            "child": [
+                {
+                    "type": "Sprite",
+                    "props": {
+                        "y": 147,
+                        "x": 147,
+                        "width": 294,
+                        "visible": false,
+                        "texture": "ui/qq_ui/resurrectView/bar_load_full2.png",
+                        "pivotY": 147,
+                        "pivotX": 147,
+                        "name": "bar2",
+                        "height": 294
+                    },
+                    "compId": 38
+                },
+                {
+                    "type": "Sprite",
+                    "props": {
+                        "y": 147,
+                        "x": 147,
+                        "width": 294,
+                        "visible": false,
+                        "texture": "ui/qq_ui/resurrectView/bar_load_full1.png",
+                        "pivotY": 147,
+                        "pivotX": 147,
+                        "name": "bar1",
+                        "height": 294
+                    },
+                    "compId": 39
+                },
+                {
+                    "type": "FontClip",
+                    "props": {
+                        "y": 0,
+                        "x": 0,
+                        "width": 294,
+                        "value": "+",
+                        "valign": "middle",
+                        "text": "10",
+                        "skin": "ui/qq_ui/resurrectView/pic_shuzidaoshu.png",
+                        "sheet": "0123456789+",
+                        "name": "lbTimer",
+                        "height": 294,
+                        "fontSize": 121,
+                        "color": "#ffffff"
+                    },
+                    "compId": 41
+                }
+            ]
+        },
+        {
+            "type": "Button",
+            "props": {
+                "y": 883,
+                "x": 180,
+                "visible": false,
+                "stateNum": 1,
+                "name": "Share"
+            },
+            "compId": 34
+        },
+        {
+            "type": "Button",
+            "props": {
+                "x": 375,
+                "width": 444,
+                "stateNum": 1,
+                "skin": "ui/qq_ui/resurrectView/btn_shipingfuhuo.png",
+                "pivotY": 61,
+                "pivotX": 222,
+                "name": "Video",
+                "height": 122,
+                "bottom": 400
+            },
+            "compId": 35
+        },
+        {
+            "type": "Box",
+            "props": {
+                "x": 135,
+                "width": 480,
+                "name": "bottomPanel",
+                "height": 76,
+                "cacheAs": "normal",
+                "bottom": 257
+            },
+            "compId": 10,
+            "child": [
+                {
+                    "type": "Button",
+                    "props": {
+                        "y": 30,
+                        "x": 240,
+                        "width": 160,
+                        "stateNum": 1,
+                        "skin": "ui/qq_ui/resurrectView/btn_skip.png",
+                        "pivotY": 20.5,
+                        "pivotX": 80,
+                        "name": "Skip",
+                        "height": 41
+                    },
+                    "compId": 49
+                }
+            ]
+        },
+        {
+            "type": "Box",
+            "props": {
+                "x": 67,
+                "name": "appLite",
+                "bottom": 550
+            },
+            "compId": 111,
+            "child": [
+                {
+                    "type": "Image",
+                    "props": {
+                        "y": -121,
+                        "x": 4,
+                        "width": 616,
+                        "skin": "ui/common/cell_5.png",
+                        "height": 720
+                    },
+                    "compId": 112
+                },
+                {
+                    "type": "List",
+                    "props": {
+                        "y": -121,
+                        "x": 22,
+                        "width": 580,
+                        "name": "appList",
+                        "height": 700
+                    },
+                    "compId": 113,
+                    "child": [
+                        {
+                            "type": "Script",
+                            "props": {
+                                "panel": "@node:111",
+                                "list": "@node:113",
+                                "category": 2,
+                                "cate": 2,
+                                "appWidth": 184,
+                                "appPrefab": "@Prefab:prefab/appItem.prefab",
+                                "appHeight": 244,
+                                "runtime": "scripts/uiComp/AppLite.ts"
+                            },
+                            "compId": 127
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "Box",
+            "props": {
+                "width": 750,
+                "name": "NativeBanner",
+                "height": 281,
+                "centerX": 0,
+                "bottom": 0
+            },
+            "compId": 115,
+            "child": [
+                {
+                    "type": "Image",
+                    "props": {
+                        "top": 0,
+                        "skin": "ui/appNativeNew1/bg_1.jpg",
+                        "right": 0,
+                        "name": "bg",
+                        "left": 0,
+                        "bottom": 0
+                    },
+                    "compId": 116
+                },
+                {
+                    "type": "Button",
+                    "props": {
+                        "stateNum": 1,
+                        "skin": "ui/appNativeNew1/bti_banner_guanbi.png",
+                        "name": "btnClose",
+                        "centerY": -118,
+                        "centerX": 352
+                    },
+                    "compId": 117
+                },
+                {
+                    "type": "Image",
+                    "props": {
+                        "width": 340,
+                        "skin": "ui/common/bg_mask1.png",
+                        "name": "icon",
+                        "height": 224,
+                        "centerY": 0,
+                        "centerX": -172
+                    },
+                    "compId": 118
+                },
+                {
+                    "type": "Label",
+                    "props": {
+                        "wordWrap": true,
+                        "width": 292,
+                        "text": "点击视频观看领取现金",
+                        "overflow": "visible",
+                        "name": "appName",
+                        "height": 89,
+                        "fontSize": 42,
+                        "font": "Arial",
+                        "color": "#fbf5f4",
+                        "centerY": -62,
+                        "centerX": 174,
+                        "bold": true,
+                        "align": "left"
+                    },
+                    "compId": 119
+                },
+                {
+                    "type": "Label",
+                    "props": {
+                        "wordWrap": true,
+                        "width": 323,
+                        "valign": "middle",
+                        "text": "搞笑娱乐视频搞笑娱乐视频搞笑娱乐视频",
+                        "overflow": "visible",
+                        "name": "appCrip",
+                        "height": 129,
+                        "fontSize": 28,
+                        "font": "Arial",
+                        "color": "#fffdfd",
+                        "centerY": 57,
+                        "centerX": 191,
+                        "bold": true,
+                        "align": "left"
+                    },
+                    "compId": 120
+                },
+                {
+                    "type": "Image",
+                    "props": {
+                        "y": 244.5,
+                        "x": 681,
+                        "skin": "ui/appNativeNew1/jiaobiao2.png"
+                    },
+                    "compId": 122
+                },
+                {
+                    "type": "Script",
+                    "props": {
+                        "touch": "@node:116",
+                        "isShow": true,
+                        "category": 1,
+                        "banner": "@node:115",
+                        "runtime": "scripts/uiComp/AppNative.ts"
+                    },
+                    "compId": 126
+                }
+            ]
+        }
+    ],
+    "loadList": [
+        "ui/common/mask_black.png",
+        "ui/qq_ui/resurrectView/bar_load_full2.png",
+        "ui/qq_ui/resurrectView/bar_load_full1.png",
+        "ui/qq_ui/resurrectView/pic_shuzidaoshu.png",
+        "ui/qq_ui/resurrectView/btn_shipingfuhuo.png",
+        "ui/qq_ui/resurrectView/btn_skip.png",
+        "ui/common/cell_5.png",
+        "prefab/appItem.prefab",
+        "ui/appNativeNew1/bg_1.jpg",
+        "ui/appNativeNew1/bti_banner_guanbi.png",
+        "ui/common/bg_mask1.png",
+        "ui/appNativeNew1/jiaobiao2.png"
+    ],
+    "loadList3D": []
+}
