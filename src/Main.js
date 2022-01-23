@@ -2013,8 +2013,21 @@ class QQ_SkinView extends BVHdla {
 		this.skinList = this.getChild("skinList");
 		Laya.loader.load("qqPrefab/qq_skinItems.json", Laya.Handler.create(this, this.initList), null, Laya.Loader.PREFAB);
 		this.skin_InitData();
+		this.initShouZhi();
 		if (!LayaSample.commonData.existVideoAd)
 			LayaSample.adMgr.loadVideoAd();
+	}
+	initShouZhi(){
+		var btnBuyx=parseInt(this.btnBuy.x);//随机解锁按钮的x
+		var btnBuyy=parseInt(this.btnBuy.y);//随机解锁按钮的y
+		btnBuyx+=250;
+		btnBuyy+=38;
+		this.btnSz = new Laya.Image("res/sz.png");
+        this.btnSz.scaleX = 0.3;
+        this.btnSz.scaleY = 0.3;
+        this.btnSz.pos(btnBuyx, btnBuyy);
+        this.addChild(this.btnSz);
+
 	}
 	skin_InitData() {
 		if (LayaSample.commonData.qq_lockerSkinList.length == 0) {
