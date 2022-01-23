@@ -2,7 +2,10 @@
 	'use strict';
 
 	'use strict';
+	class CurSence{
 
+	}
+	CurSence.curSence="";//qq_HomeView QQ_SkinView
 	class Utils {
 		constructor() { }
 		addClickEvent(btn, caller, cb, soundId) {
@@ -98,29 +101,29 @@
 				rotation: target.rotation + 5
 			}, 50, null, 0)
 				.addLabel("shake2", 0).to(target, {
-				rotation: target.rotation - 6
-			}, 50, null, 0)
+					rotation: target.rotation - 6
+				}, 50, null, 0)
 				.addLabel("shake3", 0).to(target, {
-				rotation: target.rotation - 13
-			}, 50, null, 0)
+					rotation: target.rotation - 13
+				}, 50, null, 0)
 				.addLabel("shake4", 0).to(target, {
-				rotation: target.rotation + 3
-			}, 50, null, 0)
+					rotation: target.rotation + 3
+				}, 50, null, 0)
 				.addLabel("shake5", 0).to(target, {
-				rotation: target.rotation - 5
-			}, 50, null, 0)
+					rotation: target.rotation - 5
+				}, 50, null, 0)
 				.addLabel("shake6", 0).to(target, {
-				rotation: target.rotation + 2
-			}, 50, null, 0)
+					rotation: target.rotation + 2
+				}, 50, null, 0)
 				.addLabel("shake7", 0).to(target, {
-				rotation: target.rotation - 8
-			}, 50, null, 0)
+					rotation: target.rotation - 8
+				}, 50, null, 0)
 				.addLabel("shake8", 0).to(target, {
-				rotation: target.rotation + 3
-			}, 50, null, 0)
+					rotation: target.rotation + 3
+				}, 50, null, 0)
 				.addLabel("shake9", 0).to(target, {
-				rotation: 0
-			}, 50, null, 0);
+					rotation: 0
+				}, 50, null, 0);
 			if (!tweenTimer) {
 				timeLine.on(Laya.Event.COMPLETE, this, function () {
 					timeLine.destroy();
@@ -2007,6 +2010,9 @@
 			super.onAwake();
 		}
 		initUI() {
+			CurSence.curSence="QQ_SkinView";
+			Laya.stage.offAll(Laya.Event.KEY_UP);
+			Laya.stage.on(Laya.Event.KEY_UP,this,this.onKeyUp);
 			this.btnBack = this.getChild("btnBack");
 			this.btnBuy = this.getChild("btnBuy");
 			this.btnVideo = this.getChild("btnVideo");
@@ -2016,20 +2022,38 @@
 			this.skinList = this.getChild("skinList");
 			Laya.loader.load("qqPrefab/qq_skinItems.json", Laya.Handler.create(this, this.initList), null, Laya.Loader.PREFAB);
 			this.skin_InitData();
-			this.initShouZhi();
+			this.initShouZhi();//皮肤界面添加小手指
 			if (!LayaSample.commonData.existVideoAd)
 				LayaSample.adMgr.loadVideoAd();
 		}
-		initShouZhi(){
-			var btnBuyx=parseInt(this.btnBuy.x);//随机解锁按钮的x
-			var btnBuyy=parseInt(this.btnBuy.y);//随机解锁按钮的y
-			btnBuyx+=250;
-			btnBuyy+=38;
+		onKeyUp(e) {
+			if(CurSence.curSence!="QQ_SkinView"){
+				return;
+			}
+			switch (e.keyCode) {
+				case 8:
+				case 4:
+					Laya.Scene.open("qq_views/qq_HomeView.scene", false, Laya.Handler.create(this, v => {
+						this.close();
+					}));
+					break;
+				case 38:
+				case 19:
+					this.updateItem(0);
+					break;
+			}
+		}
+		//皮肤界面添加小手指
+		initShouZhi() {
+			var btnBuyx = parseInt(this.btnBuy.x);//随机解锁按钮的x
+			var btnBuyy = parseInt(this.btnBuy.y);//随机解锁按钮的y
+			btnBuyx += 250;
+			btnBuyy += 38;
 			this.btnSz = new Laya.Image("res/sz.png");
-	        this.btnSz.scaleX = 0.3;
-	        this.btnSz.scaleY = 0.3;
-	        this.btnSz.pos(btnBuyx, btnBuyy);
-	        this.addChild(this.btnSz);
+			this.btnSz.scaleX = 0.3;
+			this.btnSz.scaleY = 0.3;
+			this.btnSz.pos(btnBuyx, btnBuyy);
+			this.addChild(this.btnSz);
 
 		}
 		skin_InitData() {
@@ -2140,7 +2164,7 @@
 			list.itemRender = dy_SkinItem;
 			list.vScrollBarSkin = "";
 			list.selectEnable = true;
-			list.selectHandler = new Laya.Handler(this, this.onSelect);
+			list.mouseHandler = new Laya.Handler(this, this.onSelect);
 			list.renderHandler = new Laya.Handler(this, this.updateItem);
 			var num = LayaSample.commonData.qq_skinMaxItem;
 			this.data = new Array();
@@ -2160,6 +2184,7 @@
 			this.renderCount = list.repeatX * list.repeatY;
 			list.array = this.data;
 			this.skinList.refresh();
+
 		}
 		onSelect(index) {
 			if (index < 0)
@@ -2251,6 +2276,10 @@
 			}
 		}
 		initUI() {
+			console.log(">--打开首页");
+			CurSence.curSence="qq_HomeView";
+			Laya.stage.offAll(Laya.Event.KEY_UP);
+			Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
 			let topPanel = this.getChild("topPanel");
 			let bottomPanel = this.getChild("bottomui");
 			this.btnSound = this.getChild("btnSound", topPanel);
@@ -2266,89 +2295,146 @@
 			this.btnGameL2.visible = false;
 			this.btnGameR2.visible = false;
 			this.btnPlay = this.getChild("btnPlay", bottomPanel);
+			this.btnPlayX = parseInt(this.btnPlay.x);
+			this.btnPlayY = parseInt(this.btnPlay.y);
+			this.btnPlayOffsetPointX = 350;
+			this.btnPlayOffsetPointY = 70;
+			this.btnPointer = new Laya.Image("res/sz.png");
+			this.btnPointer.scaleX = 0.3;
+			this.btnPointer.scaleY = 0.3;
+			this.btnPointer.pos(this.btnPlayX + this.btnPlayOffsetPointX, this.btnPlayY + this.btnPlayOffsetPointY);
+			bottomPanel.addChild(this.btnPointer);
+			this.focusView = "btnPlay";
 			this.btnRank = this.getChild("btnRank", bottomPanel);
 			this.btnSkin = this.getChild("btnSkin", bottomPanel);
+			this.btnSkinX = parseInt(this.btnSkin.x);
+			this.btnSkinY = parseInt(this.btnSkin.y);
+			this.btnSkinOffsetPoint = 50;
 			this.btnSiginIn = this.getChild("btnSiginIn", bottomPanel);
+			this.btnSignX = parseInt(this.btnSiginIn.x);
+			this.btnSignY = parseInt(this.btnSiginIn.y);
+			this.btnSignOffsetPoint = 50;
 			this.btnShare = this.getChild("btnShare", bottomPanel);
 			this.btnMore = this.getChild("btnMore", bottomPanel);
 			this.btnCollect = this.getChild("btnCollect", bottomPanel);
 			this.qq_UpdateData();
 		}
 		hideExitDialog() {
-	        this.exitDialogShow = false;
-	        this.exitDialog.close();
-	    }
-	    showExitDialog() {
-	        this.exitDialog = new Laya.Dialog();
-	        var bg = new Laya.Image("res/bg_exit.png");
-	        this.exitDialog.addChild(bg);
-	        let btnConfirm = new Laya.Image("res/confirm_select.png");
-	        btnConfirm.pos(18, 285);
-	        this.exitDialog.addChild(btnConfirm);
+			this.exitDialogShow = false;
+			this.exitDialog.close();
+		}
+		showExitDialog() {
+			this.exitDialog = new Laya.Dialog();
+			var bg = new Laya.Image("res/bg_exit.png");
+			this.exitDialog.addChild(bg);
+			let btnConfirm = new Laya.Image("res/confirm_select.png");
+			btnConfirm.pos(18, 285);
+			this.exitDialog.addChild(btnConfirm);
 
 
-	        let btnCancel = new Laya.Image("res/cancel_select.png");
-	        btnCancel.pos(195, 285);
-	        this.exitDialog.addChild(btnCancel);
+			let btnCancel = new Laya.Image("res/cancel_select.png");
+			btnCancel.pos(195, 285);
+			this.exitDialog.addChild(btnCancel);
 
-	        this.btnSz = new Laya.Image("res/sz.png");
-	        this.btnSz.scaleX = 0.3;
-	        this.btnSz.scaleY = 0.3;
-	        this.btnSz.pos(100, 300);
-	        this.exitDialog.addChild(this.btnSz);
-	        this.exitDialog.popup();
-	        this.exitDialogShow = true;
-	    }
-	    onKeyUp(e) {
-	        if (this.exitDialogShow) {
-	            switch (e.keyCode) {
-	                case 37:
-	                case 21:
-	                case 39:
-	                case 22:
-	                    if (this.btnSz.x == 260) {
-	                        this.btnSz.pos(100, 300);
-	                    } else {
-	                        this.btnSz.pos(260, 300);
-	                    }
-	                    break;
-	                case 13:
-	                case 23:
-	                case 66:
-	                    this.hideExitDialog();
-	                    if (this.btnSz.x == 100) {//确定
-	                        if (window["PlatformClass"] != null) {
-	                            let platform = window["PlatformClass"].createClass('cn.popapps.game.JSBridge');
-	                            platform.call("exit");
-	                        } else {
-	                            console.log("NO Platform");
-	                        }
-	                    }
+			var btnSz = new Laya.Image("res/sz.png");
+			btnSz.scaleX = 0.3;
+			btnSz.scaleY = 0.3;
+			btnSz.pos(100, 300);
+			this.exitDialog.addChild(btnSz);
+			this.exitDialog.popup();
+			this.exitDialogShow = true;
+		}
+		onKeyUp(e) {
+			if(CurSence.curSence!="qq_HomeView"){
+				return;
+			}
+			if (this.exitDialogShow) {
+				switch (e.keyCode) {
+					case 37:
+					case 21:
+					case 39:
+					case 22:
+						if (this.btnSz.x == 260) {
+							this.btnSz.pos(100, 300);
+						} else {
+							this.btnSz.pos(260, 300);
+						}
+						break;
+					case 13:
+					case 23:
+					case 66:
+						this.hideExitDialog();
+						if (this.btnSz.x == 100) {//确定
+							if (window["PlatformClass"] != null) {
+								let platform = window["PlatformClass"].createClass('cn.popapps.game.JSBridge');
+								platform.call("exit");
+							} else {
+								console.log("NO Platform");
+							}
+						}
 
-	                    break;
-	            }
-	        } else {
-	            switch (e.keyCode) {
-	                case 8:
-	                case 4:
-	                    this.showExitDialog();
-	                    break;
-	            }
-	        }
-	    }
+						break;
+				}
+			} else {
+				switch (e.keyCode) {
+					case 8:
+					case 4:
+						this.showExitDialog();
+						break;
+					case 13:
+					case 23:
+					case 66:
+						this.onBtnClick();
+						break;
+					case 38:
+					case 19://上
+					case 40:
+					case 20://下
+					case 37:
+					case 21://左
+					case 39:
+						console.log(">--focusView==39");
+						this.changeFocus();
+						break;
+					case 22://右
+						console.log(">--focusView==39");
+						this.changeFocus();
+						break;
+				}
+			}
+		}
+		changeFocus() {
+			if (this.focusView == "btnPlay") {
+				this.focusView = "btnSkin";
+				this.btnPointer.pos(this.btnSkinX + this.btnSkinOffsetPoint, this.btnSkinY + this.btnSkinOffsetPoint);
+			} else if (this.focusView == "btnSkin") {
+				this.focusView = "btnSign";
+				this.btnPointer.pos(this.btnSignX + this.btnSkinOffsetPoint, this.btnSignY + this.btnSkinOffsetPoint);
+			} else {
+				this.focusView = "btnPlay";
+				this.btnPointer.pos(this.btnPlayX + this.btnPlayOffsetPointX, this.btnPlayY + this.btnPlayOffsetPointY);
+			}
+			console.log(">--focusView=="+this.focusView);
+		}
 		initEvent() {
-			Laya.stage.on(Laya.Event.KEY_UP,this,this.onKeyUp);
 			LayaSample.utils.addClickEvent(this.btnVibrate, this, this.onVibrateClick);
 			LayaSample.utils.addClickEvent(this.btnSound, this, this.onSoundClick);
-			LayaSample.utils.addClickEvent(this.btnPlay, this, this.onPlayGameClick);
-			LayaSample.utils.addClickEvent(this.btnSiginIn, this, this.onSiginInClick);
-			LayaSample.utils.addClickEvent(this.btnSkin, this, this.onSkinClick);
 			LayaSample.utils.addClickEvent(this.btnMore, this, this.onMoreClick);
 			LayaSample.utils.addClickEvent(this.btnCollect, this, this.onCollectClick);
 			LayaSample.utils.addClickEvent(this.btnGameL, this, this.onWxgameClick);
 			LayaSample.utils.addClickEvent(this.btnGameR, this, this.onWxgameClick);
 			this.btnGameL2 && LayaSample.utils.addClickEvent(this.btnGameL2, this, this.onWxgameClick);
 			this.btnGameR2 && LayaSample.utils.addClickEvent(this.btnGameR2, this, this.onWxgameClick);
+		}
+		onBtnClick() {
+			console.log(">--this.focusView"+this.focusView);
+			if (this.focusView == "btnPlay") {
+				this.onPlayGameClick();
+			} else if (this.focusView == "btnSkin") {
+				this.onSkinClick();
+			} else {
+				this.onSiginInClick();
+			}
 		}
 		onPlayGameClick() {
 			Laya.Scene.open("qq_views/qq_TrySkinFree.scene", false, Laya.Handler.create(this, v => {
@@ -2718,7 +2804,7 @@
 				list.vScrollBarSkin = "";
 				list.selectEnable = true;
 				list.renderHandler = new Laya.Handler(this, this.updateItem);
-				list.mouseHandler = new Laya.Handler(this, this.onSelect);
+				list.selectHandler = new Laya.Handler(this, this.onSelect);
 				this.renderCount = list.repeatX * list.repeatY;
 			}
 			if (this.data != null) {
