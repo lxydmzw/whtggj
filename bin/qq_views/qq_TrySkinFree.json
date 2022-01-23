@@ -40,18 +40,18 @@
                 "skin": "ui/qq_ui/trySkinFreeView/pic_caidai.png",
                 "name": "tip",
                 "centerX": 0,
-                "bottom": 1150
+                "y": 100
             },
             "compId": 169
         },
         {
             "type": "Box",
             "props": {
-                "x": 95,
                 "width": 540,
                 "name": "content",
                 "height": 778,
-                "bottom": 370
+                "centerX": 0,
+                "y": 120
             },
             "compId": 70,
             "child": [
@@ -118,7 +118,7 @@
             "type": "Box",
             "props": {
                 "width": 320,
-                "visible": true,
+                "visible": false,
                 "name": "btnTips2",
                 "height": 41,
                 "centerX": -34,
@@ -164,7 +164,7 @@
         {
             "type": "Button",
             "props": {
-                "x": 386,
+                "centerX":0,
                 "width": 390,
                 "stateNum": 1,
                 "skin": "ui/qq_ui/trySkinFreeView/btn_likeshiyong.png",
@@ -172,7 +172,7 @@
                 "pivotX": 195,
                 "name": "btnTypeSkin",
                 "height": 108,
-                "bottom": 420
+                "bottom": 30
             },
             "compId": 5
         },
@@ -181,6 +181,7 @@
             "props": {
                 "x": 12,
                 "width": 750,
+                "visible":false,
                 "name": "bottomPanel",
                 "height": 100,
                 "bottom": 300

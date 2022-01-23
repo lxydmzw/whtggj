@@ -10,10 +10,10 @@
         {
             "type": "Image",
             "props": {
-                "x": 0,
                 "var": "newGui",
                 "skin": "ui/ydao.png",
-                "bottom": 500
+                "centerX":0,
+                "bottom":0
             },
             "compId": 3
         }

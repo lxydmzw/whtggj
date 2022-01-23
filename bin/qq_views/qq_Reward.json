@@ -1,22 +1,23 @@
 {
     "type": "View",
     "props": {
-        "width": 750,
+        "width": 1334,
         "runtime": "scripts/views/qq_RewardView.ts",
-        "height": 1334
+        "height": 750,
+        "align":"center"
     },
     "compId": 2,
     "child": [
         {
             "type": "Image",
             "props": {
-                "width": 750,
+                "width": 1334,
                 "top": 0,
                 "skin": "ui/common/mask_black.png",
                 "sizeGrid": "4,4,4,4",
                 "name": "bg",
                 "left": 0,
-                "height": 2000,
+                "height": 750,
                 "alpha": 0.8
             },
             "compId": 25
@@ -27,18 +28,18 @@
                 "skin": "ui/qq_ui/rewardView/pic_caidai.png",
                 "name": "tips",
                 "centerX": 0,
-                "bottom": 1150
+                "y":50
             },
             "compId": 26
         },
         {
             "type": "Image",
             "props": {
-                "x": 384,
+                "centerX":0,
                 "skin": "ui/qq_ui/rewardView/pic_jinbi_guang.png",
                 "rotation": 0,
                 "name": "effect",
-                "bottom": 650,
+                "y": 270,
                 "anchorY": 0.5,
                 "anchorX": 0.5
             },
@@ -47,21 +48,21 @@
         {
             "type": "Image",
             "props": {
-                "x": 238,
+                "centerX":0,
                 "skin": "ui/qq_ui/rewardView/pic_jinbi.png",
                 "name": "Icon",
-                "bottom": 700
+                "y": 150
             },
             "compId": 28
         },
         {
             "type": "Button",
             "props": {
-                "x": 384,
+                "centerX":0,
                 "stateNum": 1,
                 "skin": "ui/qq_ui/rewardView/btn_huang_lingqu.png",
                 "name": "btnGet",
-                "bottom": 360,
+                "bottom": 30,
                 "anchorY": 0.5,
                 "anchorX": 0.5
             },
@@ -71,7 +72,7 @@
             "type": "Box",
             "props": {
                 "width": 320,
-                "visible": true,
+                "visible": false,
                 "name": "btnTips2",
                 "height": 41,
                 "centerX": -67,
@@ -153,9 +154,9 @@
         {
             "type": "Image",
             "props": {
-                "x": 264,
+                "x":600,
                 "name": "coinBg",
-                "bottom": 650
+                "bottom": 250
             },
             "compId": 31,
             "child": [

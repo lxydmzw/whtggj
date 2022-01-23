@@ -10,13 +10,12 @@
         {
             "type": "Image",
             "props": {
-                "y": -14,
-                "width": 750,
+                "width": 1334,
                 "skin": "ui/common/mask_black.png",
                 "sizeGrid": "3,3,3,3",
                 "name": "bg",
                 "left": 0,
-                "height": 2000,
+                "height": 750,
                 "alpha": 0.7
             },
             "compId": 47
@@ -88,11 +87,11 @@
         {
             "type": "Box",
             "props": {
-                "y": 487,
-                "x": 397,
                 "width": 365,
                 "visible": true,
+                "centerX":0,
                 "pivotY": 205,
+                "bottom":200,
                 "pivotX": 192,
                 "name": "goonTime",
                 "height": 387
@@ -169,9 +168,10 @@
                 "skin": "ui/qq_ui/resurrectView/btn_shipingfuhuo.png",
                 "pivotY": 61,
                 "pivotX": 222,
+                "centerX":0,
                 "name": "Video",
                 "height": 122,
-                "bottom": 400
+                "bottom": 30
             },
             "compId": 35
         },
@@ -182,6 +182,7 @@
                 "width": 480,
                 "name": "bottomPanel",
                 "height": 76,
+                "visible":false,
                 "cacheAs": "normal",
                 "bottom": 257
             },

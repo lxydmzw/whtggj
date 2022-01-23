@@ -1,1 +1,265 @@
-{"type":"View","props":{"width":750,"visible":true,"top":0,"runtime":"scripts/views/ClearingView.ts","right":0,"left":0,"height":1334,"bottom":0},"compId":2,"child":[{"type":"Image","props":{"y":-148,"x":0,"width":750,"skin":"ui/common/mask_black.png","sizeGrid":"2,3,2,2","name":"bg","height":2800,"alpha":0.7},"compId":92},{"type":"Box","props":{"y":30,"x":0,"visible":true,"name":"topPanel"},"compId":42,"child":[{"type":"Sprite","props":{"y":0,"x":255,"width":281,"visible":false,"name":"collectHand","height":54},"compId":82}]},{"type":"Box","props":{"y":100,"x":0,"width":750,"name":"score","height":130},"compId":6,"child":[{"type":"Label","props":{"y":10,"x":311,"text":"当前分数","name":"lblName","fontSize":32,"font":"Microsoft YaHei","color":"#ffffff"},"compId":16},{"type":"FontClip","props":{"y":42,"x":0,"width":697,"var":"fontScore","value":"0","spaceX":-50,"skin":"ui/common/font_num1.png","sheet":"1234567890+","name":"fontScore","height":100,"align":"center"},"compId":83}]},{"type":"Box","props":{"x":57,"width":607,"name":"bottomPane","height":112,"cacheAs":"normal","bottom":260},"compId":38,"child":[{"type":"Button","props":{"y":0,"x":0,"stateNum":1,"skin":"ui/common/btn_home1.png","name":"btnBack","label":" ","cacheAs":"normal"},"compId":20},{"type":"Button","props":{"y":0,"x":330,"stateNum":1,"skin":"ui/common/btn_agen1.png","name":"btnPlay"},"compId":53}]},{"type":"Box","props":{"width":674,"var":"NativeBanner","name":"NativeBanner","height":534,"centerY":-147,"centerX":0},"compId":97,"child":[{"type":"Image","props":{"top":-1,"skin":"ui/appNativeNew1/pic_banner_diban.png","right":0,"name":"bg","left":0,"bottom":0},"compId":22},{"type":"Button","props":{"stateNum":1,"skin":"ui/appNativeNew1/btn.png","name":"btnLook","centerY":345,"centerX":0},"compId":29},{"type":"Button","props":{"stateNum":1,"skin":"ui/appNativeNew1/bti_banner_guanbi.png","name":"btnClose","centerY":-223,"centerX":253},"compId":23},{"type":"Image","props":{"width":550,"name":"icon","height":267,"centerY":9,"centerX":0},"compId":24},{"type":"Label","props":{"y":-1,"x":84,"wordWrap":true,"width":483,"valign":"middle","text":"点击视频观看领取现金","overflow":"visible","name":"appName","height":95,"fontSize":40,"font":"Arial","color":"#ffffff","bold":true,"align":"center"},"compId":25},{"type":"Label","props":{"y":422,"x":62,"wordWrap":true,"width":551,"valign":"middle","text":"搞笑娱乐视频阿斯顿发放","overflow":"visible","name":"appCrip","leading":5,"italic":false,"height":104,"fontSize":28,"font":"Arial","color":"#ffffff","bold":false,"align":"center"},"compId":26},{"type":"Image","props":{"y":499,"x":580.5,"skin":"ui/appNativeNew1/jiaobiao.png"},"compId":27},{"type":"Script","props":{"touch":"@node:24","isShow":true,"category":0,"banner":"@node:97","runtime":"scripts/uiComp/AppNative.ts"},"compId":102}]}],"loadList":["ui/common/mask_black.png","ui/common/font_num1.png","ui/common/btn_home1.png","ui/common/btn_agen1.png","ui/appNativeNew1/pic_banner_diban.png","ui/appNativeNew1/btn.png","ui/appNativeNew1/bti_banner_guanbi.png","ui/appNativeNew1/jiaobiao.png"],"loadList3D":[]}
+{
+    "type": "View",
+    "props": {
+        "width": 1334,
+        "visible": true,
+        "top": 0,
+        "runtime": "scripts/views/ClearingView.ts",
+        "right": 0,
+        "left": 0,
+        "height": 750,
+        "bottom": 0
+    },
+    "compId": 2,
+    "child": [
+        {
+            "type": "Image",
+            "props": {
+                "width": 1334,
+                "skin": "ui/common/mask_black.png",
+                "sizeGrid": "2,3,2,2",
+                "name": "bg",
+                "height": 750,
+                "alpha": 0.7
+            },
+            "compId": 92
+        },
+        {
+            "type": "Box",
+            "props": {
+                "y": 30,
+                "x": 0,
+                "visible": true,
+                "name": "topPanel"
+            },
+            "compId": 42,
+            "child": [
+                {
+                    "type": "Sprite",
+                    "props": {
+                        "y": 0,
+                        "x": 255,
+                        "width": 281,
+                        "visible": false,
+                        "name": "collectHand",
+                        "height": 54
+                    },
+                    "compId": 82
+                }
+            ]
+        },
+        {
+            "type": "Box",
+            "props": {
+                "y": 100,
+                "centerX":0,
+                "width": 750,
+                "name": "score",
+                "height": 130
+            },
+            "compId": 6,
+            "child": [
+                {
+                    "type": "Label",
+                    "props": {
+                        "y": 10,
+                        "x": 311,
+                        "text": "当前分数",
+                        "name": "lblName",
+                        "fontSize": 32,
+                        "font": "Microsoft YaHei",
+                        "color": "#ffffff"
+                    },
+                    "compId": 16
+                },
+                {
+                    "type": "FontClip",
+                    "props": {
+                        "y": 100,
+                        "x": 0,
+                        "width": 697,
+                        "var": "fontScore",
+                        "value": "0",
+                        "spaceX": -50,
+                        "skin": "ui/common/font_num1.png",
+                        "sheet": "1234567890+",
+                        "name": "fontScore",
+                        "height": 100,
+                        "align": "center"
+                    },
+                    "compId": 83
+                }
+            ]
+        },
+        {
+            "type": "Box",
+            "props": {
+                "centerX":0,
+                "width": 607,
+                "name": "bottomPane",
+                "height": 112,
+                "cacheAs": "normal",
+                "bottom": 160
+            },
+            "compId": 38,
+            "child": [
+                {
+                    "type": "Button",
+                    "props": {
+                        "y": 0,
+                        "x": 0,
+                        "stateNum": 1,
+                        "skin": "ui/common/btn_home1.png",
+                        "name": "btnBack",
+                        "label": " ",
+                        "cacheAs": "normal"
+                    },
+                    "compId": 20
+                },
+                {
+                    "type": "Button",
+                    "props": {
+                        "y": 0,
+                        "x": 330,
+                        "stateNum": 1,
+                        "skin": "ui/common/btn_agen1.png",
+                        "name": "btnPlay"
+                    },
+                    "compId": 53
+                }
+            ]
+        },
+        {
+            "type": "Box",
+            "props": {
+                "width": 674,
+                "var": "NativeBanner",
+                "name": "NativeBanner",
+                "height": 534,
+                "centerY": -147,
+                "centerX": 0
+            },
+            "compId": 97,
+            "child": [
+                {
+                    "type": "Image",
+                    "props": {
+                        "top": -1,
+                        "skin": "ui/appNativeNew1/pic_banner_diban.png",
+                        "right": 0,
+                        "name": "bg",
+                        "left": 0,
+                        "bottom": 0
+                    },
+                    "compId": 22
+                },
+                {
+                    "type": "Button",
+                    "props": {
+                        "stateNum": 1,
+                        "skin": "ui/appNativeNew1/btn.png",
+                        "name": "btnLook",
+                        "centerY": 345,
+                        "centerX": 0
+                    },
+                    "compId": 29
+                },
+                {
+                    "type": "Button",
+                    "props": {
+                        "stateNum": 1,
+                        "skin": "ui/appNativeNew1/bti_banner_guanbi.png",
+                        "name": "btnClose",
+                        "centerY": -223,
+                        "centerX": 253
+                    },
+                    "compId": 23
+                },
+                {
+                    "type": "Image",
+                    "props": {
+                        "width": 550,
+                        "name": "icon",
+                        "height": 267,
+                        "centerY": 9,
+                        "centerX": 0
+                    },
+                    "compId": 24
+                },
+                {
+                    "type": "Label",
+                    "props": {
+                        "y": -1,
+                        "x": 84,
+                        "wordWrap": true,
+                        "width": 483,
+                        "valign": "middle",
+                        "text": "点击视频观看领取现金",
+                        "overflow": "visible",
+                        "name": "appName",
+                        "height": 95,
+                        "fontSize": 40,
+                        "font": "Arial",
+                        "color": "#ffffff",
+                        "bold": true,
+                        "align": "center"
+                    },
+                    "compId": 25
+                },
+                {
+                    "type": "Label",
+                    "props": {
+                        "y": 422,
+                        "x": 62,
+                        "wordWrap": true,
+                        "width": 551,
+                        "valign": "middle",
+                        "text": "搞笑娱乐视频阿斯顿发放",
+                        "overflow": "visible",
+                        "name": "appCrip",
+                        "leading": 5,
+                        "italic": false,
+                        "height": 104,
+                        "fontSize": 28,
+                        "font": "Arial",
+                        "color": "#ffffff",
+                        "bold": false,
+                        "align": "center"
+                    },
+                    "compId": 26
+                },
+                {
+                    "type": "Image",
+                    "props": {
+                        "y": 499,
+                        "x": 580.5,
+                        "skin": "ui/appNativeNew1/jiaobiao.png"
+                    },
+                    "compId": 27
+                },
+                {
+                    "type": "Script",
+                    "props": {
+                        "touch": "@node:24",
+                        "isShow": true,
+                        "category": 0,
+                        "banner": "@node:97",
+                        "runtime": "scripts/uiComp/AppNative.ts"
+                    },
+                    "compId": 102
+                }
+            ]
+        }
+    ],
+    "loadList": [
+        "ui/common/mask_black.png",
+        "ui/common/font_num1.png",
+        "ui/common/btn_home1.png",
+        "ui/common/btn_agen1.png",
+        "ui/appNativeNew1/pic_banner_diban.png",
+        "ui/appNativeNew1/btn.png",
+        "ui/appNativeNew1/bti_banner_guanbi.png",
+        "ui/appNativeNew1/jiaobiao.png"
+    ],
+    "loadList3D": []
+}
