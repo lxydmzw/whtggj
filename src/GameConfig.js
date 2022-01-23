@@ -14,15 +14,15 @@ export default class GameConfig {
 		reg("../../../../../Applications/LayaAirIDE.app/Contents/Resources/app/out/vs/layaEditor/src/script/DropBox.js",DropBox);
     }
 }
-GameConfig.width = 640;
-GameConfig.height = 1136;
-GameConfig.scaleMode ="fixedwidth";
+GameConfig.width = 1334;
+GameConfig.height = 750;
+GameConfig.scaleMode ="fixedheight";
 GameConfig.screenMode = "none";
-GameConfig.alignV = "top";
-GameConfig.alignH = "left";
+GameConfig.alignV = "middle";
+GameConfig.alignH = "center";
 GameConfig.startScene = "test/TestScene.scene";
 GameConfig.sceneRoot = "";
-GameConfig.debug = false;
+GameConfig.debug = true;
 GameConfig.stat = false;
 GameConfig.physicsDebug = false;
 GameConfig.exportSceneToJson = true;

@@ -1,1 +1,68 @@
-{"type":"Scene","props":{"zOrder":3,"width":750,"runtime":"scripts/views/qq_goldView.ts","height":1334},"compId":2,"child":[{"type":"Box","props":{"y":94,"x":33,"name":"topPanel"},"compId":3,"child":[{"type":"Image","props":{"y":4,"x":12,"width":180,"skin":"ui/qq_ui/goldView/pic_ziyuankuang.png","sizeGrid":"22,73,23,45","name":"bg"},"compId":7},{"type":"Image","props":{"y":9,"x":17,"skin":"ui/qq_ui/goldView/icon_jinbi.png","scaleY":0.8,"scaleX":0.8},"compId":5},{"type":"Label","props":{"y":2,"x":64,"width":120,"valign":"middle","text":"99999","name":"goldLabel","height":50,"fontSize":35,"color":"#ffffff","bold":true,"align":"center"},"compId":6}]}],"loadList":["ui/qq_ui/goldView/pic_ziyuankuang.png","ui/qq_ui/goldView/icon_jinbi.png"],"loadList3D":[]}
+{
+    "type": "Scene",
+    "props": {
+        "zOrder": 3,
+        "width": 750,
+        "runtime": "scripts/views/qq_goldView.ts",
+        "height": 1334
+    },
+    "compId": 2,
+    "child": [
+        {
+            "type": "Box",
+            "props": {
+                "y": 94,
+                "x": 233,
+                "name": "topPanel"
+            },
+            "compId": 3,
+            "child": [
+                {
+                    "type": "Image",
+                    "props": {
+                        "y": 4,
+                        "x": 12,
+                        "width": 180,
+                        "skin": "ui/qq_ui/goldView/pic_ziyuankuang.png",
+                        "sizeGrid": "22,73,23,45",
+                        "name": "bg"
+                    },
+                    "compId": 7
+                },
+                {
+                    "type": "Image",
+                    "props": {
+                        "y": 9,
+                        "x": 17,
+                        "skin": "ui/qq_ui/goldView/icon_jinbi.png",
+                        "scaleY": 0.8,
+                        "scaleX": 0.8
+                    },
+                    "compId": 5
+                },
+                {
+                    "type": "Label",
+                    "props": {
+                        "y": 8,
+                        "x": 64,
+                        "width": 120,
+                        "valign": "middle",
+                        "text": "99999",
+                        "name": "goldLabel",
+                        "height": 50,
+                        "fontSize": 35,
+                        "color": "#ffffff",
+                        "bold": true,
+                        "align": "center"
+                    },
+                    "compId": 6
+                }
+            ]
+        }
+    ],
+    "loadList": [
+        "ui/qq_ui/goldView/pic_ziyuankuang.png",
+        "ui/qq_ui/goldView/icon_jinbi.png"
+    ],
+    "loadList3D": []
+}
