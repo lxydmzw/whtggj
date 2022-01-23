@@ -26,7 +26,7 @@
             "type": "Box",
             "props": {
                 "y": 0,
-                "x": 569,
+                "centerX":0,
                 "scaleX":0.7,
                 "scaleY":0.7,
                 "name": "showBox"
@@ -553,10 +553,11 @@
             "type": "Button",
             "props": {
                 "bottom":30,
-                "x":685,
+                "centerX":0,
                 "stateNum": 1,
                 "scaleX":0.7,
                 "scaleY":0.7,
+                "anchorX":50,
                 "skin": "ui/qq_ui/siginView/btn_lingqu.png",
                 "name": "btnGet"
             },
@@ -566,7 +567,7 @@
             "type": "Button",
             "props": {
                 "bottom":30,
-                "x":685,
+                "centerX":0,
                 "stateNum": 1,
                 "scaleX":0.7,
                 "scaleY":0.7,
