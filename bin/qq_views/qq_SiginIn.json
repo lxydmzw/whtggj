@@ -565,9 +565,11 @@
         {
             "type": "Button",
             "props": {
-                "y": 1024,
-                "x": 140,
+                "bottom":30,
+                "x":685,
                 "stateNum": 1,
+                "scaleX":0.7,
+                "scaleY":0.7,
                 "skin": "ui/qq_ui/siginView/btn_yilingqu.png",
                 "name": "btnGetOut"
             },
