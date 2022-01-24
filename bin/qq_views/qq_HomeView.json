@@ -3,7 +3,6 @@
     "props": {
         "width": 1334,
         "x":292,
-        "y":300,
         "runtime": "scripts/views/qq_HomeView.ts",
         "height": 750
     },
@@ -12,9 +11,8 @@
         {
             "type": "Box",
             "props": {
-                "y": -300,
+                "y": 0,
                 "x": 0,
-                "width": 1334,
                 "name": "topPanel",
                 "height": 60
             },
@@ -144,7 +142,6 @@
             "type": "Box",
             "props": {
                 "y": 300,
-                "x": 83.5,
                 "width": 583,
                 "name": "bottomui",
                 "height": 294,
@@ -155,13 +152,35 @@
                 {
                     "type": "Button",
                     "props": {
-                        "y": -10,
-                        "x": 89,
+                        "y": 300,
+                        "x": 200,
                         "stateNum": 1,
-                        "skin": "ui/qq_ui/homeView/btn_kaishiyouxi.png",
+                        "skin": "res/sign.png",
+                        "name": "btnSiginIn"
+                    },
+                    "compId": 12
+                },
+                {
+                    "type": "Button",
+                    "props": {
+                        "y": 300,
+                        "x": 350,
+                        "stateNum": 1,
+                        "skin": "res/start.png",
                         "name": "btnPlay"
                     },
                     "compId": 33
+                },
+                {
+                    "type": "Button",
+                    "props": {
+                        "y": 300,
+                        "x": 500,
+                        "stateNum": 1,
+                        "skin": "res/skin.png",
+                        "name": "btnSkin"
+                    },
+                    "compId": 55
                 },
                 {
                     "type": "Button",
@@ -175,17 +194,7 @@
                     },
                     "compId": 11
                 },
-                {
-                    "type": "Button",
-                    "props": {
-                        "y": 138,
-                        "x": 184,
-                        "stateNum": 1,
-                        "skin": "ui/qq_ui/homeView/btn_pifu.png",
-                        "name": "btnSkin"
-                    },
-                    "compId": 12
-                },
+                
                 {
                     "type": "Button",
                     "props": {
@@ -198,17 +207,7 @@
                     },
                     "compId": 13
                 },
-                {
-                    "type": "Button",
-                    "props": {
-                        "y": 138,
-                        "x": 350,
-                        "stateNum": 1,
-                        "skin": "ui/qq_ui/homeView/btn_qiandao.png",
-                        "name": "btnSiginIn"
-                    },
-                    "compId": 55
-                },
+                
                 {
                     "type": "Button",
                     "props": {

@@ -41,9 +41,11 @@ P 01BAE7F5 vslider.png
 D res
 P 225C9A4F bg_exit.png
 P 905CD5C9 bg_tomenu.png
-P 1CDF530B cancel_select.png
-P 8908E63C confirm_select.png
+P 271E51E9 cancel.png
+P 45B18DCE confirm.png
 R 390C350E play_tips.png
+P E2B780B4 sign.png
+P A824ABF4 skin.png
 P 7F9FFA87 start.png
 P AB8A2D46 sz.png
 D sound

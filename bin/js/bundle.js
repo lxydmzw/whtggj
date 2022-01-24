@@ -2297,23 +2297,21 @@
 			this.btnPlay = this.getChild("btnPlay", bottomPanel);
 			this.btnPlayX = parseInt(this.btnPlay.x);
 			this.btnPlayY = parseInt(this.btnPlay.y);
-			this.btnPlayOffsetPointX = 350;
-			this.btnPlayOffsetPointY = 70;
+			this.btnOffsetPointX = 80;
+			this.btnOffsetPointY = 30;
 			this.btnPointer = new Laya.Image("res/sz.png");
 			this.btnPointer.scaleX = 0.3;
 			this.btnPointer.scaleY = 0.3;
-			this.btnPointer.pos(this.btnPlayX + this.btnPlayOffsetPointX, this.btnPlayY + this.btnPlayOffsetPointY);
+			this.btnPointer.pos(this.btnPlayX + this.btnOffsetPointX, this.btnPlayY + this.btnOffsetPointY);
 			bottomPanel.addChild(this.btnPointer);
 			this.focusView = "btnPlay";
 			this.btnRank = this.getChild("btnRank", bottomPanel);
 			this.btnSkin = this.getChild("btnSkin", bottomPanel);
 			this.btnSkinX = parseInt(this.btnSkin.x);
 			this.btnSkinY = parseInt(this.btnSkin.y);
-			this.btnSkinOffsetPoint = 50;
 			this.btnSiginIn = this.getChild("btnSiginIn", bottomPanel);
 			this.btnSignX = parseInt(this.btnSiginIn.x);
 			this.btnSignY = parseInt(this.btnSiginIn.y);
-			this.btnSignOffsetPoint = 50;
 			this.btnShare = this.getChild("btnShare", bottomPanel);
 			this.btnMore = this.getChild("btnMore", bottomPanel);
 			this.btnCollect = this.getChild("btnCollect", bottomPanel);
@@ -2327,20 +2325,20 @@
 			this.exitDialog = new Laya.Dialog();
 			var bg = new Laya.Image("res/bg_exit.png");
 			this.exitDialog.addChild(bg);
-			let btnConfirm = new Laya.Image("res/confirm_select.png");
+			let btnConfirm = new Laya.Image("res/confirm.png");
 			btnConfirm.pos(18, 285);
 			this.exitDialog.addChild(btnConfirm);
 
 
-			let btnCancel = new Laya.Image("res/cancel_select.png");
+			let btnCancel = new Laya.Image("res/cancel.png");
 			btnCancel.pos(195, 285);
 			this.exitDialog.addChild(btnCancel);
 
-			var btnSz = new Laya.Image("res/sz.png");
-			btnSz.scaleX = 0.3;
-			btnSz.scaleY = 0.3;
-			btnSz.pos(100, 300);
-			this.exitDialog.addChild(btnSz);
+			this. btnSz = new Laya.Image("res/sz.png");
+			this.btnSz.scaleX = 0.3;
+			this.btnSz.scaleY = 0.3;
+			this.btnSz.pos(100, 300);
+			this.exitDialog.addChild(this.btnSz);
 			this.exitDialog.popup();
 			this.exitDialogShow = true;
 		}
@@ -2386,35 +2384,41 @@
 					case 66:
 						this.onBtnClick();
 						break;
-					case 38:
-					case 19://上
-					case 40:
-					case 20://下
 					case 37:
 					case 21://左
-					case 39:
-						console.log(">--focusView==39");
-						this.changeFocus();
+						this.changeFocus(false);
 						break;
+					case 39:
 					case 22://右
-						console.log(">--focusView==39");
-						this.changeFocus();
+						this.changeFocus(true);
 						break;
 				}
 			}
 		}
-		changeFocus() {
-			if (this.focusView == "btnPlay") {
-				this.focusView = "btnSkin";
-				this.btnPointer.pos(this.btnSkinX + this.btnSkinOffsetPoint, this.btnSkinY + this.btnSkinOffsetPoint);
-			} else if (this.focusView == "btnSkin") {
-				this.focusView = "btnSign";
-				this.btnPointer.pos(this.btnSignX + this.btnSkinOffsetPoint, this.btnSignY + this.btnSkinOffsetPoint);
-			} else {
-				this.focusView = "btnPlay";
-				this.btnPointer.pos(this.btnPlayX + this.btnPlayOffsetPointX, this.btnPlayY + this.btnPlayOffsetPointY);
+		changeFocus(toRight) {
+			if(toRight){
+				if (this.focusView == "btnPlay") {
+					this.focusView = "btnSkin";
+					this.btnPointer.pos(this.btnSkinX + this.btnOffsetPointX, this.btnSkinY + this.btnOffsetPointY);
+				} else if (this.focusView == "btnSkin") {
+					this.focusView = "btnSign";
+					this.btnPointer.pos(this.btnSignX + this.btnOffsetPointX, this.btnSignY + this.btnOffsetPointY);
+				} else {
+					this.focusView = "btnPlay";
+					this.btnPointer.pos(this.btnPlayX + this.btnOffsetPointX, this.btnPlayY + this.btnOffsetPointY);
+				}
+			}else{
+				if (this.focusView == "btnPlay") {
+					this.focusView = "btnSign";
+					this.btnPointer.pos(this.btnSignX + this.btnOffsetPointX, this.btnSignY + this.btnOffsetPointY);
+				} else if (this.focusView == "btnSkin") {
+					this.focusView = "btnPlay";
+					this.btnPointer.pos(this.btnPlayX + this.btnOffsetPointX, this.btnPlayY + this.btnOffsetPointY);
+				} else {
+					this.focusView = "btnSkin";
+					this.btnPointer.pos(this.btnSkinX + this.btnOffsetPointX, this.btnSkinY + this.btnOffsetPointY);
+				}
 			}
-			console.log(">--focusView=="+this.focusView);
 		}
 		initEvent() {
 			LayaSample.utils.addClickEvent(this.btnVibrate, this, this.onVibrateClick);
