@@ -2009,7 +2009,6 @@ class QQ_SkinView extends BVHdla {
 	}
 	initUI() {
 		CurSence.curSence = "QQ_SkinView";
-		Laya.stage.offAll(Laya.Event.KEY_UP);
 		Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
 		this.btnBack = this.getChild("btnBack");
 		this.btnBuy = this.getChild("btnBuy");
@@ -2031,15 +2030,19 @@ class QQ_SkinView extends BVHdla {
 		switch (e.keyCode) {
 			case 8:
 			case 4:
-				Laya.Scene.open("qq_views/qq_HomeView.scene", false, Laya.Handler.create(this, v => {
-					this.close();
-				}));
+				this.close();
+				CurSence.curSence = "qq_HomeView";
 				break;
 			case 38:
-			case 19:
-				this.updateItem(0);
+			case 19://上
+				this.changeFocus();
 				break;
 		}
+	}
+	//切换焦点
+	changeFocus() {
+
+
 	}
 	//皮肤界面添加小手指
 	initShouZhi() {
@@ -2273,14 +2276,14 @@ class qq_HomeView extends BVHdla {
 			this.setWxapp(3);
 		}
 	}
-	_onActive(){
+	_onActive() {
 		console.log(">--打开首页");
 		CurSence.curSence = "qq_HomeView";
 		Laya.stage.offAll(Laya.Event.KEY_UP);
 		Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
 	}
 	initUI() {
-		
+
 		let topPanel = this.getChild("topPanel");
 		let bottomPanel = this.getChild("bottomui");
 		this.btnSound = this.getChild("btnSound", topPanel);
