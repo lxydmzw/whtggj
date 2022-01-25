@@ -1,8 +1,8 @@
 ﻿'use strict';
-class CurSence{
+class CurSence {
 
 }
-CurSence.curSence="";//qq_HomeView QQ_SkinView
+CurSence.curSence = "";//qq_HomeView QQ_SkinView DY_SigninView
 class Utils {
 	constructor() { }
 	addClickEvent(btn, caller, cb, soundId) {
@@ -1828,6 +1828,7 @@ class BVHdla extends Laya.Scene {
 		this.initBanner();
 		Laya.timer.once(60000, this, this.showBanner);
 	}
+
 	onOpened(data) {
 	}
 	onClosed() {
@@ -2007,9 +2008,9 @@ class QQ_SkinView extends BVHdla {
 		super.onAwake();
 	}
 	initUI() {
-		CurSence.curSence="QQ_SkinView";
+		CurSence.curSence = "QQ_SkinView";
 		Laya.stage.offAll(Laya.Event.KEY_UP);
-		Laya.stage.on(Laya.Event.KEY_UP,this,this.onKeyUp);
+		Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
 		this.btnBack = this.getChild("btnBack");
 		this.btnBuy = this.getChild("btnBuy");
 		this.btnVideo = this.getChild("btnVideo");
@@ -2024,7 +2025,7 @@ class QQ_SkinView extends BVHdla {
 			LayaSample.adMgr.loadVideoAd();
 	}
 	onKeyUp(e) {
-		if(CurSence.curSence!="QQ_SkinView"){
+		if (CurSence.curSence != "QQ_SkinView") {
 			return;
 		}
 		switch (e.keyCode) {
@@ -2272,11 +2273,14 @@ class qq_HomeView extends BVHdla {
 			this.setWxapp(3);
 		}
 	}
-	initUI() {
+	_onActive(){
 		console.log(">--打开首页");
-		CurSence.curSence="qq_HomeView";
+		CurSence.curSence = "qq_HomeView";
 		Laya.stage.offAll(Laya.Event.KEY_UP);
 		Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
+	}
+	initUI() {
+		
 		let topPanel = this.getChild("topPanel");
 		let bottomPanel = this.getChild("bottomui");
 		this.btnSound = this.getChild("btnSound", topPanel);
@@ -2331,7 +2335,7 @@ class qq_HomeView extends BVHdla {
 		btnCancel.pos(195, 285);
 		this.exitDialog.addChild(btnCancel);
 
-		this. btnSz = new Laya.Image("res/sz.png");
+		this.btnSz = new Laya.Image("res/sz.png");
 		this.btnSz.scaleX = 0.3;
 		this.btnSz.scaleY = 0.3;
 		this.btnSz.pos(100, 300);
@@ -2340,7 +2344,7 @@ class qq_HomeView extends BVHdla {
 		this.exitDialogShow = true;
 	}
 	onKeyUp(e) {
-		if(CurSence.curSence!="qq_HomeView"){
+		if (CurSence.curSence != "qq_HomeView") {
 			return;
 		}
 		if (this.exitDialogShow) {
@@ -2393,7 +2397,7 @@ class qq_HomeView extends BVHdla {
 		}
 	}
 	changeFocus(toRight) {
-		if(toRight){
+		if (toRight) {
 			if (this.focusView == "btnPlay") {
 				this.focusView = "btnSkin";
 				this.btnPointer.pos(this.btnSkinX + this.btnOffsetPointX, this.btnSkinY + this.btnOffsetPointY);
@@ -2404,7 +2408,7 @@ class qq_HomeView extends BVHdla {
 				this.focusView = "btnPlay";
 				this.btnPointer.pos(this.btnPlayX + this.btnOffsetPointX, this.btnPlayY + this.btnOffsetPointY);
 			}
-		}else{
+		} else {
 			if (this.focusView == "btnPlay") {
 				this.focusView = "btnSign";
 				this.btnPointer.pos(this.btnSignX + this.btnOffsetPointX, this.btnSignY + this.btnOffsetPointY);
@@ -2428,7 +2432,7 @@ class qq_HomeView extends BVHdla {
 		this.btnGameR2 && LayaSample.utils.addClickEvent(this.btnGameR2, this, this.onWxgameClick);
 	}
 	onBtnClick() {
-		console.log(">--this.focusView"+this.focusView);
+		console.log(">--this.focusView" + this.focusView);
 		if (this.focusView == "btnPlay") {
 			this.onPlayGameClick();
 		} else if (this.focusView == "btnSkin") {
@@ -2489,7 +2493,9 @@ class qq_HomeView extends BVHdla {
 		LayaSample.adMgr.hideBannerAd();
 		let data = {};
 		data.target = "qq_views/qq_HomeView.scene";
-		Laya.Scene.open("qq_views/qq_SiginIn.scene", false, data, Laya.Handler.create(this, v => { }));
+		Laya.Scene.open("qq_views/qq_SiginIn.scene", false, data, Laya.Handler.create(this, v => {
+			// this.close();
+		}));
 	}
 	onMoreClick() {
 		console.log("盒子广告");
@@ -3148,6 +3154,9 @@ class DY_SigninView extends BVHdla {
 		super.onAwake();
 	}
 	initUI() {
+		CurSence.curSence = "DY_SigninView";
+		Laya.stage.offAll(Laya.Event.KEY_UP);
+		Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
 		var dataTime = new Date().getDate();
 		this.signin_level = LayaSample.storageMgr.qq_GetSigninLevel();
 		this.btnClose = this.getChild("btnClose");
@@ -3164,7 +3173,6 @@ class DY_SigninView extends BVHdla {
 		this.tipsTag2.visible = this.isUsingBtnTips;
 		var showBox = this.getChild("showBox");
 		var boxList = showBox.getChildByName("boxList");
-		;
 		var index = 0;
 		this.signin_GoldList = [];
 		this.signin_lockerList = [];
@@ -3177,6 +3185,29 @@ class DY_SigninView extends BVHdla {
 		}
 		this.initData();
 		LayaSample.adMgr.showBannerAd();
+	}
+	onKeyUp(e) {
+		if (CurSence.curSence != "DY_SigninView") {
+			return;
+		}
+		switch (e.keyCode) {
+			case 8:
+			case 4:
+				Laya.Scene.open("qq_views/qq_HomeView.scene", false, Laya.Handler.create(this, v => {
+					this.close();
+				}));
+				break;
+			case 13:
+			case 23:
+			case 66:
+				console.log(">--this.btnGet.visible==" + this.btnGet.visible);
+				if (this.btnGet.visible) {
+					this.onSigninClick();
+				} else {
+					this.cancelClick();
+				}
+				break;
+		}
 	}
 	initData() {
 		for (var i = 0; i < this.signin_GoldList.length; i++) {
@@ -3199,8 +3230,6 @@ class DY_SigninView extends BVHdla {
 	}
 	initEvent() {
 		LayaSample.utils.addClickEvent(this.btnClose, this, this.cancelClick);
-		LayaSample.utils.addClickEvent(this.btnGet, this, this.onSigninClick);
-		LayaSample.utils.addClickEvent(this.btnGetOut, this, this.cancelClick);
 		LayaSample.utils.addClickEvent(this.btnTips, this, this.onTipsClick);
 		LayaSample.utils.addClickEvent(this.btnTips2, this, this.onTipsClick);
 		LayaSample.glEvent.on("ad_video_close_event", this, this.onVideoCloseEvent);
