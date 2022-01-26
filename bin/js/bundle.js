@@ -2012,7 +2012,6 @@
 		}
 		initUI() {
 			CurSence.curSence = "QQ_SkinView";
-			Laya.stage.offAll(Laya.Event.KEY_UP);
 			Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
 			this.btnBack = this.getChild("btnBack");
 			this.btnBuy = this.getChild("btnBuy");
@@ -2034,15 +2033,19 @@
 			switch (e.keyCode) {
 				case 8:
 				case 4:
-					Laya.Scene.open("qq_views/qq_HomeView.scene", false, Laya.Handler.create(this, v => {
-						this.close();
-					}));
+					this.close();
+					CurSence.curSence = "qq_HomeView";
 					break;
 				case 38:
-				case 19:
-					this.updateItem(0);
+				case 19://上
+					this.changeFocus();
 					break;
 			}
+		}
+		//切换焦点
+		changeFocus() {
+
+
 		}
 		//皮肤界面添加小手指
 		initShouZhi() {
@@ -2276,14 +2279,11 @@
 				this.setWxapp(3);
 			}
 		}
-		_onActive(){
+		initUI() {
 			console.log(">--打开首页");
 			CurSence.curSence = "qq_HomeView";
 			Laya.stage.offAll(Laya.Event.KEY_UP);
 			Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
-		}
-		initUI() {
-			
 			let topPanel = this.getChild("topPanel");
 			let bottomPanel = this.getChild("bottomui");
 			this.btnSound = this.getChild("btnSound", topPanel);
@@ -2488,7 +2488,7 @@
 			Laya.Scene.open("qq_views/dy_SkinView.scene", false, data, Laya.Handler.create(this, v => {
 				LayaSample.adMgr.hideBannerAd();
 				this.isSkinClick = false;
-				this.close();
+				// this.close();
 			}));
 		}
 		onSiginInClick() {
@@ -3158,7 +3158,6 @@
 		}
 		initUI() {
 			CurSence.curSence = "DY_SigninView";
-			Laya.stage.offAll(Laya.Event.KEY_UP);
 			Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
 			var dataTime = new Date().getDate();
 			this.signin_level = LayaSample.storageMgr.qq_GetSigninLevel();
@@ -3196,9 +3195,8 @@
 			switch (e.keyCode) {
 				case 8:
 				case 4:
-					Laya.Scene.open("qq_views/qq_HomeView.scene", false, Laya.Handler.create(this, v => {
-						this.close();
-					}));
+					this.close();
+					CurSence.curSence="qq_HomeView";
 					break;
 				case 13:
 				case 23:
@@ -3209,6 +3207,7 @@
 					} else {
 						this.cancelClick();
 					}
+					CurSence.curSence="qq_HomeView";
 					break;
 			}
 		}

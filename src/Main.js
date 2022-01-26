@@ -2276,14 +2276,11 @@ class qq_HomeView extends BVHdla {
 			this.setWxapp(3);
 		}
 	}
-	_onActive() {
+	initUI() {
 		console.log(">--打开首页");
 		CurSence.curSence = "qq_HomeView";
 		Laya.stage.offAll(Laya.Event.KEY_UP);
 		Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
-	}
-	initUI() {
-
 		let topPanel = this.getChild("topPanel");
 		let bottomPanel = this.getChild("bottomui");
 		this.btnSound = this.getChild("btnSound", topPanel);
@@ -2488,7 +2485,7 @@ class qq_HomeView extends BVHdla {
 		Laya.Scene.open("qq_views/dy_SkinView.scene", false, data, Laya.Handler.create(this, v => {
 			LayaSample.adMgr.hideBannerAd();
 			this.isSkinClick = false;
-			this.close();
+			// this.close();
 		}));
 	}
 	onSiginInClick() {
@@ -3158,7 +3155,6 @@ class DY_SigninView extends BVHdla {
 	}
 	initUI() {
 		CurSence.curSence = "DY_SigninView";
-		Laya.stage.offAll(Laya.Event.KEY_UP);
 		Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
 		var dataTime = new Date().getDate();
 		this.signin_level = LayaSample.storageMgr.qq_GetSigninLevel();
@@ -3196,9 +3192,8 @@ class DY_SigninView extends BVHdla {
 		switch (e.keyCode) {
 			case 8:
 			case 4:
-				Laya.Scene.open("qq_views/qq_HomeView.scene", false, Laya.Handler.create(this, v => {
-					this.close();
-				}));
+				this.close();
+				CurSence.curSence="qq_HomeView";
 				break;
 			case 13:
 			case 23:
@@ -3209,6 +3204,7 @@ class DY_SigninView extends BVHdla {
 				} else {
 					this.cancelClick();
 				}
+				CurSence.curSence="qq_HomeView";
 				break;
 		}
 	}
