@@ -2049,14 +2049,19 @@ class QQ_SkinView extends BVHdla {
 			case 22://右
 				this.changeFocusRight();
 				break;
-			case 13: case 23: case 66:
+			case 13:
+			case 23:
+			case 66:
 				if (this.btnBuy.focus) {
 					this.onBuyRandomSkinClick();
+				}else if(this.btnBack.focus){
+					this.close();
+					CurSence.curSence="QQ_SkinView";
 				}
 				break;
 		}
 	}
-	
+
 	movePointer(toIndex) {
 		this.onSelect(toIndex);
 		this.btnSz.pos(this.skinList.x + this.cellArray[this.chooseID].x + 80, this.cellArray[this.chooseID].y + 80);
@@ -2068,7 +2073,6 @@ class QQ_SkinView extends BVHdla {
 		this.btnSz.pos(this.defaultPointerX, this.defaultPointerY);
 		this.btnBuy.focus = true;
 		this.btnBack.focus = false;
-		this.skinList.refresh();
 	}
 	movePointerToBackBtn() {
 		this.btnSz.pos(this.btnBack.x + 50, this.btnBack.y + 50);
@@ -2104,26 +2108,26 @@ class QQ_SkinView extends BVHdla {
 	changeFocusLeft() {
 		if (this.btnBuy.focus) {
 			this.movePointerToBackBtn();
+		} else if (this.btnBack.focus) {
+			this.movePointer(2);
 		} else {
 			if (this.chooseID % 3 == 2 || this.chooseID % 3 == 1) {
 				this.movePointer(this.chooseID - 1);
 			} else if (this.chooseID % 3 == 0) {
 				this.movePointerToBackBtn();
-			} else {
-				this.movePointer(2);
 			}
 		}
 	}
 	changeFocusRight() {
 		if (this.btnBuy.focus) {
 			this.movePointerToBackBtn();
+		} else if (this.btnBack.focus) {
+			this.movePointer(0);
 		} else {
 			if (this.chooseID % 3 == 0 || this.chooseID % 3 == 1) {
 				this.movePointer(this.chooseID + 1);
 			} else if (this.chooseID % 3 == 2) {
 				this.movePointerToBackBtn();
-			} else {
-				this.movePointer(0);
 			}
 		}
 	}
@@ -2163,6 +2167,7 @@ class QQ_SkinView extends BVHdla {
 		LayaSample.glEvent.on("ad_video_close_event", this, this.onVideoCloseEvent);
 	}
 	onBuyRandomSkinClick() {
+		console.log(">--onBuyRandomSkinClick");
 		if (this.isPlayAni)
 			return;
 		if (LayaSample.storageMgr.GetGold() < this.buyGold) {
@@ -2292,13 +2297,10 @@ class QQ_SkinView extends BVHdla {
 		this.skinList.selectedIndex = -1;
 	}
 	updateItem(cell) {
-		console.log(">--updateItem2265");
 		if (this.renderedCellNum > 0) {
-			console.log(">--updateItem2267");
 			this.cellArray.push(cell);
 			this.renderedCellNum--;
 		}
-		console.log(">--updateItem2270");
 		cell.setItem(cell.dataSource);
 	}
 }
