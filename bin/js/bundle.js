@@ -2038,76 +2038,106 @@
 					break;
 				case 38:
 				case 19://上
-
 					this.changeFocusUp();
-				// DOWN
+					break;
 				case 40:
-				case 20:
+				case 20://下
 					this.changeFocusDown();
 					break;
-				// LEFT
 				case 37:
-				case 21:
+				case 21://左
 					this.changeFocusLeft();
 					break;
-				// RIGHT
 				case 39:
-				case 22:
+				case 22://右
 					this.changeFocusRight();
+					break;
+				case 13: case 23: case 66:
+					if (this.btnBuy.focus) {
+						this.onBuyRandomSkinClick();
+					}
 					break;
 			}
 		}
+		
+		movePointer(toIndex) {
+			this.onSelect(toIndex);
+			this.btnSz.pos(this.skinList.x + this.cellArray[this.chooseID].x + 80, this.cellArray[this.chooseID].y + 80);
+			this.btnBuy.focus = false;
+			this.btnBack.focus = false;
+			this.skinList.refresh();
+		}
+		resetPointer() {
+			this.btnSz.pos(this.defaultPointerX, this.defaultPointerY);
+			this.btnBuy.focus = true;
+			this.btnBack.focus = false;
+			this.skinList.refresh();
+		}
+		movePointerToBackBtn() {
+			this.btnSz.pos(this.btnBack.x + 50, this.btnBack.y + 50);
+			this.btnBuy.focus = false;
+			this.btnBack.focus = true;
+		}
 		changeFocusUp() {
-			if(this.btnBuy.focus){
-				console.log(">--this.chooseID=="+this.chooseID);
-				this.btnBuy.focus=false;
-				this.onSelect(6);
-				this.btnSz.pos(this.skinList.x+this.cellArray[this.chooseID].x+80, this.cellArray[this.chooseID].y+80);
-				this.skinList.refresh();
-			}else {
-				console.log(">--this.chooseID=="+this.chooseID);
-				if(this.chooseID==6){
-					this.onSelect(3);
-					this.btnSz.pos(this.skinList.x+this.cellArray[this.chooseID].x+80, this.cellArray[this.chooseID].y+80);
-					this.skinList.refresh();
-				}else if(this.chooseID==3){
-					this.onSelect(0);
-					this.btnSz.pos(this.skinList.x+this.cellArray[this.chooseID].x+80, this.cellArray[this.chooseID].y+80);
-					this.skinList.refresh();
-				}else if(this.chooseID==0){
-					this.btnBuy.focus=true;
-					this.btnSz.pos(this.defaultPointerX, this.defaultPointerY);
-					this.skinList.refresh();
+			if (this.btnBuy.focus) {
+				this.movePointer(6);
+			} else if (this.btnBack.focus) {
+				this.resetPointer();
+			} else {
+				if (this.chooseID < 3) {
+					this.resetPointer();
+				} else {
+					this.movePointer(this.chooseID - 3);
 				}
 			}
-			
-			
 		}
 		changeFocusDown() {
-			if(this.btnBuy.focus){
-				this.onSelect(0);
-			}else if(this.chooseID==0){
-				this.onSelect(3);
-			}else if(this.chooseID==3){
-				this.onSelect(6);
-			}else if(this.chooseID==6){
-
+			if (this.btnBuy.focus) {
+				this.movePointer(0);
+			} else if (this.btnBack.focus) {
+				this.resetPointer();
+			} else {
+				if (this.chooseID < 6) {
+					this.movePointer(this.chooseID + 3);
+				} else {
+					this.resetPointer();
+				}
 			}
-			this.skinList.refresh();
 		}
 		changeFocusLeft() {
-			this.skinList.refresh();
+			if (this.btnBuy.focus) {
+				this.movePointerToBackBtn();
+			} else {
+				if (this.chooseID % 3 == 2 || this.chooseID % 3 == 1) {
+					this.movePointer(this.chooseID - 1);
+				} else if (this.chooseID % 3 == 0) {
+					this.movePointerToBackBtn();
+				} else {
+					this.movePointer(2);
+				}
+			}
 		}
 		changeFocusRight() {
-			this.skinList.refresh();
+			if (this.btnBuy.focus) {
+				this.movePointerToBackBtn();
+			} else {
+				if (this.chooseID % 3 == 0 || this.chooseID % 3 == 1) {
+					this.movePointer(this.chooseID + 1);
+				} else if (this.chooseID % 3 == 2) {
+					this.movePointerToBackBtn();
+				} else {
+					this.movePointer(0);
+				}
+			}
 		}
 		//皮肤界面添加小手指
 		initShouZhi() {
 			var btnBuyx = parseInt(this.btnBuy.x);//随机解锁按钮的x
 			var btnBuyy = parseInt(this.btnBuy.y);//随机解锁按钮的y
-			this.btnBuy.focus=true;
-			this.defaultPointerX=btnBuyx+250;
-			this.defaultPointerY=btnBuyy+38;
+			this.btnBuy.focus = true;
+			this.btnBack.focus = false;
+			this.defaultPointerX = btnBuyx + 250;
+			this.defaultPointerY = btnBuyy + 38;
 			this.btnSz = new Laya.Image("res/sz.png");
 			this.btnSz.scaleX = 0.3;
 			this.btnSz.scaleY = 0.3;
@@ -2131,7 +2161,7 @@
 		}
 		initEvent() {
 			LayaSample.utils.addClickEvent(this.btnBack, this, this.cancelClick);
-			LayaSample.utils.addClickEvent(this.btnBuy, this, this.onBuyRandomSkinClick);
+			// LayaSample.utils.addClickEvent(this.btnBuy, this, this.onBuyRandomSkinClick);
 			LayaSample.utils.addClickEvent(this.btnVideo, this, this.onRewardGold);
 			LayaSample.glEvent.on("ad_video_close_event", this, this.onVideoCloseEvent);
 		}
@@ -2223,12 +2253,12 @@
 			list.itemRender = dy_SkinItem;
 			list.vScrollBarSkin = "";
 			list.selectEnable = true;
-			this.cellArray=[];
+			this.cellArray = [];
 			// list.mouseHandler = new Laya.Handler(this, this.onSelect);
 			list.renderHandler = new Laya.Handler(this, this.updateItem);
 			var num = LayaSample.commonData.qq_skinMaxItem;
 			this.data = new Array();
-			this.renderedCellNum=num;
+			this.renderedCellNum = num;
 			var unlockerList = LayaSample.storageMgr.qq_GetUnLockSkinList();
 			for (var i = 0; i < num; i++) {
 				var islock = true;
@@ -2266,7 +2296,7 @@
 		}
 		updateItem(cell) {
 			console.log(">--updateItem2265");
-			if(this.renderedCellNum>0){
+			if (this.renderedCellNum > 0) {
 				console.log(">--updateItem2267");
 				this.cellArray.push(cell);
 				this.renderedCellNum--;
@@ -5143,3 +5173,4 @@
 	new Main();
 
 }());
+//# sourceMappingURL=bundle.js.map

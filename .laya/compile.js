@@ -46,7 +46,7 @@ gulp.task("compile", prevTasks, function () {
 			glsl({
 				// By default, everything gets included
 				include: /.*(.glsl|.vs|.fs)$/,
-				sourceMap: false,
+				sourceMap: true,
 				compress:false
 			}),
 			/*terser({
@@ -61,7 +61,7 @@ gulp.task("compile", prevTasks, function () {
 			file: workSpaceDir + '/bin/js/bundle.js',
 			format: 'iife',
 			name: 'laya',
-			sourcemap: false
+			sourcemap: true
 		});
 	}).catch(err=>{
 		console.log(err);
