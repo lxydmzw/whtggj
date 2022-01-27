@@ -2035,25 +2035,80 @@ class QQ_SkinView extends BVHdla {
 				break;
 			case 38:
 			case 19://上
-				this.changeFocus();
+
+				this.changeFocusUp();
+			// DOWN
+			case 40:
+			case 20:
+				this.changeFocusDown();
+				break;
+			// LEFT
+			case 37:
+			case 21:
+				this.changeFocusLeft();
+				break;
+			// RIGHT
+			case 39:
+			case 22:
+				this.changeFocusRight();
 				break;
 		}
 	}
-	//切换焦点
-	changeFocus() {
+	changeFocusUp() {
+		if(this.btnBuy.focus){
+			console.log(">--this.chooseID=="+this.chooseID);
+			this.btnBuy.focus=false;
+			this.onSelect(6);
+			this.btnSz.pos(this.skinList.x+this.cellArray[this.chooseID].x+80, this.cellArray[this.chooseID].y+80);
+			this.skinList.refresh();
+		}else {
+			console.log(">--this.chooseID=="+this.chooseID);
+			if(this.chooseID==6){
+				this.onSelect(3);
+				this.btnSz.pos(this.skinList.x+this.cellArray[this.chooseID].x+80, this.cellArray[this.chooseID].y+80);
+				this.skinList.refresh();
+			}else if(this.chooseID==3){
+				this.onSelect(0);
+				this.btnSz.pos(this.skinList.x+this.cellArray[this.chooseID].x+80, this.cellArray[this.chooseID].y+80);
+				this.skinList.refresh();
+			}else if(this.chooseID==0){
+				this.btnBuy.focus=true;
+				this.btnSz.pos(this.defaultPointerX, this.defaultPointerY);
+				this.skinList.refresh();
+			}
+		}
+		
+		
+	}
+	changeFocusDown() {
+		if(this.btnBuy.focus){
+			this.onSelect(0);
+		}else if(this.chooseID==0){
+			this.onSelect(3);
+		}else if(this.chooseID==3){
+			this.onSelect(6);
+		}else if(this.chooseID==6){
 
-
+		}
+		this.skinList.refresh();
+	}
+	changeFocusLeft() {
+		this.skinList.refresh();
+	}
+	changeFocusRight() {
+		this.skinList.refresh();
 	}
 	//皮肤界面添加小手指
 	initShouZhi() {
 		var btnBuyx = parseInt(this.btnBuy.x);//随机解锁按钮的x
 		var btnBuyy = parseInt(this.btnBuy.y);//随机解锁按钮的y
-		btnBuyx += 250;
-		btnBuyy += 38;
+		this.btnBuy.focus=true;
+		this.defaultPointerX=btnBuyx+250;
+		this.defaultPointerY=btnBuyy+38;
 		this.btnSz = new Laya.Image("res/sz.png");
 		this.btnSz.scaleX = 0.3;
 		this.btnSz.scaleY = 0.3;
-		this.btnSz.pos(btnBuyx, btnBuyy);
+		this.btnSz.pos(this.defaultPointerX, this.defaultPointerY);
 		this.addChild(this.btnSz);
 
 	}
@@ -2165,10 +2220,12 @@ class QQ_SkinView extends BVHdla {
 		list.itemRender = dy_SkinItem;
 		list.vScrollBarSkin = "";
 		list.selectEnable = true;
-		list.mouseHandler = new Laya.Handler(this, this.onSelect);
+		this.cellArray=[];
+		// list.mouseHandler = new Laya.Handler(this, this.onSelect);
 		list.renderHandler = new Laya.Handler(this, this.updateItem);
 		var num = LayaSample.commonData.qq_skinMaxItem;
 		this.data = new Array();
+		this.renderedCellNum=num;
 		var unlockerList = LayaSample.storageMgr.qq_GetUnLockSkinList();
 		for (var i = 0; i < num; i++) {
 			var islock = true;
@@ -2190,12 +2247,10 @@ class QQ_SkinView extends BVHdla {
 	onSelect(index) {
 		if (index < 0)
 			return;
-		var data = this.skinList.getItem(index);
 		var unlockerList = LayaSample.storageMgr.qq_GetUnLockSkinList();
 		if (unlockerList.indexOf(index) != -1) {
 			LayaSample.storageMgr.qq_SaveNowSkinID(index);
-		}
-		else {
+		} else {
 			console.log("皮肤未解锁! [" + index + "]");
 		}
 		if (this.chooseID != index) {
@@ -2206,7 +2261,14 @@ class QQ_SkinView extends BVHdla {
 		this.ImgSkinIcon.skin = "skin/pf" + (index) + "_ui.png";
 		this.skinList.selectedIndex = -1;
 	}
-	updateItem(cell, index) {
+	updateItem(cell) {
+		console.log(">--updateItem2265");
+		if(this.renderedCellNum>0){
+			console.log(">--updateItem2267");
+			this.cellArray.push(cell);
+			this.renderedCellNum--;
+		}
+		console.log(">--updateItem2270");
 		cell.setItem(cell.dataSource);
 	}
 }
@@ -2432,7 +2494,6 @@ class qq_HomeView extends BVHdla {
 		this.btnGameR2 && LayaSample.utils.addClickEvent(this.btnGameR2, this, this.onWxgameClick);
 	}
 	onBtnClick() {
-		console.log(">--this.focusView" + this.focusView);
 		if (this.focusView == "btnPlay") {
 			this.onPlayGameClick();
 		} else if (this.focusView == "btnSkin") {
@@ -3193,18 +3254,17 @@ class DY_SigninView extends BVHdla {
 			case 8:
 			case 4:
 				this.close();
-				CurSence.curSence="qq_HomeView";
+				CurSence.curSence = "qq_HomeView";
 				break;
 			case 13:
 			case 23:
 			case 66:
-				console.log(">--this.btnGet.visible==" + this.btnGet.visible);
 				if (this.btnGet.visible) {
 					this.onSigninClick();
 				} else {
 					this.cancelClick();
 				}
-				CurSence.curSence="qq_HomeView";
+				CurSence.curSence = "qq_HomeView";
 				break;
 		}
 	}
