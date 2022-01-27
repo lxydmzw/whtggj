@@ -181,10 +181,9 @@
             "props": {
                 "x": 12,
                 "width": 750,
-                "visible":false,
+                "visible":true,
                 "name": "bottomPanel",
-                "height": 100,
-                "bottom": 300
+                "height": 100
             },
             "compId": 153,
             "child": [
@@ -193,6 +192,7 @@
                     "props": {
                         "y": 40,
                         "x": 307,
+                        "visible":false,
                         "stateNum": 1,
                         "skin": "ui/qq_ui/trySkinFreeView/font_zanshi_cn.png",
                         "name": "btnMiniVideo"
@@ -202,8 +202,9 @@
                 {
                     "type": "Button",
                     "props": {
-                        "y": 40,
-                        "x": 307,
+                        "y": 30,
+                        "visible":false,
+                        "x": 30,
                         "stateNum": 1,
                         "skin": "ui/qq_ui/trySkinFreeView/font_zanshibu_cn.png",
                         "name": "btnBack"

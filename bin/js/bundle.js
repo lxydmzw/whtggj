@@ -5,7 +5,7 @@
 	class CurSence {
 
 	}
-	CurSence.curSence = "";//qq_HomeView QQ_SkinView DY_SigninView
+	CurSence.curSence = "";
 	class Utils {
 		constructor() { }
 		addClickEvent(btn, caller, cb, soundId) {
@@ -1828,8 +1828,8 @@
 			this.initEvent();
 			this.initEventBase();
 			this.initSize();
-			this.initBanner();
-			Laya.timer.once(60000, this, this.showBanner);
+			// this.initBanner();
+			// Laya.timer.once(60000, this, this.showBanner);
 		}
 
 		onOpened(data) {
@@ -1845,8 +1845,8 @@
 		initUI() { }
 		initEvent() { }
 		initEventBase() {
-			LayaSample.glEvent.on("ad_load_event", this, this.onLoadAdEvent);
-			LayaSample.glEvent.on("ad_show_event", this, this.onShowAdEvent);
+			// LayaSample.glEvent.on("ad_load_event", this, this.onLoadAdEvent);
+			// LayaSample.glEvent.on("ad_show_event", this, this.onShowAdEvent);
 		}
 		getChild(name, object) {
 			if (!object)
@@ -1873,99 +1873,99 @@
 			}
 		}
 		showBanner() {
-			console.log("60秒后显示广告");
-			LayaSample.commonData.isclose = false;
+			// console.log("60秒后显示广告");
+			// LayaSample.commonData.isclose = false;
 		}
 		initBanner() {
-			if (this.url === "qq_views/qq_HomeView.scene") {
-				console.log("显示banner！！！！！！！！！！！！！！！", this.url);
-				LayaSample.wxAd.bannerInShowScene = true;
-				this.refreshBannerAd();
-			}
-			else {
-				LayaSample.wxAd.bannerInShowScene = false;
-			}
+			// if (this.url === "qq_views/qq_HomeView.scene") {
+			// 	console.log("显示banner！！！！！！！！！！！！！！！", this.url);
+			// 	LayaSample.wxAd.bannerInShowScene = true;
+			// 	this.refreshBannerAd();
+			// }
+			// else {
+			// 	LayaSample.wxAd.bannerInShowScene = false;
+			// }
 		}
 		refreshBannerAd() {
-			if (LayaSample.commonData.isAdDelay) {
-				Laya.timer.clear(this, this.reappearBannerAd);
-				Laya.timer.once(LayaSample.commonData.latencyTime, this, this.reappearBannerAd);
-			}
-			else {
-				this.reappearBannerAd();
-			}
+			// if (LayaSample.commonData.isAdDelay) {
+			// 	Laya.timer.clear(this, this.reappearBannerAd);
+			// 	Laya.timer.once(LayaSample.commonData.latencyTime, this, this.reappearBannerAd);
+			// }
+			// else {
+			// 	this.reappearBannerAd();
+			// }
 		}
 		reappearBannerAd() {
-			if (this.url == "qq_views/dy_SkinView.scene" || this.url == "qq_views/qq_TrySkinFree.scene" || this.url == "qq_views/qq_ResurrectView.scene") {
-				return;
-			}
-			LayaSample.adMgr.showBannerAd();
+			// if (this.url == "qq_views/dy_SkinView.scene" || this.url == "qq_views/qq_TrySkinFree.scene" || this.url == "qq_views/qq_ResurrectView.scene") {
+			// 	return;
+			// }
+			// LayaSample.adMgr.showBannerAd();
 		}
 		resetBannerAd() {
-			let banner = LayaSample.adMgr.getBannerItem();
-			if (!banner)
-				return;
-			let beforeWidth = banner.width;
-			let beforeHeight = banner.height;
-			let clientWidth = Laya.Browser.clientWidth;
-			let laterHeight = clientWidth * beforeHeight / beforeWidth;
-			if (beforeWidth == clientWidth)
-				return;
-			this._isResizeAd = true;
-			LayaSample.adMgr.setBannerAdWidth(clientWidth);
+			// let banner = LayaSample.adMgr.getBannerItem();
+			// if (!banner)
+			// 	return;
+			// let beforeWidth = banner.width;
+			// let beforeHeight = banner.height;
+			// let clientWidth = Laya.Browser.clientWidth;
+			// let laterHeight = clientWidth * beforeHeight / beforeWidth;
+			// if (beforeWidth == clientWidth)
+			// 	return;
+			// this._isResizeAd = true;
+			// LayaSample.adMgr.setBannerAdWidth(clientWidth);
 		}
 		tweenAd(addHeight = 0) {
-			if (!LayaSample.commonData.isAdDelay)
-				return;
-			let bnHeight = 130 + addHeight;
-			let pxRatio = LayaSample.screen.realPxRatio;
-			let realAdHeight = Math.floor(bnHeight * pxRatio);
-			if (this.url === "qq_views/qq_ResurrectView.scene" || this.url === "qq_views/qq_TrySkinFree.scene") {
-				realAdHeight = 270;
-			}
-			for (let i = 0; i < this.numChildren; ++i) {
-				let view = this.getChildAt(i);
-				if (view.name == "bottomPanel") {
-					if (bnHeight && view.bottom < realAdHeight) {
-						Laya.Tween.to(view, { bottom: realAdHeight }, LayaSample.commonData.moveTime, Laya.Ease.expoInOut, Laya.Handler.create(this, () => { }), 0, true);
-					}
-				}
-				if (view.name == "middlePanel" && bnHeight) {
-					let heightCont = view.y + view.height + realAdHeight;
-					if (heightCont > Laya.stage.height) {
-						view.y = view.y - (heightCont - Laya.stage.height);
-					}
-				}
-			}
+			// if (!LayaSample.commonData.isAdDelay)
+			// 	return;
+			// let bnHeight = 130 + addHeight;
+			// let pxRatio = LayaSample.screen.realPxRatio;
+			// let realAdHeight = Math.floor(bnHeight * pxRatio);
+			// if (this.url === "qq_views/qq_ResurrectView.scene" || this.url === "qq_views/qq_TrySkinFree.scene") {
+			// 	realAdHeight = 270;
+			// }
+			// for (let i = 0; i < this.numChildren; ++i) {
+			// 	let view = this.getChildAt(i);
+			// 	if (view.name == "bottomPanel") {
+			// 		if (bnHeight && view.bottom < realAdHeight) {
+			// 			Laya.Tween.to(view, { bottom: realAdHeight }, LayaSample.commonData.moveTime, Laya.Ease.expoInOut, Laya.Handler.create(this, () => { }), 0, true);
+			// 		}
+			// 	}
+			// 	if (view.name == "middlePanel" && bnHeight) {
+			// 		let heightCont = view.y + view.height + realAdHeight;
+			// 		if (heightCont > Laya.stage.height) {
+			// 			view.y = view.y - (heightCont - Laya.stage.height);
+			// 		}
+			// 	}
+			// }
 		}
 		onLoadAdEvent(event) {
-			switch (event.adtype) {
-				case "video":
-					if (!event.isLoad) {
-					}
-					break;
-				case "banner":
-					if (event.isLoad) {
-					}
-					break;
-				default:
-					break;
-			}
+			// switch (event.adtype) {
+			// 	case "video":
+			// 		if (!event.isLoad) {
+			// 		}
+			// 		break;
+			// 	case "banner":
+			// 		if (event.isLoad) {
+			// 		}
+			// 		break;
+			// 	default:
+			// 		break;
+			// }
 		}
 		onShowAdEvent(evt) {
-			console.log("``````````", evt);
-			switch (evt.adtype) {
-				case "video":
-					break;
-				case "banner":
-					this.tweenAd(100);
-					break;
-				case "native":
-					this.tweenAd(260);
-					break;
-				default:
-					break;
-			}
+			// console.log("``````````", evt);
+			// switch (evt.adtype) {
+			// 	case "video":
+			// 		break;
+			// 	case "banner":
+			// 		this.tweenAd(100);
+			// 		break;
+			// 	case "native":
+			// 		this.tweenAd(260);
+			// 		break;
+			// 	default:
+			// 		break;
+			// }
 		}
 	}
 
@@ -2057,6 +2057,9 @@
 				case 66:
 					if (this.btnBuy.focus) {
 						this.onBuyRandomSkinClick();
+					} else if (this.btnBack.focus) {
+						this.close();
+						CurSence.curSence = "qq_HomeView";
 					}
 					break;
 			}
@@ -2311,9 +2314,23 @@
 		}
 		initUI() {
 			this.newGui.visible = true;
+			CurSence.curSence = "newGuide";
+			Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
 		}
 		initEvent() {
-			Laya.stage.on(Laya.Event.MOUSE_DOWN, this, this.mouserDown);
+
+		}
+		onKeyUp(e) {
+			if (CurSence.curSence != "newGuide") {
+				return;
+			}
+			switch (e.keyCode) {
+				case 13:
+				case 23:
+				case 66:
+					this.mouserDown();
+					break;
+			}
 		}
 		mouserDown() {
 			LayaSample.glEvent.event("play_game_event");
@@ -2697,6 +2714,8 @@
 				LayaSample.adMgr.loadVideoAd();
 		}
 		initUI() {
+			CurSence.curSence = "DY_OverView";
+			Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
 			let goonTime = this.getChild("goonTime");
 			this.btnVideo = this.getChild("Video");
 			goonTime.visible = !LayaSample.commonData.obtain_prop;
@@ -2713,11 +2732,23 @@
 			Laya.timer.loop(1000, this, this.onTimerStart);
 			LayaSample.commonData.isNoAds = false;
 		}
+		onKeyUp(e) {
+			if (CurSence.curSence != "DY_OverView") {
+				return;
+			}
+			switch (e.keyCode) {
+				case 13:
+				case 23:
+				case 66:
+					this.onVideoClick();
+					break;
+			}
+		}
 		showBtnSkip() {
 			this.btnSkip.visible = true;
 		}
 		initEvent() {
-			LayaSample.utils.addClickEvent(this.btnVideo, this, this.onVideoClick);
+			// LayaSample.utils.addClickEvent(this.btnVideo, this, this.onVideoClick);
 			LayaSample.utils.addClickEvent(this.btnSkip, this, this.onSkipClick);
 			LayaSample.glEvent.on("wx_sleep_event", this, this.onWxSleepEvent);
 			LayaSample.glEvent.on("wx_wake_event", this, this.onWxWakeEvent);
@@ -3048,17 +3079,17 @@
 			}
 		}
 		showBannerLocal() {
-			LayaSample.glEvent.event("ad_show_event", { adtype: "native" });
-			let data = this.data;
-			if (!data)
-				return;
-			LayaSample.wxAd.reportAdShow();
-			this.banner.visible = true;
-			let icon = this.banner.getChildByName("icon");
-			icon.skin = data.imgUrlList.length >= 1 ? data.imgUrlList[0] : data.iconUrlList[0];
-			this.banner.getChildByName("appName").text = data.title;
-			this.banner.getChildByName("appCrip").text = data.desc;
-			let bg2 = this.banner.getChildByName("bg2");
+			// LayaSample.glEvent.event("ad_show_event", { adtype: "native" });
+			// let data = this.data;
+			// if (!data)
+			// 	return;
+			// LayaSample.wxAd.reportAdShow();
+			// this.banner.visible = true;
+			// let icon = this.banner.getChildByName("icon");
+			// icon.skin = data.imgUrlList.length >= 1 ? data.imgUrlList[0] : data.iconUrlList[0];
+			// this.banner.getChildByName("appName").text = data.title;
+			// this.banner.getChildByName("appCrip").text = data.desc;
+			// let bg2 = this.banner.getChildByName("bg2");
 		}
 		initEvent() {
 			this.closeBtn = this.banner.getChildByName("btnClose");
@@ -3085,41 +3116,41 @@
 			this.closeBtn.visible = true;
 		}
 		setBanner() {
-			let btn = this.banner;
-			if (this._appCount > 0) {
-				let info = this.data[this._appIndex];
-				btn.skin = info.app_img;
-				btn.appid = info.app_id;
-			}
-			btn.visible = !LayaSample.commonData.existBannerAd && !LayaSample.commonData.isNoAds && this._appCount > 0;
+			// let btn = this.banner;
+			// if (this._appCount > 0) {
+			// 	let info = this.data[this._appIndex];
+			// 	btn.skin = info.app_img;
+			// 	btn.appid = info.app_id;
+			// }
+			// btn.visible = !LayaSample.commonData.existBannerAd && !LayaSample.commonData.isNoAds && this._appCount > 0;
 		}
 		nextBanner() {
-			let index = this._appIndex;
-			index++;
-			if (index >= this._appCount)
-				index = 0;
-			this._appIndex = index;
-			this.setBanner();
+			// let index = this._appIndex;
+			// index++;
+			// if (index >= this._appCount)
+			// 	index = 0;
+			// this._appIndex = index;
+			// this.setBanner();
 		}
 		onAdLoadEvent(evt) {
-			if (this.category > 0) {
-				this.banner.visible = false;
-			}
+			// if (this.category > 0) {
+			// 	this.banner.visible = false;
+			// }
 		}
 		setPanelBottom() {
-			if (this.panel && !LayaSample.commonData.existBannerAd && this._appCount > 0) {
-				this.panel.bottom = this.banner.height;
-				let sysInfo = LayaSample.commonData.wxsysInfo;
-			}
+			// if (this.panel && !LayaSample.commonData.existBannerAd && this._appCount > 0) {
+			// 	this.panel.bottom = this.banner.height;
+			// 	let sysInfo = LayaSample.commonData.wxsysInfo;
+			// }
 		}
 		onBannerClick(event) {
-			if (!this.banner.visible)
-				return;
-			if (this.btnUse)
-				true;
-			this.banner.visible = false;
-			LayaSample.wxAd.reportAdClick();
-			Laya.timer.once(200, this, function () { LayaSample.glEvent.event("nativeAdClose"); });
+			// if (!this.banner.visible)
+			// 	return;
+			// if (this.btnUse)
+			// 	true;
+			// this.banner.visible = false;
+			// LayaSample.wxAd.reportAdClick();
+			// Laya.timer.once(200, this, function () { LayaSample.glEvent.event("nativeAdClose"); });
 		}
 	}
 
@@ -3143,6 +3174,8 @@
 		initData() {
 		}
 		initUI() {
+			CurSence.curSence = "QQ_RewardView";
+			Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
 			this.btnGet = this.getChild("btnGet");
 			this.isUsingBtnTips = LayaSample.commonData.showRevivalCard;
 			this.btnRecord = this.getChild("btnRecord");
@@ -3171,6 +3204,18 @@
 				this.effect.rotation += 2;
 			});
 		}
+		onKeyUp(e) {
+			if (CurSence.curSence != "QQ_RewardView") {
+				return;
+			}
+			switch (e.keyCode) {
+				case 13:
+				case 23:
+				case 66:
+					this.onGetClick();
+					break;
+			}
+		}
 		swithGoldLabel() {
 			if (this.isUsingBtnTips) {
 				this.lbGold.text = "+" + this.gold * this.factor;
@@ -3180,7 +3225,7 @@
 			}
 		}
 		initEvent() {
-			LayaSample.utils.addClickEvent(this.btnGet, this, this.onGetClick);
+			// LayaSample.utils.addClickEvent(this.btnGet, this, this.onGetClick);
 			LayaSample.utils.addClickEvent(this.btnRecord, this, this.onRecClick);
 			LayaSample.utils.addClickEvent(this.btnRecordOut, this, this.onRecOutClick);
 			LayaSample.utils.addClickEvent(this.btnTips2, this, this.onTipsClick);
@@ -3381,16 +3426,14 @@
 				LayaSample.adMgr.loadVideoAd();
 		}
 		initUI() {
+			CurSence.curSence = "DY_TypeSkinView";
+			Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
 			this.isUsingBtnTips = LayaSample.commonData.showRevivalCard;
 			this.btnTypeSkin = this.getChild("btnTypeSkin");
 			this.btnTips = this.getChild("btnTips2");
 			this.tipsTag = this.getChild("tag", this.btnTips);
-			this.tipsTag.visible = this.isUsingBtnTips;
 			let bottomPanel = this.getChild("bottomPanel");
-			this.btnMiniVideo = this.getChild("btnMiniVideo", bottomPanel);
 			this.btnBack = this.getChild("btnBack", bottomPanel);
-			this.btnBack.visible = !this.isUsingBtnTips;
-			this.btnMiniVideo.visible = this.isUsingBtnTips;
 			let content = this.getChild("content");
 			let skinItem = this.getChild("skinItem", content);
 			this.ImgSkinIcon = this.getChild("skinIcon", skinItem);
@@ -3400,8 +3443,7 @@
 			this.ImgSkinIcon.skin = "skin/pf" + (this.itemIndex) + "_ui.png";
 		}
 		initEvent() {
-			LayaSample.utils.addClickEvent(this.btnTypeSkin, this, this.onVideoClick);
-			LayaSample.utils.addClickEvent(this.btnMiniVideo, this, this.onDelayVideoClick);
+			// LayaSample.utils.addClickEvent(this.btnTypeSkin, this, this.onVideoClick);
 			LayaSample.utils.addClickEvent(this.btnBack, this, this.onBackClick);
 			LayaSample.utils.addClickEvent(this.btnTips, this, this.onTipsClick);
 			LayaSample.glEvent.on("ad_video_close_event", this, this.onVideoCloseEvent);
@@ -3409,8 +3451,23 @@
 		onTipsClick() {
 			this.isUsingBtnTips = !this.isUsingBtnTips;
 			this.tipsTag.visible = this.isUsingBtnTips;
-			this.btnBack.visible = !this.isUsingBtnTips;
-			this.btnMiniVideo.visible = this.isUsingBtnTips;
+		}
+		onKeyUp(e) {
+			if (CurSence.curSence != "DY_TypeSkinView") {
+				return;
+			}
+			switch (e.keyCode) {
+				case 13:
+				case 23:
+				case 66:
+					this.onVideoClick();
+					break;
+				case 8:
+				case 4:
+					this.close();
+					CurSence.curSence = "qq_HomeView";
+					break;
+			}
 		}
 		onVideoClick() {
 			if (Laya.Browser.onPC) {
@@ -3459,6 +3516,8 @@
 				LayaSample.adMgr.loadVideoAd();
 		}
 		initUI() {
+			CurSence.curSence = "ClearingView";
+			Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
 			let bottomPanel = this.getChild("bottomPane");
 			let view = this.getChild("view");
 			this.btnBack = this.getChild("btnBack", bottomPanel);
@@ -3476,10 +3535,63 @@
 					this.btnPlay.visible = true;
 				});
 			}
+			initShouZhi();
+		}
+		initShouZhi() {
+			var btnBackx = parseInt(this.btnBack.x);
+			var btnBacky = parseInt(this.btnBack.y);
+			var btnPlayx = parseInt(this.btnPlay.x);
+			var btnPlayy = parseInt(this.btnPlay.y);
+			this.btnBack.focus = true;
+			this.btnPlay.focus = false;
+			this.backPointerX = btnBackx + 250;
+			this.backPointerY = btnBacky + 38;
+			this.playPointerX = btnPlayx + 250;
+			this.playPointerY = btnPlayy + 38;
+			this.btnSz = new Laya.Image("res/sz.png");
+			this.btnSz.scaleX = 0.3;
+			this.btnSz.scaleY = 0.3;
+			this.btnSz.pos(this.backPointerX, this.backPointerY);
+			this.addChild(this.btnSz);
+		}
+		onKeyUp(e) {
+			if (CurSence.curSence != "ClearingView") {
+				return;
+			}
+			switch (e.keyCode) {
+				case 37:
+				case 21://左
+				case 39:
+				case 22://右
+					this.changeFocus();
+					break;
+				case 13:
+				case 23:
+				case 66:
+					if(this.btnBack.focus){
+						this.close();
+						CurSence.curSence = "qq_HomeView";
+					}else if(this.btnPlay.focus){
+						this.onPlayGameClick();
+					}
+					
+					break;
+			}
+		}
+		changeFocus(){
+			if(this.btnBack.focus){
+				this.btnBack.focus=false;
+				this.btnPlay.focus=true;
+				this.btnSz.pos(this.playPointerX, this.playPointerY);
+			}else{
+				this.btnBack.focus=true;
+				this.btnPlay.focus=false;
+				this.btnSz.pos(this.backPointerX, this.backPointerY);
+			}
 		}
 		initEvent() {
-			LayaSample.utils.addClickEvent(this.btnPlay, this, this.onPlayGameClick);
-			LayaSample.utils.addClickEvent(this.btnBack, this, this.onBackClick);
+			// LayaSample.utils.addClickEvent(this.btnPlay, this, this.onPlayGameClick);
+			// LayaSample.utils.addClickEvent(this.btnBack, this, this.onBackClick);
 			LayaSample.glEvent.on("share_back_event", this, this.onShareBackEvent);
 			LayaSample.glEvent.on("wx_wake_event", this, this.onWxWakeEvent);
 			LayaSample.glEvent.on("show_applite_event", this, this.onWxWakeEvent);
