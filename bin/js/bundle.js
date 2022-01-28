@@ -2315,6 +2315,7 @@
 		}
 		initUI() {
 			CurSence.curSence = "newGuide";
+			Laya.stage.offAll(Laya.Event.KEY_UP);
 			Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
 		}
 		initEvent() {
@@ -3465,7 +3466,15 @@
 				case 13:
 				case 23:
 				case 66:
-					this.onVideoClick();
+					if(this.isTipShow){
+						this.tipDialog.close();
+						this.isTipShow = false;
+						Laya.Scene.open("qq_views/newGudie.scene", false, Laya.Handler.create(this, view => {
+							this.close();
+						}));
+					}else{
+						this.onVideoClick();
+					}
 					break;
 				case 8:
 				case 4:
@@ -3491,9 +3500,27 @@
 		}
 		changeSkin() {
 			LayaSample.glEvent.event("change_skin_event", { index: this.itemIndex });
-			Laya.Scene.open("qq_views/newGudie.scene", false, Laya.Handler.create(this, view => {
-				this.close();
-			}));
+			var aTimeStr = Laya.LocalStorage.getItem("remainTipTimes");//操作提示框展示次数（3次后不再展示）
+			if (aTimeStr == null) {
+				Laya.LocalStorage.setItem("remainTipTimes", "3");
+			}
+			var aTime = parseInt(aTimeStr);
+			if (aTime > 0) {
+				aTime--;
+				Laya.LocalStorage.setItem("remainTipTimes", aTime.toString());
+				this.tipDialog = new Laya.Dialog();
+				var bg = new Laya.Image("res/play_tips.png");
+				bg.scaleX = 0.5;
+				bg.scaleY = 0.5;
+				this.tipDialog.addChild(bg);
+				this.tipDialog.popup();
+				this.isTipShow = true;
+			} else{
+				Laya.Scene.open("qq_views/newGudie.scene", false, Laya.Handler.create(this, view => {
+					this.close();
+				}));
+			}
+			
 		}
 		onVideoCloseEvent(evt) {
 			console.log("看视频回调：", evt);
@@ -4020,6 +4047,7 @@
 			console.log("this", this.owner);
 		}
 		onUpdate() {
+
 			this.isJumeLad = this.owner.transform.position.y - this.jumeSeep;
 			this.jumeSeep = this.owner.transform.position.y;
 			gameInfo.RolePos = this.owner.transform.position;
@@ -5117,6 +5145,7 @@
 			gameInfo.scoreMi = this.scoreMi;
 			this.cameraScript = this.cream.addComponent(camera);
 			this.initScene();
+			this.toMenuDialogShow = false;
 			console.log(this.caiDaiBg, "this.caiDaiBg");
 		}
 		onKeyUp(e) {
@@ -5124,16 +5153,76 @@
 				return;
 			}
 			console.log(">--onKeyUp------GameUI");
-			switch (e.keyCode) {
-				case 13:
-				case 23:
-				case 66:
-					console.log(">--5122");
-					this.roleScript.onDownStage();
-					break;
+			if (this.toMenuDialogShow) {//正在游戏中，弹出返回窗
+				switch (e.keyCode) {
+					case 37:
+					case 21:
+					case 39:
+					case 22:
+						if (this.btnSz.x == 260) {
+							this.btnSz.pos(100, 300);
+						} else {
+							this.btnSz.pos(260, 300);
+						}
+						break;
+					case 13:
+					case 23:
+					case 66:
+						this.hideToMenuDialog();
+						if (this.btnSz.x == 260) {//确定
+							gameInfo.isPlayGame = true;
+						} else {
+							LayaSample.glEvent.event("restgame");
+							Laya.Scene.open("qq_views/qq_HomeView.scene", false, Laya.Handler.create(this, () => {
+
+							}));
+						}
+						break;
+				}
+			} else {
+				switch (e.keyCode) {
+					case 8:
+					case 4:
+						this.showToMenuDialog();
+						break;
+					case 13:
+					case 23:
+					case 66:
+						this.roleScript.onDownStage();
+						break;
+				}
 			}
 
+
 		}
+		hideToMenuDialog() {
+			this.toMenuDialogShow = false;
+			this.toMenuDialog.close();
+		}
+		showToMenuDialog() {
+			this.toMenuDialog = new Laya.Dialog();
+			var bg = new Laya.Image("res/bg_tomenu.png");
+			this.toMenuDialog.addChild(bg);
+			let btnConfirm = new Laya.Image("res/confirm.png");
+			btnConfirm.pos(18, 285);
+			this.toMenuDialog.addChild(btnConfirm);
+
+
+			let btnCancel = new Laya.Image("res/cancel.png");
+			btnCancel.pos(195, 285);
+			this.toMenuDialog.addChild(btnCancel);
+
+			this.btnSz = new Laya.Image("res/sz.png");
+			this.btnSz.scaleX = 0.3;
+			this.btnSz.scaleY = 0.3;
+			this.btnSz.pos(100, 300);
+			this.toMenuDialog.addChild(this.btnSz);
+			this.toMenuDialog.popup();
+			this.toMenuDialogShow = true;
+
+			gameInfo.isPlayGame = false;
+		}
+
 		onTabCamera() {
 			console.log(">--onTabCamera");
 			gameInfo.creamLerpT = 0.1;
@@ -5212,7 +5301,7 @@
 		onPlayGame() {
 			gameInfo.isPlayGame = true;
 			gameInfo.roleDie = false;
-			if(CurSence.curSence!="GameUI"){
+			if (CurSence.curSence != "GameUI") {
 				CurSence.curSence = "GameUI";
 				Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
 			}
