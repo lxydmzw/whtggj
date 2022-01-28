@@ -137,6 +137,7 @@
                 "name": "NativeBanner",
                 "height": 534,
                 "centerY": -147,
+                "visible":false,
                 "centerX": 0
             },
             "compId": 97,

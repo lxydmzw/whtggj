@@ -2030,6 +2030,7 @@
 			if (CurSence.curSence != "QQ_SkinView") {
 				return;
 			}
+			console.log(">--onKeyUp------QQ_SkinView");
 			switch (e.keyCode) {
 				case 8:
 				case 4:
@@ -2313,7 +2314,6 @@
 			super.onAwake();
 		}
 		initUI() {
-			this.newGui.visible = true;
 			CurSence.curSence = "newGuide";
 			Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
 		}
@@ -2324,18 +2324,18 @@
 			if (CurSence.curSence != "newGuide") {
 				return;
 			}
+			console.log(">--onKeyUp------newGuide");
 			switch (e.keyCode) {
 				case 13:
 				case 23:
 				case 66:
-					this.mouserDown();
+					this.startPlay();
 					break;
 			}
 		}
-		mouserDown() {
+		startPlay() {
 			LayaSample.glEvent.event("play_game_event");
 			this.close();
-			Laya.stage.off(Laya.Event.MOUSE_DOWN, this, this.mouserDown);
 		}
 	}
 
@@ -2458,6 +2458,7 @@
 			if (CurSence.curSence != "qq_HomeView") {
 				return;
 			}
+			console.log(">--onKeyUp------qq_HomeView");
 			if (this.exitDialogShow) {
 				switch (e.keyCode) {
 					case 37:
@@ -2736,6 +2737,7 @@
 			if (CurSence.curSence != "DY_OverView") {
 				return;
 			}
+			console.log(">--onKeyUp------DY_OverView");
 			switch (e.keyCode) {
 				case 13:
 				case 23:
@@ -3208,6 +3210,7 @@
 			if (CurSence.curSence != "QQ_RewardView") {
 				return;
 			}
+			console.log(">--onKeyUp------QQ_RewardView");
 			switch (e.keyCode) {
 				case 13:
 				case 23:
@@ -3327,6 +3330,7 @@
 			if (CurSence.curSence != "DY_SigninView") {
 				return;
 			}
+			console.log(">--onKeyUp------DY_SigninView");
 			switch (e.keyCode) {
 				case 8:
 				case 4:
@@ -3422,8 +3426,8 @@
 		}
 		initData() {
 			LayaSample.adMgr.hideBannerAd();
-			if (!LayaSample.commonData.existVideoAd)
-				LayaSample.adMgr.loadVideoAd();
+			// if (!LayaSample.commonData.existVideoAd)
+			// 	LayaSample.adMgr.loadVideoAd();
 		}
 		initUI() {
 			CurSence.curSence = "DY_TypeSkinView";
@@ -3444,7 +3448,7 @@
 		}
 		initEvent() {
 			// LayaSample.utils.addClickEvent(this.btnTypeSkin, this, this.onVideoClick);
-			LayaSample.utils.addClickEvent(this.btnBack, this, this.onBackClick);
+			// LayaSample.utils.addClickEvent(this.btnBack, this, this.onBackClick);
 			LayaSample.utils.addClickEvent(this.btnTips, this, this.onTipsClick);
 			LayaSample.glEvent.on("ad_video_close_event", this, this.onVideoCloseEvent);
 		}
@@ -3456,6 +3460,7 @@
 			if (CurSence.curSence != "DY_TypeSkinView") {
 				return;
 			}
+			console.log(">--onKeyUp------DY_TypeSkinView");
 			switch (e.keyCode) {
 				case 13:
 				case 23:
@@ -3475,7 +3480,7 @@
 				this.changeSkin();
 				return;
 			}
-			LayaSample.adMgr.showVideoAd(0);
+			// LayaSample.adMgr.showVideoAd(0);
 		}
 		onDelayVideoClick() {
 			if (Laya.Browser.onPC || !this.isUsingBtnTips) {
@@ -3512,8 +3517,8 @@
 
 	class ClearingView extends BVHdla {
 		initData() {
-			if (!LayaSample.commonData.existVideoAd)
-				LayaSample.adMgr.loadVideoAd();
+			// if (!LayaSample.commonData.existVideoAd)
+			// 	LayaSample.adMgr.loadVideoAd();
 		}
 		initUI() {
 			CurSence.curSence = "ClearingView";
@@ -3523,6 +3528,8 @@
 			this.btnBack = this.getChild("btnBack", bottomPanel);
 			this.btnPlay = this.getChild("btnPlay", bottomPanel);
 			let score = this.getChild("score", view);
+			this.initShouZhi();
+			bottomPanel.addChild(this.btnSz);
 			console.log("LayaSample.commonData.newScore++++", LayaSample.commonData.newScore);
 			this.fontScore = this.getChild("fontScore", score);
 			this.fontScore.value = LayaSample.commonData.newScore.toString();
@@ -3533,9 +3540,10 @@
 				Laya.timer.once(3000, this, function () {
 					this.btnBack.visible = true;
 					this.btnPlay.visible = true;
+
 				});
 			}
-			initShouZhi();
+
 		}
 		initShouZhi() {
 			var btnBackx = parseInt(this.btnBack.x);
@@ -3545,19 +3553,19 @@
 			this.btnBack.focus = true;
 			this.btnPlay.focus = false;
 			this.backPointerX = btnBackx + 250;
-			this.backPointerY = btnBacky + 38;
+			this.backPointerY = btnBacky + 58;
 			this.playPointerX = btnPlayx + 250;
-			this.playPointerY = btnPlayy + 38;
+			this.playPointerY = btnPlayy + 58;
 			this.btnSz = new Laya.Image("res/sz.png");
 			this.btnSz.scaleX = 0.3;
 			this.btnSz.scaleY = 0.3;
 			this.btnSz.pos(this.backPointerX, this.backPointerY);
-			this.addChild(this.btnSz);
 		}
 		onKeyUp(e) {
 			if (CurSence.curSence != "ClearingView") {
 				return;
 			}
+			console.log(">--onKeyUp------ClearingView");
 			switch (e.keyCode) {
 				case 37:
 				case 21://左
@@ -3568,24 +3576,25 @@
 				case 13:
 				case 23:
 				case 66:
-					if(this.btnBack.focus){
-						this.close();
+					if (this.btnBack.focus) {
 						CurSence.curSence = "qq_HomeView";
-					}else if(this.btnPlay.focus){
+						this.onBackClick();
+					} else {
+						CurSence.curSence = "DY_TypeSkinView";
 						this.onPlayGameClick();
 					}
-					
+
 					break;
 			}
 		}
-		changeFocus(){
-			if(this.btnBack.focus){
-				this.btnBack.focus=false;
-				this.btnPlay.focus=true;
+		changeFocus() {
+			if (this.btnBack.focus) {
+				this.btnBack.focus = false;
+				this.btnPlay.focus = true;
 				this.btnSz.pos(this.playPointerX, this.playPointerY);
-			}else{
-				this.btnBack.focus=true;
-				this.btnPlay.focus=false;
+			} else {
+				this.btnBack.focus = true;
+				this.btnPlay.focus = false;
 				this.btnSz.pos(this.backPointerX, this.backPointerY);
 			}
 		}
@@ -3964,7 +3973,7 @@
 		}
 		onAwake() {
 			Laya.stage.on("PLAYGAME", this, this.onPlayGame);
-			gameInfo.gameView.on(Laya.Event.MOUSE_DOWN, this, this.onDownStage);
+			// gameInfo.gameView.on(Laya.Event.MOUSE_DOWN, this, this.onDownStage);
 			this.parent = this.owner.parent.parent;
 			this.teXiao = this.parent.getChildByName("teXiao");
 		}
@@ -5110,7 +5119,23 @@
 			this.initScene();
 			console.log(this.caiDaiBg, "this.caiDaiBg");
 		}
+		onKeyUp(e) {
+			if (CurSence.curSence != "GameUI") {
+				return;
+			}
+			console.log(">--onKeyUp------GameUI");
+			switch (e.keyCode) {
+				case 13:
+				case 23:
+				case 66:
+					console.log(">--5122");
+					this.roleScript.onDownStage();
+					break;
+			}
+
+		}
 		onTabCamera() {
+			console.log(">--onTabCamera");
 			gameInfo.creamLerpT = 0.1;
 			if (this.tabPos == 0)
 				this.cameraScript.setCameraPos1();
@@ -5122,6 +5147,7 @@
 				this.tabPos = 0;
 		}
 		hideSceneObj() {
+			console.log(">--hideSceneObj");
 			for (var k in this.mainScene._children) {
 				let isCamera = this.mainScene._children[k].name.indexOf("mainCamera") != -1;
 				let isLight = this.mainScene._children[k].name.indexOf("Directional Light") != -1;
@@ -5186,6 +5212,10 @@
 		onPlayGame() {
 			gameInfo.isPlayGame = true;
 			gameInfo.roleDie = false;
+			if(CurSence.curSence!="GameUI"){
+				CurSence.curSence = "GameUI";
+				Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
+			}
 			Laya.stage.event("PLAYGAME");
 			this.jumebarBox.visible = true;
 			this.scoreMi.visible = true;
