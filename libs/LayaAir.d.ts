@@ -58,11 +58,6 @@
 		 * 是否允许GPUInstance动态合并,仅对3D有效。
 		 */
 		static allowGPUInstanceDynamicBatch:boolean;
-
-		/**
-		 * 是否允许静态合并
-		 */
-		static enableStaticBatch:boolean;
 		static useRetinalCanvas:boolean;
 	}
 
@@ -72,10 +67,6 @@
 	declare class Config3D implements Laya.IClone  {
 		static get useCannonPhysics():boolean;
 		static set useCannonPhysics(value:boolean);
-		static set enableDynamicManager(value:boolean);
-		static get enableDynamicManager():boolean;
-		static set enableStaticManager(value:boolean);
-		static get enableStaticManager():boolean;
 
 		/**
 		 * 是否开启抗锯齿。
@@ -344,6 +335,11 @@
 		 * SimpleAnimator资源。
 		 */
 		static SIMPLEANIMATORBIN:string;
+
+		/**
+		 * @private 
+		 */
+		static physicsSettings:Laya.PhysicsSettings;
 
 		/**
 		 * 获取是否可以启用物理。
@@ -2330,15 +2326,6 @@ declare module Laya {
 		constructor();
 	}
 
-enum AnimatorUpdateMode {
-    /**正常更新。*/
-    Normal = 0,
-    /**低频率更新 */
-    LowFrame = 1,
-    /**不更新 */
-    UnScaleTime = 2
-}
-
 	/**
 	 * <code>Animator</code> 类用于创建动画组件。
 	 */
@@ -2366,27 +2353,10 @@ enum AnimatorUpdateMode {
 		set speed(value:number);
 
 		/**
-		 * 设置更新模式
-		 */
-		set updateMode(value:AnimatorUpdateMode);
-		set lowUpdateDelty(value:number);
-		get controllerLayerCount():number;
-
-		/**
 		 * 创建一个 <code>Animation</code> 实例。
 		 */
 
 		constructor();
-
-		/**
-		 * 赋值Node数据
-		 * @param stateInfo 动画状态
-		 * @param additive 是否为addtive
-		 * @param weight state权重
-		 * @param isFirstLayer 是否是第一层
-		 */
-		private _setClipDatasToNode:any;
-		private _applyUpdateMode:any;
 
 		/**
 		 * 获取默认动画状态。
@@ -2505,12 +2475,6 @@ enum AnimatorUpdateMode {
 		 */
 		get defaultState():AnimatorState;
 		set defaultState(value:AnimatorState);
-
-		/**
-		 * 骨骼遮罩
-		 */
-		get avatarMask():AvatarMask;
-		set avatarMask(value:AvatarMask);
 
 		/**
 		 * 创建一个 <code>AnimatorControllerLayer</code> 实例。
@@ -2702,50 +2666,6 @@ enum AnimatorUpdateMode {
 	}
 
 	/**
-	 * 用来描述动画层遮罩
-	 */
-	class AvatarMask  {
-
-		/**
-		 * 创建一个<code>AvatarMask</code>实例
-		 */
-
-		constructor();
-
-		/**
-		 * 查找节点路径遮罩
-		 * @param path 
-		 * @returns 
-		 */
-		getTransformActive(path:string):boolean;
-
-		/**
-		 * 设置
-		 * @param path 
-		 * @param value 
-		 */
-		setTransformActive(path:string,value:boolean):void;
-
-		/**
-		 * 获得遮罩信息
-		 * @returns 
-		 */
-		getAllTranfromPath():{[key:string]:boolean;};
-
-		/**
-		 * 克隆。
-		 * @return 克隆副本。
-		 */
-		clone():any;
-
-		/**
-		 * 克隆。
-		 * @param destObject 克隆源。
-		 */
-		cloneTo(destObject:any):void;
-	}
-
-	/**
 	 * <code>PostProcess</code> 类用于创建后期处理组件。
 	 */
 	class PostProcess  {
@@ -2757,7 +2677,6 @@ enum AnimatorUpdateMode {
 		constructor();
 		get enable():boolean;
 		set enable(value:boolean);
-		set commandContext(oriContext:RenderContext3D);
 
 		/**
 		 * 添加后期处理效果。
@@ -2930,7 +2849,6 @@ enum AnimatorUpdateMode {
 		 */
 
 		constructor();
-		clearElement():void;
 	}
 
 	/**
@@ -3301,22 +3219,13 @@ enum CameraEventFlags {
 	 * <code>Camera</code> 类用于创建摄像机。
 	 */
 	class Camera extends BaseCamera  {
-		static set _updateMark(value:number);
-		static get _updateMark():number;
 
 		/**
 		 * 根据相机、scene信息获得scene中某一位置的渲染结果
-		 * @param camera 相机
-		 * @param scene 需要渲染的场景
-		 * @param shader 着色器
-		 * @param replacementTag 替换标记。
+		 * @param camera 
+		 * @param scene 
 		 */
-		static drawRenderTextureByScene(camera:Camera,scene:Scene3D,renderTexture:RenderTexture,shader?:Shader3D,replaceFlag?:string):RenderTexture;
-
-		/**
-		 * 深度贴图模式
-		 */
-		private _depthTextureFormat:any;
+		static drawRenderTextureByScene(camera:Camera,scene:Scene3D,renderTexture:RenderTexture):RenderTexture;
 
 		/**
 		 * 深度贴图
@@ -3411,18 +3320,6 @@ enum CameraEventFlags {
 		set depthTextureMode(value:number);
 
 		/**
-		 * 深度贴图格式
-		 */
-		get depthTextureFormat():RenderTextureDepthFormat;
-		set depthTextureFormat(value:RenderTextureDepthFormat);
-
-		/**
-		 * 设置是否使用内置的深度贴图(TODO:如果开启,只可在后期使用深度贴图，不可在渲染流程中使用)
-		 */
-		set enableBlitDepth(value:boolean);
-		get canblitDepth():boolean;
-
-		/**
 		 * 创建一个 <code>Camera</code> 实例。
 		 * @param aspectRatio 横纵比。
 		 * @param nearPlane 近裁面。
@@ -3437,7 +3334,6 @@ enum CameraEventFlags {
 		 * @return 是否显示。
 		 */
 		_isLayerVisible(layer:number):boolean;
-		clone():Camera;
 
 		/**
 		 * 调用渲染命令流
@@ -3446,7 +3342,7 @@ enum CameraEventFlags {
 		 * @param context 
 		 */
 		_applyCommandBuffer(event:number,context:RenderContext3D):void;
-		set depthTexture(value:BaseTexture);
+		set depthTexture(value:RenderTexture);
 		set depthNormalTexture(value:RenderTexture);
 
 		/**
@@ -4096,6 +3992,11 @@ enum ShadowMode {
 		 * 默认材质，禁止修改
 		 */
 		static defaultMaterial:BlinnPhongMaterial;
+		private _albedoColor:any;
+		private _albedoIntensity:any;
+		private _enableLighting:any;
+		private _enableVertexColor:any;
+		private _enableTransmission:any;
 		set _ColorR(value:number);
 		set _ColorG(value:number);
 		set _ColorB(value:number);
@@ -4106,6 +4007,7 @@ enum ShadowMode {
 		set _SpecColorB(value:number);
 		set _SpecColorA(value:number);
 		set _SpecColor(value:Vector4);
+		set _AlbedoIntensity(value:number);
 		set _Shininess(value:number);
 		set _MainTex_STX(x:number);
 		set _MainTex_STY(y:number);
@@ -4321,6 +4223,7 @@ enum ShadowMode {
 		 * 默认材质，禁止修改
 		 */
 		static defaultMaterial:EffectMaterial;
+		private _color:any;
 		set _TintColorR(value:number);
 		set _TintColorG(value:number);
 		set _TintColorB(value:number);
@@ -4624,16 +4527,6 @@ enum ShadowMode {
 		set depthTest(value:number);
 
 		/**
-		 * 获得材质属性
-		 */
-		get MaterialProperty():any;
-
-		/**
-		 * 获得材质宏
-		 */
-		get MaterialDefine():Array<string>;
-
-		/**
 		 * 创建一个 <code>BaseMaterial</code> 实例。
 		 */
 
@@ -4650,19 +4543,6 @@ enum ShadowMode {
 		 * @param name 名称。
 		 */
 		setShaderName(name:string):void;
-
-		/**
-		 * 设置属性值
-		 * @param name 
-		 * @param value 
-		 */
-		setShaderPropertyValue(name:string,value:any):void;
-
-		/**
-		 * 获取属性值
-		 * @param name 
-		 */
-		getShaderPropertyValue(name:string):any;
 
 		/**
 		 * 克隆。
@@ -5348,7 +5228,9 @@ enum PBRMetallicSmoothnessSource {
 		 * 默认材质，禁止修改
 		 */
 		static defaultMaterial:UnlitMaterial;
+		private _albedoColor:any;
 		private _albedoIntensity:any;
+		private _enableVertexColor:any;
 		set _ColorR(value:number);
 		set _ColorG(value:number);
 		set _ColorB(value:number);
@@ -7299,38 +7181,6 @@ enum ParticleSystemShapeType {
 		 */
 		destroy(destroyChild?:boolean):void;
 	}
-	class ShurikenParticleInstanceSystem extends ShurikenParticleSystem  {
-		private _instanceParticleVertexBuffer:any;
-		private _instanceVertex:any;
-		private _instanceBufferState:any;
-		private _meshIndexCount:any;
-		private _meshFloatCountPreVertex:any;
-
-		/**
-		 * 每个粒子数据 float 个数
-		 */
-		private _floatCountPerParticleData:any;
-
-		constructor(owner:ShuriKenParticle3D);
-
-		/**
-		 * *
-		 * 重排 mesh vb
-		 */
-		private _initMeshVertex:any;
-
-		/**
-		 * 初始化 buffer
-		 * @returns 
-		 */
-		_initBufferDatas():void;
-		protected _retireActiveParticles():void;
-		protected _freeRetiredParticles():void;
-		addParticle(position:Vector3,direction:Vector3,time:number):boolean;
-		addNewParticlesToVertexBuffer():void;
-		_render(stage:RenderContext3D):void;
-		destroy():void;
-	}
 
 	/**
 	 * <code>ShurikenParticleMaterial</code> 类用于实现粒子材质。
@@ -8299,7 +8149,6 @@ enum ReflectionProbeMode {
 	 * <code>Render</code> 类用于渲染器的父类，抽象类不允许实例。
 	 */
 	class BaseRender extends EventDispatcher implements ISingletonElement,IOctreeObject  {
-		_renderElements:RenderElement[];
 
 		/**
 		 * 排序矫正值。
@@ -8407,7 +8256,6 @@ enum ReflectionProbeMode {
 		 * [实现ISingletonElement接口]
 		 */
 		_setIndexInList(index:number):void;
-		_setUnBelongScene():void;
 
 		/**
 		 * 标记为非静态,静态合并后可用于取消静态限制。
@@ -8702,7 +8550,7 @@ enum ReflectionProbeMode {
 		 * @param shaderData 着色器数据,如果为null只接收sourceTexture。
 		 * @param subShader subShader索引,默认值为0。
 		 */
-		blitScreenQuad(source:BaseTexture,dest:RenderTexture,offsetScale?:Vector4,shader?:Shader3D,shaderData?:ShaderData,subShader?:number,definedCanvas?:boolean):void;
+		blitScreenQuad(source:BaseTexture,dest:RenderTexture,offsetScale?:Vector4,shader?:Shader3D,shaderData?:ShaderData,subShader?:number):void;
 
 		/**
 		 * 添加一条通过全屏四边形将源纹理渲染到目标渲染纹理指令。
@@ -8782,7 +8630,6 @@ enum ReflectionProbeMode {
 		static maxInstanceCount:number;
 
 		constructor();
-		get bufferState():VertexBuffer3D;
 
 		/**
 		 * @inheritDoc 
@@ -9125,7 +8972,7 @@ enum ShaderDataType {
 	/**
 	 * <code>BoundsOctree</code> 类用于创建八叉树。
 	 */
-	class BoundsOctree implements ISceneRenderManager  {
+	class BoundsOctree  {
 
 		/**
 		 * 创建一个 <code>BoundsOctree</code> 实例。
@@ -9141,13 +8988,13 @@ enum ShaderDataType {
 		 * 添加物体
 		 * @param object 
 		 */
-		addRender(object:IOctreeObject):void;
+		add(object:IOctreeObject):void;
 
 		/**
 		 * 移除物体
 		 * @return 是否成功
 		 */
-		removeRender(object:IOctreeObject):boolean;
+		remove(object:IOctreeObject):boolean;
 
 		/**
 		 * 更新物体
@@ -9170,16 +9017,6 @@ enum ShaderDataType {
 		 * @param 运动物体 。
 		 */
 		removeMotionObject(object:IOctreeObject):void;
-
-		/**
-		 * 裁剪更新
-		 */
-		preFruUpdate():void;
-
-		/**
-		 * 直射光阴影裁剪
-		 */
-		cullingShadow(cullInfo:ShadowCullInfo,context:RenderContext3D):void;
 
 		/**
 		 * 更新所有运动物体。
@@ -9227,13 +9064,12 @@ enum ShaderDataType {
 		 * @return 最大包围盒
 		 */
 		getMaxBounds():BoundBox;
-		destroy():void;
 	}
 
 	/**
 	 * <code>BoundsOctreeNode</code> 类用于创建八叉树节点。
 	 */
-	class BoundsOctreeNode implements IRenderNodeObject  {
+	class BoundsOctreeNode  {
 
 		/**
 		 * 创建一个 <code>BoundsOctreeNode</code> 实例。
@@ -9244,8 +9080,6 @@ enum ShaderDataType {
 		 */
 
 		constructor(octree:BoundsOctree,parent:BoundsOctreeNode,baseLength:number,center:Vector3);
-		private _getCollidingWithCastShadowFrustum:any;
-		getManagerNode():BoundsOctree;
 
 		/**
 		 * 添加指定物体。
@@ -9303,7 +9137,6 @@ enum ShaderDataType {
 		 * @param result 相交物体列表。
 		 */
 		getCollidingWithFrustum(cameraCullInfo:CameraCullInfo,context:RenderContext3D,customShader:Shader3D,replacementTag:string,isShadowCasterCull:boolean):void;
-		getCollidingWithCastShadowFrustum(cameraCullInfo:ShadowCullInfo,contect:RenderContext3D):void;
 
 		/**
 		 * 获取是否与指定包围盒相交。
@@ -9331,12 +9164,12 @@ enum ShaderDataType {
 		/**
 		 * 获得八叉树节点
 		 */
-		_getOctreeNode():IRenderNodeObject;
+		_getOctreeNode():BoundsOctreeNode;
 
 		/**
 		 * 设置八叉树节点
 		 */
-		_setOctreeNode(value:IRenderNodeObject):void;
+		_setOctreeNode(value:BoundsOctreeNode):void;
 
 		/**
 		 * 获得动态列表中的Index
@@ -9429,8 +9262,6 @@ enum AmbientMode {
 		static SCENERENDERFLAG_RENDERQPAQUE:number;
 		static SCENERENDERFLAG_SKYBOX:number;
 		static SCENERENDERFLAG_RENDERTRANSPARENT:number;
-		static set _updateMark(value:number);
-		static get _updateMark():number;
 
 		/**
 		 * 加载场景,注意:不缓存。
@@ -9453,7 +9284,6 @@ enum AmbientMode {
 		 * 资源的URL地址。
 		 */
 		get url():string;
-		set sceneRenderableManager(manager:ISceneRenderManager);
 
 		/**
 		 * 是否允许雾化。
@@ -9573,7 +9403,6 @@ enum AmbientMode {
 		 * @override 
 		 */
 		protected _onInActive():void;
-		private _removeScriptInPool:any;
 
 		/**
 		 * @inheritDoc 
@@ -9628,59 +9457,6 @@ enum AmbientMode {
 		 */
 		getlightmaps():Texture2D[];
 	}
-
-	interface IRenderNodeObject{
-
-		/**
-		 * 获得管理节点
-		 */
-		getManagerNode():ISceneRenderManager;
-	}
-
-
-	interface ISceneRenderManager{
-
-		/**
-		 * 增加一个渲染节点
-		 */
-		addRender(object:IOctreeObject):void;
-
-		/**
-		 * 减少一个渲染节点
-		 */
-		removeRender(object:IOctreeObject):void;
-
-		/**
-		 * 添加运动物体。
-		 */
-		addMotionObject(object:IOctreeObject):void;
-
-		/**
-		 * 移除运动物体。
-		 */
-		removeMotionObject(object:IOctreeObject):void;
-
-		/**
-		 * 释放一个管理节点
-		 */
-		destroy():void;
-
-		/**
-		 * 裁剪之前的更新
-		 */
-		preFruUpdate():void;
-
-		/**
-		 * 直射光裁剪
-		 */
-		cullingShadow(cullInfo:ShadowCullInfo,context:RenderContext3D):void;
-
-		/**
-		 * 获取与指定视锥相交的的物理列表。
-		 */
-		getCollidingWithFrustum(cameraCullInfo:CameraCullInfo,context:RenderContext3D,shader:Shader3D,replacementTag:string,isShadowCasterCull:boolean):void;
-	}
-
 	class SimpleSkinnedMeshRenderer extends SkinnedMeshRenderer  {
 
 		/**
@@ -9758,7 +9534,6 @@ enum AmbientMode {
 		 */
 
 		constructor(owner:RenderableSprite3D);
-		protected _computeSkinnedData():void;
 
 		/**
 		 * @override 包围盒。
@@ -9881,11 +9656,6 @@ enum AmbientMode {
 		/**
 		 */
 		_setCreateURL(url:string):void;
-
-		/**
-		 * @private 
-		 */
-		protected _onInActiveInScene():void;
 
 		/**
 		 * @inheritDoc 
@@ -10517,37 +10287,6 @@ enum TrailAlignment {
 		 * @deprecated 
 		 */
 		set scale(value:Vector3);
-		localToGlobal(value:Vector3,out:Vector3):void;
-
-		/**
-		 * 转化成局部坐标
-		 * @param pos 
-		 * @param out 
-		 */
-		globalToLocal(pos:Vector3,out:Vector3):void;
-
-		/**
-		 * 转化成局部向量
-		 * @param pos 
-		 * @param out 
-		 */
-		toLocalNormal(pos:Vector3,out:Vector3):void;
-		toDir(forward:Vector3,dir:Vector3):void;
-		static tmpVec3:Vector3;
-
-		/**
-		 * 这是一个 glmatrix中的函数
-		 * a,b都是规格化以后的向量
-		 * Sets a quaternion to represent the shortest rotation from one
-		 * vector to another.
-		 * 
-		 * Both vectors are assumed to be unit length.
-		 * @param out the receiving quaternion.
-		 * @param a the initial vector
-		 * @param b the destination vector
-		 * @returns out
-		 */
-		rotationTo(out:Quaternion,a:Vector3,b:Vector3):boolean;
 	}
 
 	/**
@@ -10584,29 +10323,6 @@ enum DepthTextureMode {
 }
 
 	/**
-	 * <code>ShadowCasterPass</code> 类用于实现阴影渲染管线
-	 */
-	class DepthPass  {
-		private static SHADOW_BIAS:any;
-
-		constructor();
-
-		/**
-		 * 渲染深度更新
-		 * @param camera 
-		 * @param depthType 
-		 */
-		update(camera:Camera,depthType:DepthTextureMode,depthTextureFormat:RenderTextureDepthFormat):void;
-
-		/**
-		 * 渲染深度帧缓存
-		 * @param context 
-		 * @param depthType 
-		 */
-		render(context:RenderContext3D,depthType:DepthTextureMode):void;
-	}
-
-	/**
 	 * camera裁剪数据
 	 */
 	class CameraCullInfo  {
@@ -10630,17 +10346,6 @@ enum DepthTextureMode {
 		 * 遮挡标记
 		 */
 		cullingMask:number;
-	}
-
-	/**
-	 * 阴影裁剪数据
-	 */
-	class ShadowCullInfo  {
-		position:Vector3;
-		cullPlanes:Plane[];
-		cullSphere:BoundSphere;
-		cullPlaneCount:number;
-		direction:Vector3;
 	}
 
 	/**
@@ -11083,21 +10788,6 @@ enum IndexFormat {
 		 * 字节数组4
 		 */
 		static Byte4:string;
-
-		/**
-		 * 字节数组3
-		 */
-		static Byte3:string;
-
-		/**
-		 * 字节数组2
-		 */
-		static Byte2:string;
-
-		/**
-		 * 字节数组1
-		 */
-		static ByteOne:string;
 
 		/**
 		 * 半精度浮点数数组2
@@ -12285,11 +11975,6 @@ enum IndexFormat {
 		 * 设置矩阵为单位矩阵
 		 */
 		identity():void;
-
-		/**
-		 * 判断是否是单位矩阵
-		 */
-		isIdentity():boolean;
 
 		/**
 		 * 克隆。
@@ -14620,6 +14305,13 @@ enum IndexFormat {
 	}
 
 	/**
+	 * Laya物理类
+	 * internal
+	 */
+	class Physics3D  {
+	}
+
+	/**
 	 * <code>PhysicsCollider</code> 类用于创建物理碰撞器。
 	 */
 	class PhysicsCollider extends PhysicsTriggerComponent  {
@@ -15391,13 +15083,6 @@ enum IndexFormat {
 		 * @override 
 		 */
 		clone():any;
-	}
-
-	/**
-	 * Laya物理类
-	 * internal
-	 */
-	class Physics3D  {
 	}
 
 	/**
@@ -16439,35 +16124,6 @@ enum IndexFormat {
 	}
 
 	/**
-	 * <code>MulSampleRenderTexture</code>类用于创建多重采样渲染目标
-	 * webGL2.0多重采样才会生效
-	 */
-	class MulSampleRenderTexture extends RenderTexture  {
-
-		/**
-		 * 多重采样次数
-		 */
-		protected _mulSampler:number;
-
-		/**
-		 * 是否为多重采样贴图
-		 */
-		protected _mulSamplerRT:boolean;
-
-		constructor(width:number,height:number,format?:RenderTextureFormat,depthStencilFormat?:RenderTextureDepthFormat,mulSampler?:number);
-		protected _create(width:number,height:number):void;
-		protected _createGLDepthRenderbuffer(width:number,height:number):void;
-		protected _createGLDepthTexture(width:number,height:number):void;
-		_end():void;
-
-		/**
-		 * @inheritDoc 
-		 * @override 
-		 */
-		protected _disposeResource():void;
-	}
-
-	/**
 	 * <code>RenderTexture</code> 类用于创建渲染目标。
 	 */
 	class RenderTexture extends BaseTexture  {
@@ -16480,25 +16136,12 @@ enum IndexFormat {
 		/**
 		 * 从对象池获取临时渲染目标。
 		 */
-		static createFromPool(width:number,height:number,format?:number,depthStencilFormat?:number,mulSamples?:number):RenderTexture;
+		static createFromPool(width:number,height:number,format?:number,depthStencilFormat?:number):RenderTexture;
 
 		/**
 		 * 回收渲染目标到对象池,释放后可通过createFromPool复用。
 		 */
 		static recoverToPool(renderTexture:RenderTexture):void;
-
-		/**
-		 * 绑定到主画布上的RenderTexture
-		 */
-		static get bindCanvasRender():RenderTexture;
-		static set bindCanvasRender(value:RenderTexture);
-		protected _mulSampler:number;
-
-		/**
-		 * @inrernal 是否使用多重采样
-		 */
-		protected _mulSamplerRT:boolean;
-		protected _depthAttachMode:RTDEPTHATTACHMODE;
 
 		/**
 		 * 深度格式。
@@ -16509,14 +16152,6 @@ enum IndexFormat {
 		 * @override 
 		 */
 		get defaulteTexture():BaseTexture;
-		get mulSampler():number;
-		get depthStencilTexture():BaseTexture;
-
-		/**
-		 * FramBuffer的DepthAttach绑定模式
-		 */
-		set depthAttachMode(value:RTDEPTHATTACHMODE);
-		get depthAttachMode():RTDEPTHATTACHMODE;
 
 		/**
 		 * @param width 宽度。
@@ -16528,27 +16163,6 @@ enum IndexFormat {
 		constructor(width:number,height:number,format?:RenderTextureFormat,depthStencilFormat?:RenderTextureDepthFormat);
 
 		/**
-		 * 创建gl_Texture的类型，当渲染器拿到此RT时，会将gl_texture的值传给渲染
-		 * @param width 
-		 * @param height 
-		 */
-		protected _creatGlTexture(width:number,height:number):void;
-
-		/**
-		 * 创建gl_DepthTexture的类型，用来存储深度信息，可以拷贝出来当贴图用
-		 * @param width 
-		 * @param height 
-		 */
-		protected _createGLDepthTexture(width:number,height:number):void;
-
-		/**
-		 * 创建gl_DepthRender的类型，用来存储深度信息
-		 * @param width 
-		 * @param height 
-		 */
-		protected _createGLDepthRenderbuffer(width:number,height:number):void;
-
-		/**
 		 * 获得像素数据。
 		 * @param x X像素坐标。
 		 * @param y Y像素坐标。
@@ -16556,7 +16170,7 @@ enum IndexFormat {
 		 * @param height 高度。
 		 * @return 像素数据。
 		 */
-		getData(x:number,y:number,width:number,height:number,out:Uint8Array|Float32Array):Uint8Array|Float32Array;
+		getData(x:number,y:number,width:number,height:number,out:Uint8Array):Uint8Array;
 
 		/**
 		 * @inheritDoc 
@@ -17079,8 +16693,6 @@ enum TextureCubeFace {
 		 * @return 纹理。
 		 */
 		getTexture(index:number):BaseTexture;
-		setValueData(index:number,value:any):void;
-		getValueData(index:number):any;
 
 		/**
 		 * 设置Attribute。
@@ -17730,13 +17342,6 @@ enum ShadowLightType {
 		 * @param e 目标数据
 		 */
 		static quaternionWeight(f:Quaternion,weight:number,e:Quaternion):void;
-
-		/**
-		 * 将RenderTexture转换为Base64
-		 * @param rendertexture 渲染Buffer
-		 * @returns 
-		 */
-		static uint8ArrayToArrayBuffer(rendertexture:RenderTexture):String;
 	}
 
 	/**
@@ -21070,12 +20675,6 @@ const enum VIDEOTYPE {
 		private _onKeyDown:any;
 
 		/**
-		 * 小游戏专用(解决键盘输入框内容和游戏输入框内容不同步的bug)
-		 * @param value 
-		 */
-		miniGameTxt(value:string):void;
-
-		/**
 		 * @inheritDoc 
 		 * @override 
 		 */
@@ -23187,7 +22786,7 @@ const enum VIDEOTYPE {
 		/**
 		 * @private 存储文字行数信息。
 		 */
-		protected _lines:string[]|null;
+		protected _lines:any[]|null;
 
 		/**
 		 * @private 保存每行宽度
@@ -29980,7 +29579,7 @@ enum HTMLElementType {
 		 * @param cache 是否缓存加载的资源。
 		 * @return 如果url为数组，返回true；否则返回指定的资源类对象。
 		 */
-		create(url:string|(string | createItem)[],complete?:Handler|null,progress?:Handler|null,type?:string|null,constructParams?:any[]|null,propertyParams?:any,priority?:number,cache?:boolean):void;
+		create(url:any,complete?:Handler|null,progress?:Handler|null,type?:string|null,constructParams?:any[]|null,propertyParams?:any,priority?:number,cache?:boolean):void;
 
 		/**
 		 * @private 
@@ -30001,7 +29600,7 @@ enum HTMLElementType {
 		 * @param useWorkerLoader (default = false)是否使用worker加载（只针对IMAGE类型和ATLAS类型，并且浏览器支持的情况下生效）
 		 * @return 此 LoaderManager 对象本身。
 		 */
-		load(url:string|(string | loadItem)[],complete?:Handler|null,progress?:Handler|null,type?:string|null,priority?:number,cache?:boolean,group?:string|null,ignoreCache?:boolean,useWorkerLoader?:boolean):LoaderManager;
+		load(url:string|string[]|loadItem[],complete?:Handler|null,progress?:Handler|null,type?:string|null,priority?:number,cache?:boolean,group?:string|null,ignoreCache?:boolean,useWorkerLoader?:boolean):LoaderManager;
 		private _resInfoLoaded:any;
 		private _next:any;
 		private _doLoad:any;
@@ -30089,29 +29688,6 @@ enum HTMLElementType {
 	}
 
 	interface loadItem{
-	}
-
-
-	interface createItem{
-		url:string;
-
-		/**
-		 * 资源类型
-		 */
-		type?:string;
-		priority?:number;
-		group?:string;
-
-		/**
-		 * 资源属性参数。
-		 */
-		propertyParams?:any[];
-
-		/**
-		 * 资源构造函数参数。
-		 */
-		constructParams?:any[];
-		progress?:number;
 	}
 
 
@@ -31527,51 +31103,6 @@ enum HTMLElementType {
 	}
 
 	/**
-	 * 2D边框碰撞体
-	 */
-	class EdgeCollider extends ColliderBase  {
-
-		/**
-		 * 相对节点的x轴偏移
-		 */
-		private _x:any;
-
-		/**
-		 * 相对节点的y轴偏移
-		 */
-		private _y:any;
-
-		/**
-		 * 用逗号隔开的点的集合，注意只有两个点，格式：x,y,x,y
-		 */
-		private _points:any;
-
-		/**
-		 * @override 
-		 */
-		protected getDef():any;
-		private _setShape:any;
-
-		/**
-		 * 相对节点的x轴偏移
-		 */
-		get x():number;
-		set x(value:number);
-
-		/**
-		 * 相对节点的y轴偏移
-		 */
-		get y():number;
-		set y(value:number);
-
-		/**
-		 * 用逗号隔开的点的集合，注意只有两个点，格式：x,y,x,y
-		 */
-		get points():string;
-		set points(value:string);
-	}
-
-	/**
 	 * 距离关节：两个物体上面各自有一点，两点之间的距离固定不变
 	 */
 	class DistanceJoint extends JointBase  {
@@ -31612,24 +31143,14 @@ enum HTMLElementType {
 		private _length:any;
 
 		/**
-		 * 约束的最小长度，-1表示使用默认值
-		 */
-		private _maxLength:any;
-
-		/**
-		 * 约束的最大长度，-1表示使用默认值
-		 */
-		private _minLength:any;
-
-		/**
-		 * 弹簧系统的震动频率，可以视为弹簧的弹性系数，通常频率应该小于时间步长频率的一半
+		 * 弹簧系统的震动频率，可以视为弹簧的弹性系数
 		 */
 		private _frequency:any;
 
 		/**
-		 * 刚体在回归到节点过程中受到的阻尼比，建议取值0~1
+		 * 刚体在回归到节点过程中受到的阻尼，建议取值0~1
 		 */
-		private _dampingRatio:any;
+		private _damping:any;
 
 		/**
 		 * @override 
@@ -31643,25 +31164,13 @@ enum HTMLElementType {
 		set length(value:number);
 
 		/**
-		 * 约束的最小长度
-		 */
-		get minLength():number;
-		set minLength(value:number);
-
-		/**
-		 * 约束的最大长度
-		 */
-		get maxLength():number;
-		set maxLength(value:number);
-
-		/**
-		 * 弹簧系统的震动频率，可以视为弹簧的弹性系数，通常频率应该小于时间步长频率的一半
+		 * 弹簧系统的震动频率，可以视为弹簧的弹性系数
 		 */
 		get frequency():number;
 		set frequency(value:number);
 
 		/**
-		 * 刚体在回归到节点过程中受到的阻尼比，建议取值0~1
+		 * 刚体在回归到节点过程中受到的阻尼，建议取值0~1
 		 */
 		get damping():number;
 		set damping(value:number);
@@ -31724,12 +31233,6 @@ enum HTMLElementType {
 		 */
 		get joint():any;
 		protected _createJoint():void;
-
-		/**
-		 * 获取是否为单实例组件。
-		 * @override 
-		 */
-		get isSingleton():boolean;
 	}
 
 	/**
@@ -31844,14 +31347,14 @@ enum HTMLElementType {
 		private _maxForce:any;
 
 		/**
-		 * 弹簧系统的震动频率，可以视为弹簧的弹性系数，通常频率应该小于时间步长频率的一半
+		 * 弹簧系统的震动频率，可以视为弹簧的弹性系数
 		 */
 		private _frequency:any;
 
 		/**
-		 * 刚体在回归到节点过程中受到的阻尼比，建议取值0~1
+		 * 刚体在回归到节点过程中受到的阻尼，取值0~1
 		 */
-		private _dampingRatio:any;
+		private _damping:any;
 		private onMouseDown:any;
 
 		/**
@@ -31868,13 +31371,13 @@ enum HTMLElementType {
 		set maxForce(value:number);
 
 		/**
-		 * 弹簧系统的震动频率，可以视为弹簧的弹性系数，通常频率应该小于时间步长频率的一半
+		 * 弹簧系统的震动频率，可以视为弹簧的弹性系数
 		 */
 		get frequency():number;
 		set frequency(value:number);
 
 		/**
-		 * 刚体在回归到节点过程中受到的阻尼比，建议取值0~1
+		 * 刚体在回归到节点过程中受到的阻尼，取值0~1
 		 */
 		get damping():number;
 		set damping(value:number);
@@ -32146,6 +31649,58 @@ enum HTMLElementType {
 	}
 
 	/**
+	 * 绳索关节：限制了两个点之间的最大距离。它能够阻止连接的物体之间的拉伸，即使在很大的负载下
+	 */
+	class RopeJoint extends JointBase  {
+
+		/**
+		 * @private 
+		 */
+		private static _temp:any;
+
+		/**
+		 * [首次设置有效]关节的自身刚体
+		 */
+		selfBody:RigidBody;
+
+		/**
+		 * [首次设置有效]关节的连接刚体，可不设置，默认为左上角空刚体
+		 */
+		otherBody:RigidBody;
+
+		/**
+		 * [首次设置有效]自身刚体链接点，是相对于自身刚体的左上角位置偏移
+		 */
+		selfAnchor:any[];
+
+		/**
+		 * [首次设置有效]链接刚体链接点，是相对于otherBody的左上角位置偏移
+		 */
+		otherAnchor:any[];
+
+		/**
+		 * [首次设置有效]两个刚体是否可以发生碰撞，默认为false
+		 */
+		collideConnected:boolean;
+
+		/**
+		 * selfAnchor和otherAnchor之间的最大距离
+		 */
+		private _maxLength:any;
+
+		/**
+		 * @override 
+		 */
+		protected _createJoint():void;
+
+		/**
+		 * selfAnchor和otherAnchor之间的最大距离
+		 */
+		get maxLength():number;
+		set maxLength(value:number);
+	}
+
+	/**
 	 * 焊接关节：焊接关节的用途是使两个物体不能相对运动，受到关节的限制，两个刚体的相对位置和角度都保持不变，看上去像一个整体
 	 */
 	class WeldJoint extends JointBase  {
@@ -32176,14 +31731,14 @@ enum HTMLElementType {
 		collideConnected:boolean;
 
 		/**
-		 * 弹簧系统的震动频率，可以视为弹簧的弹性系数，通常频率应该小于时间步长频率的一半
+		 * 弹簧系统的震动频率，可以视为弹簧的弹性系数
 		 */
 		private _frequency:any;
 
 		/**
-		 * 刚体在回归到节点过程中受到的阻尼比，建议取值0~1
+		 * 刚体在回归到节点过程中受到的阻尼，取值0~1
 		 */
-		private _dampingRatio:any;
+		private _damping:any;
 
 		/**
 		 * @override 
@@ -32191,13 +31746,13 @@ enum HTMLElementType {
 		protected _createJoint():void;
 
 		/**
-		 * 弹簧系统的震动频率，可以视为弹簧的弹性系数，通常频率应该小于时间步长频率的一半
+		 * 弹簧系统的震动频率，可以视为弹簧的弹性系数
 		 */
 		get frequency():number;
 		set frequency(value:number);
 
 		/**
-		 * 刚体在回归到节点过程中受到的阻尼比，建议取值0~1
+		 * 刚体在回归到节点过程中受到的阻尼，建议取值0~1
 		 */
 		get damping():number;
 		set damping(value:number);
@@ -32239,14 +31794,14 @@ enum HTMLElementType {
 		axis:any[];
 
 		/**
-		 * 弹簧系统的震动频率，可以视为弹簧的弹性系数，通常频率应该小于时间步长频率的一半
+		 * 弹簧系统的震动频率，可以视为弹簧的弹性系数
 		 */
 		private _frequency:any;
 
 		/**
-		 * 刚体在回归到节点过程中受到的阻尼比，建议取值0~1
+		 * 刚体在回归到节点过程中受到的阻尼，取值0~1
 		 */
-		private _dampingRatio:any;
+		private _damping:any;
 
 		/**
 		 * 是否开启马达，开启马达可使目标刚体运动
@@ -32264,33 +31819,18 @@ enum HTMLElementType {
 		private _maxMotorTorque:any;
 
 		/**
-		 * 是否对刚体的移动范围加以约束
-		 */
-		private _enableLimit:any;
-
-		/**
-		 * 启用约束后，刚体移动范围的下限，是距离anchor的偏移量
-		 */
-		private _lowerTranslation:any;
-
-		/**
-		 * 启用约束后，刚体移动范围的上限，是距离anchor的偏移量
-		 */
-		private _upperTranslation:any;
-
-		/**
 		 * @override 
 		 */
 		protected _createJoint():void;
 
 		/**
-		 * 弹簧系统的震动频率，可以视为弹簧的弹性系数，通常频率应该小于时间步长频率的一半
+		 * 弹簧系统的震动频率，可以视为弹簧的弹性系数
 		 */
 		get frequency():number;
 		set frequency(value:number);
 
 		/**
-		 * 刚体在回归到节点过程中受到的阻尼比，建议取值0~1
+		 * 刚体在回归到节点过程中受到的阻尼，取值0~1
 		 */
 		get damping():number;
 		set damping(value:number);
@@ -32312,24 +31852,6 @@ enum HTMLElementType {
 		 */
 		get maxMotorTorque():number;
 		set maxMotorTorque(value:number);
-
-		/**
-		 * 是否对刚体的移动范围加以约束
-		 */
-		get enableLimit():boolean;
-		set enableLimit(value:boolean);
-
-		/**
-		 * 启用约束后，刚体移动范围的下限，是距离anchor的偏移量
-		 */
-		get lowerTranslation():number;
-		set lowerTranslation(value:number);
-
-		/**
-		 * 启用约束后，刚体移动范围的上限，是距离anchor的偏移量
-		 */
-		get upperTranslation():number;
-		set upperTranslation(value:number);
 	}
 
 	/**
@@ -33172,7 +32694,6 @@ enum HTMLElementType {
 		 * 获取mipmap数量。
 		 */
 		get mipmapCount():number;
-		set mipmapCount(value:number);
 		get defaulteTexture():BaseTexture;
 
 		/**
@@ -33992,15 +33513,8 @@ enum RenderTextureDepthFormat {
     DEPTHSTENCIL_24_8 = 2,
     /**深度格式_DEPTHSTENCIL_NONE。*/
     DEPTHSTENCIL_NONE = 3,
-    /**深度格式_DEPTH_32。*/
-    DEPTH_32 = 4,
     /** @deprecated*/
     DEPTHSTENCIL_16_8 = 2
-}
-
-enum RTDEPTHATTACHMODE {
-    RENDERBUFFER = 0,
-    TEXTURE = 1
 }
 
 	/**
@@ -34414,11 +33928,6 @@ enum RTDEPTHATTACHMODE {
 		static blackTexture:Texture2D;
 
 		/**
-		 * 错误纹理
-		 */
-		static erroTextur:Texture2D;
-
-		/**
 		 * 加载Texture2D。
 		 * @param url Texture2D地址。
 		 * @param complete 完成回掉。
@@ -34502,12 +34011,8 @@ enum TextureFormat {
     DXT5 = 4,
     /**纹理格式_ETC2RGB。*/
     ETC1RGB = 5,
-    ETC2RGB = 6,
-    ETC2RGBA = 7,
     /**纹理格式_ETC2RGB_PUNCHTHROUGHALPHA。*/
     /**纹理格式_PVRTCRGB_2BPPV。*/
-    ETC2RGB_Alpha8 = 8,
-    ETC2SRGB = 28,
     PVRTCRGB_2BPPV = 9,
     /**纹理格式_PVRTCRGBA_2BPPV。*/
     PVRTCRGBA_2BPPV = 10,
@@ -34518,28 +34023,7 @@ enum TextureFormat {
     /**RGBA格式纹理,每个通道32位浮点数。*/
     R32G32B32A32 = 15,
     /**RGBA格式纹理，每个通道16位浮点数。 */
-    R16G16B16A16 = 17,
-    /**ASTC 4x4*/
-    ASTC4x4 = 18,
-    /**ASTC sRGB 4x4 */
-    ASTC4x4SRGB = 23,
-    /**ASTC 6x6*/
-    ASTC6x6 = 19,
-    /**ASTC  6x6*/
-    ASTC6x6SRGB = 24,
-    /**ASTC 8x8 */
-    ASTC8x8 = 20,
-    ASTC8x8SRGB = 25,
-    /**ASTC 10x10 */
-    ASTC10x10 = 21,
-    ASTC10x10SRGB = 26,
-    /**ASTC 12x12 */
-    ASTC12x12 = 22,
-    ASTC12x12SRGB = 27,
-    /**ktx图片 */
-    KTXTEXTURE = -1,
-    /**pvr图片 */
-    PVRTEXTURE = -2
+    R16G16B16A16 = 17
 }
 
 	/**
@@ -34610,316 +34094,8 @@ enum WarpMode {
     /** 循环平铺。*/
     Repeat = 0,
     /** 超过UV边界后采用最后一个像素。*/
-    Clamp = 1,
-    /** 镜像采样 */
-    Mirrored = 2
+    Clamp = 1
 }
-	class SpineAssetManager extends spine.AssetManager  {
-
-		constructor(pathPrefix:string,downloader:any,textureDic:any);
-	}
-	class SpineGLTexture extends Texture  {
-
-		constructor(tex:Texture2D|Texture);
-		getImage():Object;
-		setFilters(minFilter:spine.TextureFilter,magFilter:spine.TextureFilter):void;
-		setWraps(uWrap:spine.TextureWrap,vWrap:spine.TextureWrap):void;
-	}
-
-	/**
-	 * 动画开始播放调度
-	 * @eventType Event.PLAYED
-	 */
-
-	/**
-	 * 动画停止播放调度
-	 * @eventType Event.STOPPED
-	 */
-
-	/**
-	 * 动画暂停播放调度
-	 * @eventType Event.PAUSED
-	 */
-
-	/**
-	 * 自定义事件。
-	 * @eventType Event.LABEL
-	 */
-
-	/**
-	 * spine动画由<code>SpineTemplet</code>，<code>SpineSkeletonRender</code>，<code>SpineSkeleton</code>三部分组成。
-	 */
-	class SpineSkeleton extends Sprite  {
-		static stopped:number;
-		static paused:number;
-		static playing:number;
-		private _templet:any;
-		private timeKeeper:any;
-		private skeleton:any;
-		private state:any;
-		private stateData:any;
-		private currentPlayTime:any;
-		private skeletonRenderer:any;
-		_ins:SpineSkeleton;
-
-		/**
-		 * 播放速率
-		 */
-		private _playbackRate:any;
-		private trackIndex:any;
-
-		/**
-		 * 创建一个Skeleton对象
-		 * @param templet 骨骼动画模板
-		 */
-
-		constructor(templet?:SpineTempletBase);
-		init(templet:SpineTempletBase):void;
-
-		/**
-		 * 播放动画
-		 * @param nameOrIndex 动画名字或者索引
-		 * @param loop 是否循环播放
-		 * @param force false,如果要播的动画跟上一个相同就不生效,true,强制生效
-		 * @param start 起始时间
-		 * @param end 结束时间
-		 * @param freshSkin 是否刷新皮肤数据
-		 * @param playAudio 是否播放音频
-		 */
-		play(nameOrIndex:any,loop:boolean,force?:boolean,start?:number,end?:number,freshSkin?:boolean,playAudio?:boolean):void;
-		private _update:any;
-
-		/**
-		 * 得到当前动画的数量
-		 * @return 当前动画的数量
-		 */
-		getAnimNum():number;
-
-		/**
-		 * 得到指定动画的名字
-		 * @param index 动画的索引
-		 */
-		getAniNameByIndex(index:number):string;
-
-		/**
-		 * 通过名字得到插槽的引用
-		 * @param slotName 
-		 */
-		getSlotByName(slotName:string):spine.Slot;
-
-		/**
-		 * 设置动画播放速率
-		 * @param value 1为标准速率
-		 */
-		playbackRate(value:number):void;
-
-		/**
-		 * 通过名字显示一套皮肤
-		 * @param name 皮肤的名字
-		 */
-		showSkinByName(name:string):void;
-
-		/**
-		 * 通过索引显示一套皮肤
-		 * @param skinIndex 皮肤索引
-		 */
-		showSkinByIndex(skinIndex:number):void;
-
-		/**
-		 * 停止动画
-		 */
-		stop():void;
-
-		/**
-		 * 暂停动画的播放
-		 */
-		paused():void;
-
-		/**
-		 * 恢复动画的播放
-		 */
-		resume():void;
-
-		/**
-		 * 销毁当前动画
-		 * @override 
-		 */
-		destroy(destroyChild?:boolean):void;
-
-		/**
-		 * 得到动画模板的引用
-		 * @return templet
-		 */
-		get templet():SpineTempletBase;
-
-		/**
-		 * 添加一个动画
-		 * @param nameOrIndex 动画名字或者索引
-		 * @param loop 是否循环播放
-		 * @param delay 延迟调用，可以为负数
-		 */
-		addAnimation(nameOrIndex:any,loop?:boolean,delay?:number):void;
-
-		/**
-		 * 设置当动画被改变时，存储混合(交叉淡出)的持续时间
-		 * @param fromNameOrIndex 
-		 * @param toNameOrIndex 
-		 * @param duration 
-		 */
-		setMix(fromNameOrIndex:any,toNameOrIndex:any,duration:number):void;
-
-		/**
-		 * 获取骨骼信息(spine.Bone)
-		 * 注意: 获取到的是spine运行时的骨骼信息(spine.Bone)，不适用引擎的方法
-		 * @param boneName 
-		 */
-		getBoneByName(boneName:string):spine.Bone;
-
-		/**
-		 * 获取Skeleton(spine.Skeleton)
-		 */
-		getSkeleton():Skeleton;
-
-		/**
-		 * 替换插槽皮肤
-		 * @param slotName 
-		 * @param attachmentName 
-		 */
-		setSlotAttachment(slotName:string,attachmentName:string):void;
-
-		/**
-		 * 设置当前播放位置
-		 * @param value 当前时间
-		 */
-		set currentTime(value:number);
-
-		/**
-		 * 获取当前播放状态
-		 * @return 当前播放状态
-		 */
-		get playState():number;
-	}
-	class SpineSkeletonRenderer  {
-		static QUAD_TRIANGLES:number[];
-		premultipliedAlpha:boolean;
-		vertexEffect:spine.VertexEffect;
-		private tempColor:any;
-		private tempColor2:any;
-		private vertices:any;
-		private vertexSize:any;
-		private twoColorTint:any;
-		private renderable:any;
-		private clipper:any;
-		private temp:any;
-		private temp2:any;
-		private temp3:any;
-		private temp4:any;
-
-		constructor(twoColorTint?:boolean);
-		draw(skeleton:Skeleton,slotRangeStart:number,slotRangeEnd:number,spineSkeletonIns:SpineSkeleton,textureList:any):void;
-	}
-
-	/**
-	 * 数据解析完成后的调度。
-	 * @eventType Event.COMPLETE
-	 */
-
-	/**
-	 * 数据解析错误后的调度。
-	 * @eventType Event.ERROR
-	 */
-	class SpineTemplet extends SpineTempletBase  {
-
-		/**
-		 * Spine动画模板类
-		 * @param ver spine资源版本号
-		 */
-
-		constructor(ver:SpineVersion);
-		loadAni(jsonOrSkelUrl:string):void;
-
-		/**
-		 * 创建动画
-		 * @return 
-		 */
-		buildArmature():SpineSkeleton;
-
-		/**
-		 * 通过索引得动画名称
-		 * @param index 
-		 * @return 
-		 */
-		getAniNameByIndex(index:number):string;
-
-		/**
-		 * 通过皮肤名字得到皮肤索引
-		 * @param skinName 皮肤名称
-		 * @return 
-		 */
-		getSkinIndexByName(skinName:string):number;
-
-		/**
-		 * 释放纹理
-		 * @override 
-		 */
-		destroy():void;
-	}
-
-enum SpineVersion {
-    "v3_7" = "v3_7",
-    "v3_8" = "v3_8",
-    "v4_0" = "v4_0"
-}
-
-enum SpineFormat {
-    "json" = "json",
-    "binary" = "binary"
-}
-
-	/**
-	 * Spine动画模板基类
-	 */
-	class SpineTempletBase extends Resource  {
-		private _templet:any;
-		private _isDestroyed:any;
-		skeletonData:spine.SkeletonData;
-		private _layaPremultipliedAlpha:any;
-		private _spinePremultipliedAlpha:any;
-
-		constructor();
-		get templet():SpineTempletBase;
-		set templet(value:SpineTempletBase);
-		get isDestroyed():boolean;
-		set isDestroyed(value:boolean);
-		get spinePremultipliedAlpha():boolean;
-		set spinePremultipliedAlpha(value:boolean);
-
-		/**
-		 * 创建动画
-		 * @return 
-		 */
-		buildArmature():SpineSkeleton;
-
-		/**
-		 * 通过索引得动画名称
-		 * @param index 
-		 * @return 
-		 */
-		getAniNameByIndex(index:number):string;
-
-		/**
-		 * 通过皮肤名字得到皮肤索引
-		 * @param skinName 皮肤名称
-		 * @return 
-		 */
-		getSkinIndexByName(skinName:string):number;
-
-		/**
-		 * 释放纹理
-		 * @override 
-		 */
-		destroy():void;
-	}
 
 	/**
 	 * @private 
@@ -40541,11 +39717,6 @@ enum SpineFormat {
 		get width():number;
 
 		/**
-		 * 兼容以前的changeItems逻辑，是否在发生变动时，使用 sortItem 排序所有item
-		 */
-		isSortItem:boolean;
-
-		/**
 		 * @inheritDoc 
 		 * @override 
 		 */
@@ -42990,36 +42161,6 @@ enum SpineFormat {
 		 * 显示鼠标
 		 */
 		static show():void;
-	}
-	class PerformancePlugin  {
-		static _enable:boolean;
-		static PERFORMANCE_LAYA:string;
-		static PERFORMANCE_LAYA_3D:string;
-		static PERFORMANCE_LAYA_2D:string;
-		static PERFORMANCE_LAYA_3D_PRERENDER:string;
-		static PERFORMANCE_LAYA_3D_UPDATESCRIPT:string;
-		static PERFORMANCE_LAYA_3D_PHYSICS:string;
-		static PERFORMANCE_LAYA_3D_PHYSICS_SIMULATE:string;
-		static PERFORMANCE_LAYA_3D_PHYSICS_CHARACTORCOLLISION:string;
-		static PERFORMANCE_LAYA_3D_PHYSICS_EVENTSCRIPTS:string;
-		static PERFORMANCE_LAYA_3D_RENDER:string;
-		static PERFORMANCE_LAYA_3D_RENDER_SHADOWMAP:string;
-		static PERFORMANCE_LAYA_3D_RENDER_CLUSTER:string;
-		static PERFORMANCE_LAYA_3D_RENDER_CULLING:string;
-		static PERFORMANCE_LAYA_3D_RENDER_RENDERDEPTHMDOE:string;
-		static PERFORMANCE_LAYA_3D_RENDER_RENDEROPAQUE:string;
-		static PERFORMANCE_LAYA_3D_RENDER_RENDERCOMMANDBUFFER:string;
-		static PERFORMANCE_LAYA_3D_RENDER_RENDERTRANSPARENT:string;
-		static PERFORMANCE_LAYA_3D_RENDER_POSTPROCESS:string;
-		static setPerformanceDataTool(tool:any):void;
-		static begainSample(path:string):void;
-		static endSample(path:string):number;
-		static expoertFile(path:string):any;
-		static showFunSampleFun(path:string):void;
-		static set enable(value:boolean);
-		static get enable():boolean;
-		static set enableDataExport(value:boolean);
-		static get enableDataExport():boolean;
 	}
 
 	/**

@@ -245,8 +245,6 @@
 	            else if (!isNaN(this.left)) {
 	                owner.x = Math.round(this.left + owner.pivotX * owner.scaleX);
 	                if (!isNaN(this.right)) {
-	                    if (!parent._width)
-	                        return false;
 	                    var temp = (parent._width - this.left - this.right) / (owner.scaleX || 0.01);
 	                    if (temp != owner.width) {
 	                        owner.width = temp;
@@ -272,8 +270,6 @@
 	            else if (!isNaN(this.top)) {
 	                owner.y = Math.round(this.top + owner.pivotY * owner.scaleY);
 	                if (!isNaN(this.bottom)) {
-	                    if (!parent._height)
-	                        return false;
 	                    var temp = (parent._height - this.top - this.bottom) / (owner.scaleY || 0.01);
 	                    if (temp != owner.height) {
 	                        owner.height = temp;
@@ -1476,7 +1472,7 @@
 	    }
 	    changeClip() {
 	        this._clipChanged = false;
-	        if (!this._skin || this.destroyed)
+	        if (!this._skin)
 	            return;
 	        var img = Laya.Loader.getRes(this._skin);
 	        if (img) {
@@ -2216,12 +2212,7 @@
 	            var pow = Math.pow(10, (this._tick + "").length - 1);
 	            this._value = Math.round(Math.round(this._value / this._tick) * this._tick * pow) / pow;
 	        }
-	        if (this._max >= this._max) {
-	            this._value = this._value > this._max ? this._max : this._value < this._min ? this._min : this._value;
-	        }
-	        else {
-	            this._value = this._value > this._min ? this._min : this._value < this._max ? this._max : this._value;
-	        }
+	        this._value = this._value > this._max ? this._max : this._value < this._min ? this._min : this._value;
 	        var num = this._max - this._min;
 	        if (num === 0)
 	            num = 1;
@@ -2391,9 +2382,6 @@
 	        }
 	    }
 	    _skinLoaded() {
-	        if (this.destroyed) {
-	            return;
-	        }
 	        this.slider.skin = this._skin;
 	        this.callLater(this.changeScrollBar);
 	        this._sizeChanged();
@@ -3481,8 +3469,6 @@
 	        this.labels = labels;
 	    }
 	    destroy(destroyChild = true) {
-	        Laya.ILaya.stage.off(Laya.Event.MOUSE_DOWN, this, this.removeList);
-	        Laya.ILaya.stage.off(Laya.Event.MOUSE_WHEEL, this, this._onStageMouseWheel);
 	        super.destroy(destroyChild);
 	        this._button && this._button.destroy(destroyChild);
 	        this._list && this._list.destroy(destroyChild);
@@ -3824,9 +3810,6 @@
 	        }
 	    }
 	    _skinLoaded() {
-	        if (this.destroyed) {
-	            return;
-	        }
 	        this._bg.skin = this._skin;
 	        this._bar.skin = this._skin.replace(".png", "$bar.png");
 	        this.callLater(this.changeValue);
@@ -5322,10 +5305,6 @@
 	Laya.ClassUtils.regClass("Laya.HBox", HBox);
 
 	class VBox extends LayoutBox {
-	    constructor() {
-	        super(...arguments);
-	        this.isSortItem = false;
-	    }
 	    set width(value) {
 	        if (this._width != value) {
 	            super.width = value;
@@ -5346,9 +5325,7 @@
 	                maxWidth = this._width ? this._width : Math.max(maxWidth, item.width * item.scaleX);
 	            }
 	        }
-	        if (this.isSortItem) {
-	            this.sortItem(items);
-	        }
+	        this.sortItem(items);
 	        var top = 0;
 	        for (i = 0, n = items.length; i < n; i++) {
 	            item = items[i];
@@ -5703,7 +5680,7 @@
 	    _closeOnSide() {
 	        var dialog = this.getChildAt(this.numChildren - 1);
 	        if (dialog instanceof IUI.Dialog)
-	            dialog.close("side");
+	            dialog.close();
 	    }
 	    setLockView(value) {
 	        if (!this.lockLayer) {

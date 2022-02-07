@@ -12,9 +12,9 @@
             "props": {
                 "var": "newGui",
                 "name":"btnGuide",
-                "skin": "ui/ydao.png",
+                "skin": "res/tiaoyue.png",
                 "centerX":0,
-                "bottom":0
+                "bottom":30
             },
             "compId": 3
         }

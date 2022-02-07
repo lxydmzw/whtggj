@@ -229,7 +229,6 @@
 	        style.position = 'absolute';
 	        style.top = '0px';
 	        style.left = '0px';
-	        this.video.setAttribute('crossorigin', 'anonymous');
 	        this.video.addEventListener("loadedmetadata", () => {
 	            this._w = this.video.videoWidth;
 	            this._h = this.video.videoHeight;
@@ -300,9 +299,7 @@
 	    updateTexture() {
 	        var gl = Laya.LayaGL.instance;
 	        Laya.WebGLContext.bindTexture(this.gl, gl.TEXTURE_2D, this._source);
-	        this.gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
 	        this.gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, this.video);
-	        this.gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
 	        WebGLVideo.curBindSource = this._source;
 	    }
 	    get _glTexture() {

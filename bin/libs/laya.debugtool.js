@@ -5088,9 +5088,7 @@
 	        }
 	        for (i = 0; i < len; i++) {
 	            key = DebugPanel.tObjKeys[i];
-	            if (key !== "__proto__") {
-	                this.preValueO[key] = tTarget[key];
-	            }
+	            this.preValueO[key] = tTarget[key];
 	        }
 	    }
 	    adptPos() {
