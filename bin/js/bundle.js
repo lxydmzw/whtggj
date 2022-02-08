@@ -2556,10 +2556,15 @@
 			}
 		}
 		onPlayGameClick() {
-			this.setSound(true);
-			Laya.Scene.open("qq_views/qq_TrySkinFree.scene", false, Laya.Handler.create(this, v => {
-				this.close();
-			}));
+			var skeleton = new Laya.Skeleton();
+	//添加到舞台
+	this.addChild(skeleton);
+	//通过加载直接创建动画
+	skeleton.load("res/xstc.sk");
+			// this.setSound(true);
+			// Laya.Scene.open("qq_views/qq_TrySkinFree.scene", false, Laya.Handler.create(this, v => {
+			// 	this.close();
+			// }));
 		}
 		setSound(status) {
 			let statusStr = status ? "kai.png" : "guan.png";
