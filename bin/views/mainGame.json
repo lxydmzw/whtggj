@@ -3,12 +3,12 @@
     "props": {
         "y": 0,
         "x": 0,
-        "width": 750,
+        "width": 1334,
         "top": 0,
         "runtime": "scripts/views/GameView.ts",
         "right": 0,
         "left": 0,
-        "height": 1337,
+        "height": 750,
         "bottom": 0
     },
     "compId": 2,
@@ -100,12 +100,12 @@
         {
             "type": "Box",
             "props": {
-                "y": 939,
                 "x": 305.5,
                 "width": 139,
                 "visible": false,
                 "var": "isXuLi",
-                "height": 335
+                "height": 335,
+                "bottom":100
             },
             "compId": 177,
             "child": [
@@ -135,8 +135,7 @@
                     "type": "Image",
                     "props": {
                         "y": 0,
-                        "x": -91,
-                        "skin": "ui/font_xili.png"
+                        "skin": "res/xuli.png"
                     },
                     "compId": 182
                 },
@@ -153,7 +152,6 @@
                     "type": "ProgressBar",
                     "props": {
                         "y": 290,
-                        "x": -91,
                         "width": 344,
                         "var": "clickValue",
                         "value": 0.2,
@@ -720,7 +718,7 @@
         "ui/kuangdian-progress$bar-2.png",
         "ui/kuangdian-guangquan-1.png",
         "ui/kuangdian-guangquan-2.png",
-        "ui/font_xili.png",
+        "res/xuli.png",
         "ui/kongzhi-shou-2.png",
         "ui/kuangdian.png",
         "comp/pd_lansetouxiangkuang.png",

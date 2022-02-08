@@ -329,7 +329,9 @@
 			this._userData.isPlaySound = isPlaySound;
 			this.writeStorage();
 			if (isPlaySound)
-				LayaSample.soundMgr.playBGM();
+				{
+					LayaSample.soundMgr.playBGM();
+				}
 			else
 				LayaSample.soundMgr.stopBGM();
 		}
@@ -539,14 +541,14 @@
 			for (let i = 0; i < soundCount; ++i) {
 				file = soundFile[i];
 				let innerAudioContext = new Laya.SoundChannel;
-				innerAudioContext.url = path + file + ".mp3";
+				innerAudioContext.url = path + file + ".ogg";
 				Laya.SoundManager.addChannel(innerAudioContext);
 				this._soundCtx[file] = true;
 			}
 		}
 		play(name, loop = 1) {
 			if (this._soundCtx[name] && LayaSample.storageMgr.isPlaySound()) {
-				Laya.SoundManager.playSound(this._pathRoot + name + ".mp3", loop);
+				Laya.SoundManager.playSound(this._pathRoot + name + ".ogg", loop);
 			}
 		}
 		playBullet() {
@@ -563,11 +565,11 @@
 		}
 		stop(name) {
 			if (this._soundCtx[name]) {
-				Laya.SoundManager.stopSound(this._pathRoot + name + ".mp3");
+				Laya.SoundManager.stopSound(this._pathRoot + name + ".ogg");
 			}
 		}
 		playBGM() {
-			let url = this._pathRoot + "bgm" + ".mp3";
+			let url = this._pathRoot + "bgm" + ".ogg";
 			if (LayaSample.storageMgr.isPlaySound() == false)
 				return;
 			if (Laya.Browser.onWeiXin) {
@@ -2554,6 +2556,7 @@
 			}
 		}
 		onPlayGameClick() {
+			this.setSound(true);
 			Laya.Scene.open("qq_views/qq_TrySkinFree.scene", false, Laya.Handler.create(this, v => {
 				this.close();
 			}));
@@ -3544,8 +3547,8 @@
 
 	class ClearingView extends BVHdla {
 		initData() {
-			// if (!LayaSample.commonData.existVideoAd)
-			// 	LayaSample.adMgr.loadVideoAd();
+			if (!LayaSample.commonData.existVideoAd)
+				LayaSample.adMgr.loadVideoAd();
 		}
 		initUI() {
 			CurSence.curSence = "ClearingView";
@@ -3691,20 +3694,20 @@
 				return;
 			if (name == "Idel" || name == "die" || name == "charge")
 				return;
-			let url = `sound/${name}.mp3`;
-			Laya.SoundManager.stopSound("sound/run.mp3");
+			let url = `sound/${name}.ogg`;
+			Laya.SoundManager.stopSound("sound/run.ogg");
 			Laya.SoundManager.playSound(url, 1);
 		}
 		static playRunSound() {
 			if (!LayaSample.storageMgr.isPlaySound)
 				return;
-			Laya.SoundManager.stopSound("sound/run.mp3");
-			Laya.SoundManager.playSound("sound/run.mp3");
+			Laya.SoundManager.stopSound("sound/run.ogg");
+			Laya.SoundManager.playSound("sound/run.ogg");
 		}
 		static playMusic(name) {
 			if (!LayaSample.storageMgr.isPlaySound)
 				return;
-			let url = `sound/${name}.mp3`;
+			let url = `sound/${name}.ogg`;
 			let soundObj = Laya.SoundManager.playMusic(url, 0);
 		}
 		static setGameSate() {

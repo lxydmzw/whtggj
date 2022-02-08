@@ -80,19 +80,7 @@
 	        }
 	        else {
 	            this._source = null;
-	            if (this._drawGridCmd) {
-	                if (this._one) {
-	                    if (this._one == this._drawGridCmd) {
-	                        this.clear();
-	                    }
-	                }
-	                let cmds = this.cmds;
-	                if (cmds && cmds.length > 0) {
-	                    if (cmds[0] == this._drawGridCmd) {
-	                        cmds.splice(0, 1);
-	                    }
-	                }
-	            }
+	            this.clear();
 	        }
 	    }
 	    _setChanged() {
@@ -100,31 +88,6 @@
 	            this._isChanged = true;
 	            Laya.ILaya.timer.callLater(this, this.changeSource);
 	        }
-	    }
-	    _createDrawTexture(texture, x = 0, y = 0, width = 0, height = 0, matrix = null, alpha = 1, color = null, blendMode = null, uv) {
-	        if (!texture || alpha < 0.01)
-	            return null;
-	        if (!texture.getIsReady())
-	            return null;
-	        if (!width)
-	            width = texture.sourceWidth;
-	        if (!height)
-	            height = texture.sourceHeight;
-	        if (texture.getIsReady()) {
-	            var wRate = width / texture.sourceWidth;
-	            var hRate = height / texture.sourceHeight;
-	            width = texture.width * wRate;
-	            height = texture.height * hRate;
-	            if (width <= 0 || height <= 0)
-	                return null;
-	            x += texture.offsetX * wRate;
-	            y += texture.offsetY * hRate;
-	        }
-	        if (this._sp) {
-	            this._sp._renderType |= Laya.SpriteConst.GRAPHICS;
-	            this._sp._setRenderType(this._sp._renderType);
-	        }
-	        return Laya.DrawTextureCmd.create.call(this, texture, x, y, width, height, matrix, alpha, color, blendMode, uv);
 	    }
 	    changeSource() {
 	        this._isChanged = false;
@@ -137,12 +100,14 @@
 	        var sw = source.sourceWidth;
 	        var sh = source.sourceHeight;
 	        if (!sizeGrid || (sw === width && sh === height)) {
-	            let cmd = this._createDrawTexture(source, this._offset ? this._offset[0] : 0, this._offset ? this._offset[1] : 0, width, height, null, 1, null, null, this.uv);
-	            cmd && this._setDrawGridCmd(cmd);
+	            this.clear();
+	            this.drawTexture(source, this._offset ? this._offset[0] : 0, this._offset ? this._offset[1] : 0, width, height, null, 1, null, null, this.uv);
 	        }
 	        else {
-	            let cmd = Laya.Draw9GridTexture.create(source, 0, 0, width, height, sizeGrid);
-	            this._setDrawGridCmd(cmd);
+	            this.clear();
+	            this.draw9Grid(source, 0, 0, width, height, sizeGrid);
+	            this._repaint();
+	            return;
 	        }
 	        this._repaint();
 	    }
@@ -165,33 +130,6 @@
 	            texture = Laya.Texture.createFromTexture(tex, x, y, width, height);
 	        }
 	        return texture;
-	    }
-	    _setDrawGridCmd(newcmd) {
-	        var source = this._source;
-	        if (!source || !source.bitmap) {
-	            return;
-	        }
-	        let cmds = this.cmds;
-	        if (!this._one && (!cmds || cmds.length <= 0)) {
-	            this._saveToCmd(null, newcmd);
-	        }
-	        else {
-	            let lastOne = this._one;
-	            if (lastOne) {
-	                if (lastOne == this._drawGridCmd) {
-	                    this._one = newcmd;
-	                }
-	                else {
-	                    this.clear();
-	                    this._saveToCmd(null, newcmd);
-	                    this._saveToCmd(null, lastOne);
-	                }
-	            }
-	            else {
-	                cmds.splice(0, 0, newcmd);
-	            }
-	        }
-	        this._drawGridCmd = newcmd;
 	    }
 	}
 	Laya.ClassUtils.regClass("laya.ui.AutoBitmap", AutoBitmap);
@@ -228,9 +166,7 @@
 	        this.resetLayoutY();
 	    }
 	    _onParentResize() {
-	        var flagX = this.resetLayoutX();
-	        var flagY = this.resetLayoutY();
-	        if (flagX || flagY)
+	        if (this.resetLayoutX() || this.resetLayoutY())
 	            this.owner.event(Laya.Event.RESIZE);
 	    }
 	    resetLayoutX() {
@@ -633,7 +569,7 @@
 	        if (super.get_scaleX() == value)
 	            return;
 	        super.set_scaleX(value);
-	        this.callLater(this._sizeChanged);
+	        this.event(Laya.Event.RESIZE);
 	    }
 	    get scaleX() {
 	        return super.scaleX;
@@ -645,7 +581,7 @@
 	        if (super.get_scaleY() == value)
 	            return;
 	        super.set_scaleY(value);
-	        this.callLater(this._sizeChanged);
+	        this.event(Laya.Event.RESIZE);
 	    }
 	    get scaleY() {
 	        return super.scaleY;
@@ -716,7 +652,7 @@
 	        this.skin = skin;
 	    }
 	    destroy(destroyChild = true) {
-	        super.destroy(destroyChild);
+	        super.destroy(true);
 	        this._bitmap && this._bitmap.destroy();
 	        this._bitmap = null;
 	    }
@@ -878,16 +814,16 @@
 	                    path: "",
 	                    extraData: "",
 	                    envVersion: "release",
-	                    success: () => {
+	                    success: function success() {
 	                        console.log("-------------跳转成功--------------");
 	                    },
-	                    fail: () => {
+	                    fail: function fail() {
 	                        console.log("-------------跳转失败--------------");
 	                    },
-	                    complete: () => {
+	                    complete: function complete() {
 	                        console.log("-------------跳转接口调用成功--------------");
 	                        this.updateAdvsInfo();
-	                    }
+	                    }.bind(this)
 	                });
 	            }
 	        }
@@ -1639,8 +1575,8 @@
 	Laya.ClassUtils.regClass("Laya.Clip", Clip);
 
 	class ColorPicker extends UIComponent {
-	    constructor(createChildren = true) {
-	        super(false);
+	    constructor() {
+	        super(...arguments);
 	        this._gridSize = 11;
 	        this._bgColor = "#ffffff";
 	        this._borderColor = "#000000";
@@ -1648,14 +1584,8 @@
 	        this._inputBgColor = "#efefef";
 	        this._colors = [];
 	        this._selectedColor = "#000000";
-	        if (createChildren) {
-	            this.preinitialize();
-	            this.createChildren();
-	            this.initialize();
-	        }
 	    }
 	    destroy(destroyChild = true) {
-	        Laya.ILaya.stage.off(Laya.Event.MOUSE_DOWN, this, this.removeColorBox);
 	        super.destroy(destroyChild);
 	        this._colorPanel && this._colorPanel.destroy(destroyChild);
 	        this._colorButton && this._colorButton.destroy(destroyChild);
@@ -2864,7 +2794,7 @@
 	        this._scrollBar.once(Laya.Event.END, this, this.onScrollEnd);
 	    }
 	    onScrollEnd() {
-	        super.cacheAs = this._usedCache || 'none';
+	        super.cacheAs = this._usedCache;
 	    }
 	    get content() {
 	        return this._content;
@@ -3153,11 +3083,10 @@
 	        if (!this.cacheContent) {
 	            var index = scrollLine * lineX;
 	            var num = 0;
-	            let down = true;
-	            var toIndex = 0;
 	            if (index > this._startIndex) {
 	                num = index - this._startIndex;
-	                toIndex = this._startIndex + lineX * (lineY + 1);
+	                var down = true;
+	                var toIndex = this._startIndex + lineX * (lineY + 1);
 	                this._isMoved = true;
 	            }
 	            else if (index < this._startIndex) {
@@ -3207,6 +3136,7 @@
 	        if (!this._scrollBar)
 	            return;
 	        var lineX = (this._isVertical ? this.repeatX : this.repeatY);
+	        var lineY = (this._isVertical ? this.repeatY : this.repeatX);
 	        var pos = Math.floor(cellIndex / lineX) * this._cellSize;
 	        this._isVertical ? cell._y = pos : cell.x = pos;
 	    }
@@ -3228,12 +3158,10 @@
 	        }
 	    }
 	    get selectedItem() {
-	        if (!this._array)
-	            return null;
 	        return this._selectedIndex != -1 ? this._array[this._selectedIndex] : null;
 	    }
 	    set selectedItem(value) {
-	        this._array && (this.selectedIndex = this._array.indexOf(value));
+	        this.selectedIndex = this._array.indexOf(value);
 	    }
 	    get selection() {
 	        return this.getCell(this._selectedIndex);
@@ -3317,8 +3245,9 @@
 	    }
 	    updateArray(array) {
 	        this._array = array;
+	        var freshStart;
 	        if (this._array) {
-	            let freshStart = this._preLen - this._startIndex;
+	            freshStart = this._preLen - this._startIndex;
 	            if (freshStart >= 0)
 	                this.renderItems(freshStart);
 	            this._preLen = this._array.length;
@@ -3377,15 +3306,13 @@
 	        this.array = this._array;
 	    }
 	    getItem(index) {
-	        if (!this._array)
-	            return null;
 	        if (index > -1 && index < this._array.length) {
 	            return this._array[index];
 	        }
 	        return null;
 	    }
 	    changeItem(index, source) {
-	        if (index > -1 && this._array && index < this._array.length) {
+	        if (index > -1 && index < this._array.length) {
 	            this._array[index] = source;
 	            if (index >= this._startIndex && index < this._startIndex + this._cells.length) {
 	                this.renderItem(this.getCell(index), index);
@@ -3395,13 +3322,8 @@
 	    setItem(index, source) {
 	        this.changeItem(index, source);
 	    }
-	    addItem(source) {
-	        if (!this.array) {
-	            this.array = [source];
-	        }
-	        else {
-	            this._array.push(source);
-	        }
+	    addItem(souce) {
+	        this._array.push(souce);
 	        this.array = this._array;
 	    }
 	    addItemAt(souce, index) {
@@ -3409,10 +3331,8 @@
 	        this.array = this._array;
 	    }
 	    deleteItem(index) {
-	        if (this._array) {
-	            this._array.splice(index, 1);
-	            this.array = this._array;
-	        }
+	        this._array.splice(index, 1);
+	        this.array = this._array;
 	    }
 	    getCell(index) {
 	        this.runCallLater(this.changeCells);
@@ -4504,11 +4424,11 @@
 	        this.callLater(this.changeScroll);
 	    }
 	    destroy(destroyChild = true) {
+	        super.destroy(destroyChild);
 	        this._vScrollBar && this._vScrollBar.destroy();
 	        this._hScrollBar && this._hScrollBar.destroy();
 	        this._vScrollBar = null;
 	        this._hScrollBar = null;
-	        super.destroy(destroyChild);
 	    }
 	    initialize() {
 	        this.width = 180;
@@ -5019,8 +4939,7 @@
 	    }
 	    getArray() {
 	        var arr = [];
-	        for (let key in this._source) {
-	            let item = this._source[key];
+	        for (let item of this._source) {
 	            if (this.getParentOpenStatus(item)) {
 	                item.x = this._spaceLeft * this.getDepth(item);
 	                arr.push(item);
@@ -5116,8 +5035,7 @@
 	        if (!isRoot) {
 	            obj = {};
 	            var list2 = xml.attributes;
-	            for (let key in list2) {
-	                var attrs = list2[key];
+	            for (let attrs of list2) {
 	                var prop = attrs.nodeName;
 	                var value = attrs.nodeValue;
 	                obj[prop] = value == "true" ? true : value == "false" ? false : value;
@@ -5655,16 +5573,17 @@
 
 	class IUI {
 	}
+	IUI.Dialog = null;
 
 	class DialogManager extends Laya.Sprite {
 	    constructor() {
 	        super();
 	        this.maskLayer = new Laya.Sprite();
-	        this.popupEffect = (dialog) => {
+	        this.popupEffect = function (dialog) {
 	            dialog.scale(1, 1);
 	            dialog._effectTween = Laya.Tween.from(dialog, { x: Laya.ILaya.stage.width / 2, y: Laya.ILaya.stage.height / 2, scaleX: 0, scaleY: 0 }, 300, Laya.Ease.backOut, Laya.Handler.create(this, this.doOpen, [dialog]), 0, false, false);
 	        };
-	        this.closeEffect = (dialog) => {
+	        this.closeEffect = function (dialog) {
 	            dialog._effectTween = Laya.Tween.to(dialog, { x: Laya.ILaya.stage.width / 2, y: Laya.ILaya.stage.height / 2, scaleX: 0, scaleY: 0 }, 300, Laya.Ease.strongOut, Laya.Handler.create(this, this.doClose, [dialog]), 0, false, false);
 	        };
 	        this.popupEffectHandler = new Laya.Handler(this, this.popupEffect);
@@ -6049,10 +5968,7 @@
 	        Laya.Laya.timer.clear(this, this._onLoop);
 	    }
 	    _onLoop() {
-	        let _canvas = window.sharedCanvas;
-	        this.texture.sourceWidth = _canvas.width;
-	        this.texture.sourceHeight = _canvas.height;
-	        this.texture.bitmap.loadImageSource(_canvas);
+	        this.texture.bitmap.loadImageSource(window.sharedCanvas);
 	    }
 	    set width(value) {
 	        super.width = value;
@@ -6070,7 +5986,7 @@
 	        this.callLater(this._postMsg);
 	    }
 	    get height() {
-	        return super.height;
+	        return super.width;
 	    }
 	    set x(value) {
 	        super.x = value;
@@ -6150,4 +6066,4 @@
 	exports.WXOpenDataViewer = WXOpenDataViewer;
 	exports.Widget = Widget;
 
-}(window.Laya = window.Laya || {}, Laya));
+}(window.Laya = window.Laya|| {}, Laya));

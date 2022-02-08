@@ -9,9 +9,6 @@ window.qgMiniGame = function (exports, Laya) {
 	        }
 	        return false;
 	    }
-	    static isNetFile(url) {
-	        return (url.indexOf("http://") != -1 || url.indexOf("https://") != -1) && url.indexOf(QGMiniAdapter.window.qg.env.USER_DATA_PATH) == -1;
-	    }
 	    static getFileInfo(fileUrl) {
 	        var fileNativePath = fileUrl;
 	        var fileObj = MiniFileMgr.fakeObj[fileNativePath];
@@ -19,6 +16,7 @@ window.qgMiniGame = function (exports, Laya) {
 	            return null;
 	        else
 	            return fileObj;
+	        return null;
 	    }
 	    static read(filePath, encoding = "utf8", callBack = null, readyUrl = "", isSaveFile = false, fileType = "") {
 	        var fileUrl;
@@ -33,20 +31,10 @@ window.qgMiniGame = function (exports, Laya) {
 	                callBack != null && callBack.runWith([0, data]);
 	            }, fail: function (data) {
 	                if (data && readyUrl != "")
-	                    MiniFileMgr.downFiles(encodeURI(readyUrl), encoding, callBack, readyUrl, isSaveFile, fileType);
+	                    MiniFileMgr.downFiles(readyUrl, encoding, callBack, readyUrl, isSaveFile, fileType);
 	                else
 	                    callBack != null && callBack.runWith([1]);
 	            } });
-	    }
-	    static isFile(url) {
-	        let stat;
-	        try {
-	            stat = MiniFileMgr.fs.statSync(url);
-	        }
-	        catch (err) {
-	            return false;
-	        }
-	        return stat.isFile();
 	    }
 	    static downFiles(fileUrl, encoding = "ascii", callBack = null, readyUrl = "", isSaveFile = false, fileType = "", isAutoClear = true) {
 	        var downloadTask = MiniFileMgr.wxdown({ url: fileUrl, success: function (data) {
@@ -71,7 +59,7 @@ window.qgMiniGame = function (exports, Laya) {
 	                if (filePath.indexOf(QGMiniAdapter.window.qg.env.USER_DATA_PATH) == -1 && (filePath.indexOf("http://") != -1 || filePath.indexOf("https://") != -1)) {
 	                    if (QGMiniAdapter.autoCacheFile || isSaveFile) {
 	                        callBack != null && callBack.runWith([0, data]);
-	                        MiniFileMgr.copyTOCache(filePath, readyUrl, null, encoding, isAutoClear);
+	                        MiniFileMgr.copyFile(filePath, readyUrl, null, encoding, isAutoClear);
 	                    }
 	                    else
 	                        callBack != null && callBack.runWith([0, data]);
@@ -88,7 +76,7 @@ window.qgMiniGame = function (exports, Laya) {
 	                if (data.statusCode === 200) {
 	                    if ((QGMiniAdapter.autoCacheFile || isSaveFile) && readyUrl.indexOf("qlogo.cn") == -1 && readyUrl.indexOf(".php") == -1) {
 	                        callBack != null && callBack.runWith([0, data.tempFilePath]);
-	                        MiniFileMgr.copyTOCache(data.tempFilePath, readyUrl, null, "", isAutoClear);
+	                        MiniFileMgr.copyFile(data.tempFilePath, readyUrl, null, "", isAutoClear);
 	                    }
 	                    else
 	                        callBack != null && callBack.runWith([0, data.tempFilePath]);
@@ -100,37 +88,25 @@ window.qgMiniGame = function (exports, Laya) {
 	                callBack != null && callBack.runWith([1, data]);
 	            } });
 	    }
-	    static copyFile(src, dest, complete = null) {
-	        MiniFileMgr.fs.copyFile({
-	            srcPath: src,
-	            destPath: dest,
-	            success: function () {
-	                complete && complete.runWith(0);
-	            },
-	            fail: function (err) {
-	                complete && complete.runWith([1, err]);
-	            }
-	        });
-	    }
 	    static downLoadFile(fileUrl, fileType = "", callBack = null, encoding = "ascii") {
 	        if (QGMiniAdapter.window.navigator.userAgent.indexOf('MiniGame') < 0 && QGMiniAdapter.window.navigator.userAgent.indexOf('OPPO') < 0) {
 	            Laya.Laya.loader.load(fileUrl, callBack);
 	        }
 	        else {
 	            if (fileType == Laya.Loader.IMAGE || fileType == Laya.Loader.SOUND)
-	                MiniFileMgr.downOtherFiles(encodeURI(fileUrl), callBack, fileUrl, true, false);
+	                MiniFileMgr.downOtherFiles(fileUrl, callBack, fileUrl, true, false);
 	            else
-	                MiniFileMgr.downFiles(encodeURI(fileUrl), encoding, callBack, fileUrl, true, fileType, false);
+	                MiniFileMgr.downFiles(fileUrl, encoding, callBack, fileUrl, true, fileType, false);
 	        }
 	    }
-	    static copyTOCache(tempFilePath, readyUrl, callBack, encoding = "", isAutoClear = true) {
+	    static copyFile(tempFilePath, readyUrl, callBack, encoding = "", isAutoClear = true) {
 	        var temp = tempFilePath.split("/");
 	        var tempFileName = temp[temp.length - 1];
 	        var fileurlkey = readyUrl;
 	        var fileObj = MiniFileMgr.getFileInfo(readyUrl);
 	        var saveFilePath = MiniFileMgr.getFileNativePath(tempFileName);
-	        MiniFileMgr.fakeObj[fileurlkey] = { md5: tempFileName, readyUrl: readyUrl, size: 0, times: Laya.Browser.now(), encoding: encoding, tempFilePath: tempFilePath };
-	        var totalSize = QGMiniAdapter.sizeLimit;
+	        MiniFileMgr.fakeObj[fileurlkey] = { md5: tempFileName, readyUrl: readyUrl, size: 0, times: Laya.Browser.now(), encoding: encoding };
+	        var totalSize = 50 * 1024 * 1024;
 	        var chaSize = 4 * 1024 * 1024;
 	        var fileUseSize = MiniFileMgr.getCacheUseSize();
 	        if (fileObj) {
@@ -204,20 +180,17 @@ window.qgMiniGame = function (exports, Laya) {
 	    static deleteFile(tempFileName, readyUrl = "", callBack = null, encoding = "", fileSize = 0) {
 	        var fileObj = MiniFileMgr.getFileInfo(readyUrl);
 	        var deleteFileUrl = MiniFileMgr.getFileNativePath(fileObj.md5);
+	        var isAdd = tempFileName != "" ? true : false;
+	        MiniFileMgr.onSaveFile(readyUrl, tempFileName, isAdd, encoding, callBack, fileSize);
 	        MiniFileMgr.fs.unlink({ filePath: deleteFileUrl, success: function (data) {
 	                if (tempFileName != "") {
 	                    var saveFilePath = MiniFileMgr.getFileNativePath(tempFileName);
 	                    MiniFileMgr.fs.copyFile({ srcPath: tempFileName, destPath: saveFilePath, success: function (data) {
-	                            MiniFileMgr.onSaveFile(readyUrl, tempFileName, true, encoding, callBack, fileSize);
 	                        }, fail: function (data) {
 	                            callBack != null && callBack.runWith([1, data]);
 	                        } });
 	                }
-	                else {
-	                    MiniFileMgr.onSaveFile(readyUrl, tempFileName, false, encoding, callBack, fileSize);
-	                }
 	            }, fail: function (data) {
-	                callBack != null && callBack.runWith([1, data]);
 	            } });
 	    }
 	    static deleteAll() {
@@ -241,7 +214,7 @@ window.qgMiniGame = function (exports, Laya) {
 	            MiniFileMgr.filesListObj['fileUsedSize'] = 0;
 	        if (isAdd) {
 	            var fileNativeName = MiniFileMgr.getFileNativePath(md5Name);
-	            MiniFileMgr.filesListObj[fileurlkey] = { md5: md5Name, readyUrl: readyUrl, size: fileSize, times: Laya.Browser.now(), encoding: encoding, tempFilePath: fileNativeName };
+	            MiniFileMgr.filesListObj[fileurlkey] = { md5: md5Name, readyUrl: readyUrl, size: fileSize, times: Laya.Browser.now(), encoding: encoding };
 	            MiniFileMgr.filesListObj['fileUsedSize'] = parseInt(MiniFileMgr.filesListObj['fileUsedSize']) + fileSize;
 	            MiniFileMgr.writeFilesList(fileurlkey, JSON.stringify(MiniFileMgr.filesListObj), true);
 	            callBack != null && callBack.runWith([0]);
@@ -250,9 +223,6 @@ window.qgMiniGame = function (exports, Laya) {
 	            if (MiniFileMgr.filesListObj[fileurlkey]) {
 	                var deletefileSize = parseInt(MiniFileMgr.filesListObj[fileurlkey].size);
 	                MiniFileMgr.filesListObj['fileUsedSize'] = parseInt(MiniFileMgr.filesListObj['fileUsedSize']) - deletefileSize;
-	                if (MiniFileMgr.fakeObj[fileurlkey].md5 == MiniFileMgr.filesListObj[fileurlkey].md5) {
-	                    delete MiniFileMgr.fakeObj[fileurlkey];
-	                }
 	                delete MiniFileMgr.filesListObj[fileurlkey];
 	                MiniFileMgr.writeFilesList(fileurlkey, JSON.stringify(MiniFileMgr.filesListObj), false);
 	                callBack != null && callBack.runWith([0]);
@@ -273,22 +243,6 @@ window.qgMiniGame = function (exports, Laya) {
 	            return MiniFileMgr.filesListObj['fileUsedSize'];
 	        return 0;
 	    }
-	    static getCacheList(dirPath, cb) {
-	        let stat;
-	        try {
-	            stat = MiniFileMgr.fs.statSync(dirPath);
-	        }
-	        catch (err) {
-	            stat = null;
-	        }
-	        if (stat) {
-	            MiniFileMgr.readSync(MiniFileMgr.fileListName, "utf8", cb);
-	        }
-	        else {
-	            MiniFileMgr.fs.mkdirSync(dirPath, true);
-	            cb && cb.runWith([1]);
-	        }
-	    }
 	    static existDir(dirPath, callBack) {
 	        MiniFileMgr.fs.mkdir({ dirPath: dirPath, success: function (data) {
 	                callBack != null && callBack.runWith([0, { data: JSON.stringify({}) }]);
@@ -303,8 +257,17 @@ window.qgMiniGame = function (exports, Laya) {
 	        var fileUrl = MiniFileMgr.getFileNativePath(filePath);
 	        var filesListStr;
 	        try {
-	            filesListStr = MiniFileMgr.fs.readFileSync(fileUrl, encoding);
-	            callBack != null && callBack.runWith([0, { data: filesListStr }]);
+	            MiniFileMgr.fs.readFile({
+	                filePath: fileUrl,
+	                encoding: encoding,
+	                success: function (data) {
+	                    filesListStr = data.data;
+	                    callBack != null && callBack.runWith([0, { data: filesListStr }]);
+	                },
+	                fail: function () {
+	                    callBack != null && callBack.runWith([1]);
+	                }
+	            });
 	        }
 	        catch (error) {
 	            callBack != null && callBack.runWith([1]);
@@ -434,8 +397,6 @@ window.qgMiniGame = function (exports, Laya) {
 	        return QGMiniAdapter.window.qg.createInnerAudioContext();
 	    }
 	    load(url) {
-	        if (!MiniSound._musicAudio)
-	            MiniSound._musicAudio = MiniSound._createSound();
 	        if (!MiniFileMgr.isLocalNativeFile(url)) {
 	            url = Laya.URL.formatURL(url);
 	        }
@@ -519,7 +480,8 @@ window.qgMiniGame = function (exports, Laya) {
 	                    else {
 	                        var fileObj = MiniFileMgr.getFileInfo(sourceUrl);
 	                        if (fileObj && fileObj.md5) {
-	                            fileNativeUrl = fileObj.tempFilePath || MiniFileMgr.getFileNativePath(fileObj.md5);
+	                            var fileMd5Name = fileObj.md5;
+	                            fileNativeUrl = MiniFileMgr.getFileNativePath(fileMd5Name);
 	                        }
 	                        else {
 	                            fileNativeUrl = sourceUrl;
@@ -529,24 +491,12 @@ window.qgMiniGame = function (exports, Laya) {
 	                else {
 	                    fileNativeUrl = tempFilePath;
 	                }
-	                if (this.url != Laya.SoundManager._bgMusic) {
-	                    this._sound = MiniSound._createSound();
-	                    this._sound.src = this.url = fileNativeUrl;
-	                }
-	                else {
-	                    this._sound = MiniSound._musicAudio;
-	                    this._sound.src = this.url = fileNativeUrl;
-	                }
+	                this._sound = MiniSound._createSound();
+	                this._sound.src = this.url = fileNativeUrl;
 	            }
 	            else {
-	                if (this.url != Laya.SoundManager._bgMusic) {
-	                    this._sound = MiniSound._createSound();
-	                    this._sound.src = sourceUrl;
-	                }
-	                else {
-	                    this._sound = MiniSound._musicAudio;
-	                    this._sound.src = sourceUrl;
-	                }
+	                this._sound = MiniSound._createSound();
+	                this._sound.src = this.url = sourceUrl;
 	            }
 	            this._sound.onCanplay(MiniSound.bindToThis(this.onCanPlay, this));
 	            this._sound.onError(MiniSound.bindToThis(this.onError, this));
@@ -747,8 +697,7 @@ window.qgMiniGame = function (exports, Laya) {
 	    }
 	    _loadResourceFilter(type, url) {
 	        var thisLoader = this;
-	        this.sourceUrl = Laya.URL.formatURL(url);
-	        if (MiniFileMgr.isNetFile(url)) {
+	        if (url.indexOf("http://usr/") == -1 && (url.indexOf("http://") != -1 || url.indexOf("https://") != -1)) {
 	            if (MiniFileMgr.loadPath != "") {
 	                url = url.split(MiniFileMgr.loadPath)[1];
 	            }
@@ -793,21 +742,24 @@ window.qgMiniGame = function (exports, Laya) {
 	    }
 	    _loadSound(url) {
 	        var thisLoader = this;
-	        if (!QGMiniAdapter.autoCacheFile) {
+	        var fileNativeUrl;
+	        if (MiniFileMgr.isLocalNativeFile(url)) {
+	            var tempStr = Laya.URL.rootPath != "" ? Laya.URL.rootPath : Laya.URL._basePath;
+	            var tempUrl = url;
+	            if (tempStr != "" && (url.indexOf("http://") != -1 || url.indexOf("https://") != -1))
+	                fileNativeUrl = url.split(tempStr)[1];
+	            if (!fileNativeUrl) {
+	                fileNativeUrl = tempUrl;
+	            }
 	            MiniLoader.onDownLoadCallBack(url, thisLoader, 0);
 	        }
 	        else {
 	            var tempurl = Laya.URL.formatURL(url);
-	            if (!MiniFileMgr.isLocalNativeFile(url) && !MiniFileMgr.getFileInfo(tempurl)) {
-	                if (MiniFileMgr.isNetFile(tempurl)) {
-	                    MiniFileMgr.downOtherFiles(QGMiniAdapter.safeEncodeURI(tempurl), Laya.Handler.create(MiniLoader, MiniLoader.onDownLoadCallBack, [tempurl, thisLoader]), tempurl);
-	                }
-	                else {
-	                    MiniLoader.onDownLoadCallBack(url, thisLoader, 0);
-	                }
+	            if (!MiniFileMgr.isLocalNativeFile(url) && (tempurl.indexOf("http://") == -1 && tempurl.indexOf("https://") == -1) || (tempurl.indexOf("http://usr/") != -1)) {
+	                MiniLoader.onDownLoadCallBack(url, thisLoader, 0);
 	            }
 	            else {
-	                MiniLoader.onDownLoadCallBack(url, thisLoader, 0);
+	                MiniFileMgr.downOtherFiles(tempurl, Laya.Handler.create(MiniLoader, MiniLoader.onDownLoadCallBack, [tempurl, thisLoader]), tempurl);
 	            }
 	        }
 	    }
@@ -817,12 +769,19 @@ window.qgMiniGame = function (exports, Laya) {
 	            if (QGMiniAdapter.autoCacheFile) {
 	                if (!tempFilePath) {
 	                    if (MiniFileMgr.isLocalNativeFile(sourceUrl)) {
-	                        fileNativeUrl = sourceUrl;
+	                        var tempStr = Laya.URL.rootPath != "" ? Laya.URL.rootPath : Laya.URL._basePath;
+	                        var tempUrl = sourceUrl;
+	                        if (tempStr != "" && (sourceUrl.indexOf("http://") != -1 || sourceUrl.indexOf("https://") != -1))
+	                            fileNativeUrl = sourceUrl.split(tempStr)[1];
+	                        if (!fileNativeUrl) {
+	                            fileNativeUrl = tempUrl;
+	                        }
 	                    }
 	                    else {
 	                        var fileObj = MiniFileMgr.getFileInfo(sourceUrl);
 	                        if (fileObj && fileObj.md5) {
-	                            fileNativeUrl = fileObj.tempFilePath || MiniFileMgr.getFileNativePath(fileObj.md5);
+	                            var fileMd5Name = fileObj.md5;
+	                            fileNativeUrl = MiniFileMgr.getFileNativePath(fileMd5Name);
 	                        }
 	                        else {
 	                            fileNativeUrl = sourceUrl;
@@ -833,26 +792,19 @@ window.qgMiniGame = function (exports, Laya) {
 	                    fileNativeUrl = tempFilePath;
 	                }
 	            }
-	            else {
-	                fileNativeUrl = Laya.URL.formatURL(sourceUrl);
-	            }
 	            sourceUrl = fileNativeUrl;
 	            var sound = (new Laya.SoundManager._soundClass());
-	            sound.load(QGMiniAdapter.safeEncodeURI(sourceUrl));
+	            sound.load(sourceUrl);
 	            thisLoader.onLoaded(sound);
 	        }
 	        else {
 	            thisLoader.event(Laya.Event.ERROR, "Load sound failed");
 	        }
 	    }
-	    complete(data) {
-	        if (data instanceof Laya.Resource) {
-	            data._setCreateURL(this.sourceUrl);
-	        }
-	        else if ((data instanceof Laya.Texture) && (data.bitmap instanceof Laya.Resource)) {
-	            data.bitmap._setCreateURL(this.sourceUrl);
-	        }
-	        this.originComplete(data);
+	    static bindToThis(fun, scope) {
+	        var rst = fun;
+	        rst = fun.bind(scope);
+	        return rst;
 	    }
 	    _loadHttpRequestWhat(url, contentType) {
 	        var thisLoader = this;
@@ -861,29 +813,25 @@ window.qgMiniGame = function (exports, Laya) {
 	            thisLoader.onLoaded(Laya.Loader.preLoadedMap[url]);
 	        else {
 	            var tempurl = Laya.URL.formatURL(url);
-	            if (!QGMiniAdapter.AutoCacheDownFile) {
-	                if (MiniFileMgr.isNetFile(tempurl)) {
-	                    MiniFileMgr.downFiles(QGMiniAdapter.safeEncodeURI(tempurl), encoding, new Laya.Handler(MiniLoader, MiniLoader.onReadNativeCallBack, [url, contentType, thisLoader]), tempurl, false);
-	                }
-	                else
-	                    MiniFileMgr.readFile(url, encoding, new Laya.Handler(MiniLoader, MiniLoader.onReadNativeCallBack, [url, contentType, thisLoader]), url);
+	            if (url.indexOf("http://usr/") == -1 && (tempurl.indexOf("http://") != -1 || tempurl.indexOf("https://") != -1) && !QGMiniAdapter.AutoCacheDownFile) {
+	                thisLoader._loadHttpRequest(tempurl, contentType, thisLoader, thisLoader.onLoaded, thisLoader, thisLoader.onProgress, thisLoader, thisLoader.onError);
 	            }
 	            else {
-	                if (!MiniFileMgr.isLocalNativeFile(url) && !MiniFileMgr.getFileInfo(tempurl)) {
-	                    if (MiniFileMgr.isNetFile(tempurl)) {
-	                        MiniFileMgr.downFiles(QGMiniAdapter.safeEncodeURI(tempurl), encoding, new Laya.Handler(MiniLoader, MiniLoader.onReadNativeCallBack, [url, contentType, thisLoader]), tempurl, true);
-	                    }
-	                    else {
-	                        MiniFileMgr.readFile(url, encoding, new Laya.Handler(MiniLoader, MiniLoader.onReadNativeCallBack, [url, contentType, thisLoader]), url);
-	                    }
+	                var fileObj = MiniFileMgr.getFileInfo(Laya.URL.formatURL(url));
+	                if (fileObj) {
+	                    fileObj.encoding = fileObj.encoding == null ? "utf8" : fileObj.encoding;
+	                    MiniFileMgr.readFile(fileObj.url, encoding, new Laya.Handler(MiniLoader, MiniLoader.onReadNativeCallBack, [url, contentType, thisLoader]), url);
+	                }
+	                else if (thisLoader.type == "image" || thisLoader.type == "htmlimage") {
+	                    thisLoader._transformUrl(url, contentType);
 	                }
 	                else {
-	                    var tempUrl = url;
-	                    var fileObj = MiniFileMgr.getFileInfo(tempurl);
-	                    if (fileObj && fileObj.md5) {
-	                        tempUrl = fileObj.tempFilePath || MiniFileMgr.getFileNativePath(fileObj.md5);
+	                    if (contentType != Laya.Loader.IMAGE && ((tempurl.indexOf("http://") == -1 && tempurl.indexOf("https://") == -1) || MiniFileMgr.isLocalNativeFile(url))) {
+	                        MiniFileMgr.readFile(url, encoding, new Laya.Handler(MiniLoader, MiniLoader.onReadNativeCallBack, [url, contentType, thisLoader]), url);
 	                    }
-	                    MiniFileMgr.readFile(tempUrl, encoding, new Laya.Handler(MiniLoader, MiniLoader.onReadNativeCallBack, [url, contentType, thisLoader]), url);
+	                    else {
+	                        MiniFileMgr.downFiles(encodeURI(tempurl), encoding, new Laya.Handler(MiniLoader, MiniLoader.onReadNativeCallBack, [url, contentType, thisLoader]), tempurl, true);
+	                    }
 	                }
 	            }
 	        }
@@ -901,35 +849,34 @@ window.qgMiniGame = function (exports, Laya) {
 	                tempData = data.data;
 	            }
 	            if (!QGMiniAdapter.isZiYu && QGMiniAdapter.isPosMsgYu && type != Laya.Loader.BUFFER) {
-	                QGMiniAdapter.window.qg.postMessage({ url: url, data: tempData, isLoad: "filedata" });
+	                QGMiniAdapter.window.wx.postMessage({ url: url, data: tempData, isLoad: "filedata" });
 	            }
 	            thisLoader.onLoaded(tempData);
 	        }
 	        else if (errorCode == 1) {
-	            thisLoader.onError && thisLoader.onError(data);
+	            thisLoader._loadHttpRequest(url, type, thisLoader, thisLoader.onLoaded, thisLoader, thisLoader.onProgress, thisLoader, thisLoader.onError);
 	        }
 	    }
 	    static _transformImgUrl(url, type, thisLoader) {
-	        if (QGMiniAdapter.isZiYu || MiniFileMgr.isLocalNativeFile(url)) {
-	            thisLoader._loadImage(url, false);
+	        if (QGMiniAdapter.isZiYu) {
+	            thisLoader._loadImage(url);
 	            return;
 	        }
-	        if (!QGMiniAdapter.autoCacheFile) {
-	            thisLoader._loadImage(QGMiniAdapter.safeEncodeURI(url));
-	        }
-	        else {
+	        if (!MiniFileMgr.getFileInfo(url)) {
 	            var tempUrl = Laya.URL.formatURL(url);
-	            if (!MiniFileMgr.isLocalNativeFile(url) && !MiniFileMgr.getFileInfo(tempUrl)) {
-	                if (MiniFileMgr.isNetFile(tempUrl)) {
-	                    MiniFileMgr.downOtherFiles(QGMiniAdapter.safeEncodeURI(tempUrl), new Laya.Handler(MiniLoader, MiniLoader.onDownImgCallBack, [url, thisLoader]), tempUrl);
+	            if (url.indexOf('http://usr/') == -1 && (tempUrl.indexOf("http://") != -1 || tempUrl.indexOf("https://") != -1)) {
+	                if (QGMiniAdapter.isZiYu) {
+	                    thisLoader._loadImage(url);
 	                }
 	                else {
-	                    MiniLoader.onCreateImage(url, thisLoader, true);
+	                    MiniFileMgr.downOtherFiles(tempUrl, new Laya.Handler(MiniLoader, MiniLoader.onDownImgCallBack, [url, thisLoader]), tempUrl);
 	                }
 	            }
-	            else {
-	                MiniLoader.onCreateImage(url, thisLoader);
-	            }
+	            else
+	                thisLoader._loadImage(url);
+	        }
+	        else {
+	            thisLoader._loadImage(url);
 	        }
 	    }
 	    static onDownImgCallBack(sourceUrl, thisLoader, errorCode, tempFilePath = "") {
@@ -947,8 +894,9 @@ window.qgMiniGame = function (exports, Laya) {
 	                    fileNativeUrl = tempFilePath;
 	                }
 	                else {
-	                    var fileObj = MiniFileMgr.getFileInfo(Laya.URL.formatURL(sourceUrl));
-	                    fileNativeUrl = fileObj.tempFilePath || MiniFileMgr.getFileNativePath(fileObj.md5);
+	                    var fileObj = MiniFileMgr.getFileInfo(sourceUrl);
+	                    var fileMd5Name = fileObj.md5;
+	                    fileNativeUrl = MiniFileMgr.getFileNativePath(fileMd5Name);
 	                }
 	            }
 	            else if (QGMiniAdapter.isZiYu) {
@@ -968,7 +916,7 @@ window.qgMiniGame = function (exports, Laya) {
 	            else
 	                fileNativeUrl = sourceUrl;
 	        }
-	        thisLoader._loadImage(fileNativeUrl, false);
+	        thisLoader._loadImage(fileNativeUrl);
 	    }
 	}
 
@@ -993,7 +941,7 @@ window.qgMiniGame = function (exports, Laya) {
 	        QGMiniAdapter.EnvConfig = {};
 	        if (!QGMiniAdapter.isZiYu) {
 	            MiniFileMgr.setNativeFileDir("/layaairGame");
-	            MiniFileMgr.getCacheList(MiniFileMgr.fileNativeDir, Laya.Handler.create(QGMiniAdapter, QGMiniAdapter.onMkdirCallBack));
+	            MiniFileMgr.existDir(MiniFileMgr.fileNativeDir, Laya.Handler.create(QGMiniAdapter, QGMiniAdapter.onMkdirCallBack));
 	        }
 	        QGMiniAdapter.window.qg.getSystemInfo({
 	            success: function (data) {
@@ -1016,7 +964,6 @@ window.qgMiniGame = function (exports, Laya) {
 	        };
 	        QGMiniAdapter.window.document.body.appendChild = function () {
 	        };
-	        Laya.HttpRequest._urlEncode = QGMiniAdapter.safeEncodeURI;
 	        QGMiniAdapter.EnvConfig.pixelRatioInt = 0;
 	        Laya.Browser["_pixelRatio"] = QGMiniAdapter.pixelRatio();
 	        QGMiniAdapter._preCreateElement = Laya.Browser.createElement;
@@ -1026,8 +973,6 @@ window.qgMiniGame = function (exports, Laya) {
 	        Laya.Input['_createInputElement'] = MiniInput['_createInputElement'];
 	        Laya.Loader.prototype._loadResourceFilter = MiniLoader.prototype._loadResourceFilter;
 	        Laya.Loader.prototype._loadSound = MiniLoader.prototype._loadSound;
-	        Laya.Loader.prototype.originComplete = Laya.Loader.prototype.complete;
-	        Laya.Loader.prototype.complete = MiniLoader.prototype.complete;
 	        Laya.Loader.prototype._loadHttpRequestWhat = MiniLoader.prototype._loadHttpRequestWhat;
 	        Laya.Config.useRetinalCanvas = true;
 	        QGMiniAdapter.window.qg.onMessage && QGMiniAdapter.window.qg.onMessage(QGMiniAdapter._onMessage);
@@ -1094,46 +1039,9 @@ window.qgMiniGame = function (exports, Laya) {
 	        QGMiniAdapter.window["wx"].exitMiniProgram();
 	    }
 	    static onMkdirCallBack(errorCode, data) {
-	        if (!errorCode) {
-	            MiniFileMgr.filesListObj = JSON.parse(data.data) || {};
-	            MiniFileMgr.fakeObj = JSON.parse(data.data) || {};
-	        }
-	        else {
-	            MiniFileMgr.fakeObj = {};
-	            MiniFileMgr.filesListObj = {};
-	        }
-	        let files = MiniFileMgr.fs.readdirSync(MiniFileMgr.fileNativeDir);
-	        if (!files || !files.length)
-	            return;
-	        var tempMd5ListObj = {};
-	        var fileObj;
-	        for (let key in MiniFileMgr.filesListObj) {
-	            if (key != "fileUsedSize") {
-	                fileObj = MiniFileMgr.filesListObj[key];
-	                tempMd5ListObj[fileObj.md5] = fileObj.readyUrl;
-	            }
-	        }
-	        var fileName;
-	        for (let i = 0, sz = files.length; i < sz; i++) {
-	            fileName = files[i];
-	            if (fileName == MiniFileMgr.fileListName)
-	                continue;
-	            if (!tempMd5ListObj[fileName]) {
-	                let deleteFileUrl = MiniFileMgr.getFileNativePath(fileName);
-	                MiniFileMgr.fs.unlink({
-	                    filePath: deleteFileUrl,
-	                    success: function (data) {
-	                        console.log("删除无引用的磁盘文件:" + fileName);
-	                    }
-	                });
-	            }
-	            delete tempMd5ListObj[fileName];
-	        }
-	        for (let key in tempMd5ListObj) {
-	            delete MiniFileMgr.filesListObj[tempMd5ListObj[key]];
-	            delete MiniFileMgr.fakeObj[tempMd5ListObj[key]];
-	            console.log("删除错误记录：", tempMd5ListObj[key]);
-	        }
+	        if (!errorCode)
+	            MiniFileMgr.filesListObj = JSON.parse(data.data);
+	        MiniFileMgr.fakeObj = MiniFileMgr.filesListObj;
 	    }
 	    static pixelRatio() {
 	        if (!QGMiniAdapter.EnvConfig.pixelRatioInt) {
@@ -1243,7 +1151,8 @@ window.qgMiniGame = function (exports, Laya) {
 	        var textureUrl = atlaspngUrl;
 	        var fileObj = MiniFileMgr.getFileInfo(Laya.URL.formatURL(atlaspngUrl));
 	        if (fileObj) {
-	            var fileNativeUrl = fileObj.tempFilePath || MiniFileMgr.getFileNativePath(fileObj.md5);
+	            var fileMd5Name = fileObj.md5;
+	            var fileNativeUrl = MiniFileMgr.getFileNativePath(fileMd5Name);
 	        }
 	        else {
 	            fileNativeUrl = textureUrl;
@@ -1259,7 +1168,8 @@ window.qgMiniGame = function (exports, Laya) {
 	        var tempTextureUrl = Laya.URL.formatURL(url);
 	        var fileObj = MiniFileMgr.getFileInfo(tempTextureUrl);
 	        if (fileObj) {
-	            var fileNativeUrl = fileObj.tempFilePath || MiniFileMgr.getFileNativePath(fileObj.md5);
+	            var fileMd5Name = fileObj.md5;
+	            var fileNativeUrl = MiniFileMgr.getFileNativePath(fileMd5Name);
 	            url = tempTextureUrl;
 	        }
 	        else {
@@ -1284,31 +1194,10 @@ window.qgMiniGame = function (exports, Laya) {
 	        }
 	    }
 	}
-	QGMiniAdapter.IGNORE = new RegExp("[-_.!~*'();/?:@&=+$,#%]|[0-9|A-Z|a-z]");
-	QGMiniAdapter.safeEncodeURI = function (str) {
-	    var strTemp = "";
-	    var length = str.length;
-	    for (var i = 0; i < length; i++) {
-	        var word = str[i];
-	        if (QGMiniAdapter.IGNORE.test(word)) {
-	            strTemp += word;
-	        }
-	        else {
-	            try {
-	                strTemp += encodeURI(word);
-	            }
-	            catch (e) {
-	                console.log("errorInfo", ">>>" + word);
-	            }
-	        }
-	    }
-	    return strTemp;
-	};
 	QGMiniAdapter._inited = false;
 	QGMiniAdapter.systemInfo = {};
 	QGMiniAdapter.autoCacheFile = true;
 	QGMiniAdapter.minClearSize = (5 * 1024 * 1024);
-	QGMiniAdapter.sizeLimit = (50 * 1024 * 1024);
 	QGMiniAdapter.nativefiles = ["layaNativeDir"];
 	QGMiniAdapter.subNativeheads = [];
 	QGMiniAdapter.subMaps = [];

@@ -204,7 +204,7 @@
 	        Geolocation.navigator.geolocation.clearWatch(id);
 	    }
 	}
-	Geolocation.navigator = navigator;
+	Geolocation.navigator = Laya.ILaya.Browser.window.navigator;
 	Geolocation.position = new GeolocationInfo();
 	Geolocation.PERMISSION_DENIED = 1;
 	Geolocation.POSITION_UNAVAILABLE = 2;
@@ -217,8 +217,6 @@
 	class HtmlVideo extends Laya.Bitmap {
 	    constructor() {
 	        super();
-	        this._w = 0;
-	        this._h = 0;
 	        this._width = 1;
 	        this._height = 1;
 	        this.createDomElement();
@@ -229,10 +227,10 @@
 	        style.position = 'absolute';
 	        style.top = '0px';
 	        style.left = '0px';
-	        this.video.addEventListener("loadedmetadata", () => {
+	        this.video.addEventListener("loadedmetadata", (function () {
 	            this._w = this.video.videoWidth;
 	            this._h = this.video.videoHeight;
-	        });
+	        })['bind'](this));
 	    }
 	    setSource(url, extension) {
 	        while (this.video.childElementCount)
@@ -287,6 +285,8 @@
 	    constructor() {
 	        super();
 	        var gl = Laya.LayaGL.instance;
+	        if (!Laya.ILaya.Render.isConchApp && Laya.ILaya.Browser.onIPhone)
+	            return;
 	        this.gl = Laya.ILaya.Render.isConchApp ? window.LayaGLContext.instance : Laya.WebGLContext.mainContext;
 	        this._source = this.gl.createTexture();
 	        Laya.WebGLContext.bindTexture(this.gl, gl.TEXTURE_2D, this._source);
@@ -297,6 +297,8 @@
 	        Laya.WebGLContext.bindTexture(this.gl, gl.TEXTURE_2D, null);
 	    }
 	    updateTexture() {
+	        if (!Laya.ILaya.Render.isConchApp && Laya.ILaya.Browser.onIPhone)
+	            return;
 	        var gl = Laya.LayaGL.instance;
 	        Laya.WebGLContext.bindTexture(this.gl, gl.TEXTURE_2D, this._source);
 	        this.gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, this.video);
@@ -308,13 +310,11 @@
 	    destroy() {
 	        if (this._source) {
 	            this.gl = Laya.ILaya.Render.isConchApp ? window.LayaGLContext.instance : Laya.WebGLContext.mainContext;
-	            if (this.gl) {
-	                if (WebGLVideo.curBindSource == this._source) {
-	                    Laya.WebGLContext.bindTexture(this.gl, this.gl.TEXTURE_2D, null);
-	                    WebGLVideo.curBindSource = null;
-	                }
-	                this.gl.deleteTexture(this._source);
+	            if (WebGLVideo.curBindSource == this._source) {
+	                Laya.WebGLContext.bindTexture(this.gl, this.gl.TEXTURE_2D, null);
+	                WebGLVideo.curBindSource = null;
 	            }
+	            this.gl.deleteTexture(this._source);
 	        }
 	        super.destroy();
 	    }
@@ -351,23 +351,8 @@
 	        this.videoElement.addEventListener("ended", this.onPlayComplete['bind'](this));
 	        this.size(width, height);
 	        if (Laya.ILaya.Browser.onMobile) {
-	            this.videoElement["x5-playsInline"] = true;
-	            this.videoElement["x5-playsinline"] = true;
-	            this.videoElement.x5PlaysInline = true;
-	            this.videoElement.playsInline = true;
-	            this.videoElement["webkit-playsInline"] = true;
-	            this.videoElement["webkit-playsinline"] = true;
-	            this.videoElement.webkitPlaysInline = true;
-	            this.videoElement.playsinline = true;
-	            this.videoElement.style.playsInline = true;
-	            this.videoElement.crossOrigin = "anonymous";
-	            this.videoElement.setAttribute('crossorigin', "anonymous");
-	            this.videoElement.setAttribute('playsinline', 'true');
-	            this.videoElement.setAttribute('x5-playsinline', 'true');
-	            this.videoElement.setAttribute('webkit-playsinline', 'true');
-	            this.videoElement.autoplay = true;
-	            this._clickhandle = this.onDocumentClick.bind(this);
-	            Laya.ILaya.Browser.document.addEventListener("touchend", this._clickhandle);
+	            this.onDocumentClick = this.onDocumentClick.bind(this);
+	            Laya.ILaya.Browser.document.addEventListener("touchend", this.onDocumentClick);
 	        }
 	    }
 	    static onAbort(e) { e.target.layaTarget.event("abort"); }
@@ -392,9 +377,9 @@
 	    static onVolumechange(e) { e.target.layaTarget.event("volumechange"); }
 	    static onWaiting(e) { e.target.layaTarget.event("waiting"); }
 	    onPlayComplete(e) {
+	        this.event("ended");
 	        if (!Laya.ILaya.Render.isConchApp || !this.videoElement || !this.videoElement.loop)
 	            Laya.ILaya.timer.clear(this, this.renderCanvas);
-	        this.event("ended");
 	    }
 	    load(url) {
 	        if (url.indexOf("blob:") == 0)
@@ -436,16 +421,9 @@
 	        this.graphics.drawTexture(this.internalTexture, 0, 0, this.width, this.height);
 	    }
 	    onDocumentClick() {
-	        if (!this.videoElement || this.videoElement != 0)
-	            return;
-	        if (Laya.Browser.onIOS) {
-	            this.videoElement.load();
-	        }
-	        else {
-	            this.videoElement.play();
-	            this.videoElement.pause();
-	        }
-	        Laya.ILaya.Browser.document.removeEventListener("touchend", this._clickhandle);
+	        this.videoElement.play();
+	        this.videoElement.pause();
+	        Laya.ILaya.Browser.document.removeEventListener("touchend", this.onDocumentClick);
 	    }
 	    get buffered() {
 	        return this.videoElement.buffered;
@@ -545,7 +523,6 @@
 	        }
 	        else {
 	            this.videoElement.width = width / Laya.ILaya.Browser.pixelRatio;
-	            this.videoElement.height = height / Laya.Browser.pixelRatio;
 	        }
 	        if (this.paused)
 	            this.renderCanvas();
@@ -673,4 +650,4 @@
 	exports.Video = Video;
 	exports.WebGLVideo = WebGLVideo;
 
-}(window.Laya = window.Laya || {}, Laya));
+}(window.Laya = window.Laya|| {}, Laya));

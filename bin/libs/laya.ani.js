@@ -342,6 +342,46 @@
         }
         _computeFullKeyframeIndices() {
             return;
+            var templet = this._templet;
+            if (templet._fullFrames)
+                return;
+            var anifullFrames = this._templet._fullFrames = [];
+            var cacheFrameInterval = this._cacheFrameRateInterval * this._cachePlayRate;
+            for (var i = 0, iNum = templet.getAnimationCount(); i < iNum; i++) {
+                var aniFullFrame = [];
+                if (!templet.getAnimation(i).nodes) {
+                    anifullFrames.push(aniFullFrame);
+                    continue;
+                }
+                for (var j = 0, jNum = templet.getAnimation(i).nodes.length; j < jNum; j++) {
+                    var node = templet.getAnimation(i).nodes[j];
+                    var frameCount = Math.round(node.playTime / cacheFrameInterval);
+                    var nodeFullFrames = new Uint16Array(frameCount + 1);
+                    var stidx = -1;
+                    var nodeframes = node.keyFrame;
+                    for (var n = 0, nNum = nodeframes.length; n < nNum; n++) {
+                        var keyFrame = nodeframes[n];
+                        var pos = Math.round(keyFrame.startTime / cacheFrameInterval);
+                        if (stidx < 0 && pos > 0) {
+                            stidx = pos;
+                        }
+                        if (pos <= frameCount) {
+                            nodeFullFrames[pos] = n;
+                        }
+                    }
+                    var cf = 0;
+                    for (n = stidx; n < frameCount; n++) {
+                        if (nodeFullFrames[n] == 0) {
+                            nodeFullFrames[n] = cf;
+                        }
+                        else {
+                            cf = nodeFullFrames[n];
+                        }
+                    }
+                    aniFullFrame.push(nodeFullFrames);
+                }
+                anifullFrames.push(aniFullFrame);
+            }
         }
         _onAnimationTempletLoaded() {
             (this.destroyed) || (this._calculatePlayDuration());
@@ -642,6 +682,7 @@
                 }
                 return cid;
             }
+            return 0;
         }
         getOriginalData(aniIndex, originalData, nodesFrameIndices, frameIndex, playCurTime) {
             var oneAni = this._anis[aniIndex];
@@ -1333,6 +1374,8 @@
                     this.skinMesh(boneMatrixArray, tSkinSprite);
                     graphics.drawSkin(tSkinSprite, alpha);
                     break;
+                case 3:
+                    break;
             }
         }
         skinMesh(boneMatrixArray, skinSprite) {
@@ -1506,6 +1549,7 @@
                 this.deformData = tVertices;
                 return;
             }
+            var tTweenKey = this.tweenKeyList[this.frameIndex];
             var tPrevVertices = this.vectices[this.frameIndex - 1];
             var tNextVertices = this.vectices[this.frameIndex];
             var tPreFrameTime = this.timeList[this.frameIndex - 1];
@@ -1540,6 +1584,7 @@
         constructor(data, bones) {
             this.isSpine = true;
             this.isDebug = false;
+            this._data = data;
             this._targetBone = bones[data.targetBoneIndex];
             this.isSpine = data.isSpine;
             if (this._bones == null)
@@ -2233,6 +2278,7 @@
             }
         }
     }
+    PathConstraint.NONE = -1;
     PathConstraint.BEFORE = -2;
     PathConstraint.AFTER = -3;
     PathConstraint._tempMt = new Laya.Matrix();
@@ -2560,14 +2606,14 @@
                     if (this._player.currentPlayTime >= tEventData.time) {
                         this.event(Laya.Event.LABEL, tEventData);
                         this._eventIndex++;
-                        if (this._playAudio && tEventData.audioValue && tEventData.audioValue !== "null" && tEventData.audioValue !== "undefined") {
+                        if (this._playAudio && tEventData.audioValue && tEventData.audioValue !== "null") {
                             _soundChannel = Laya.SoundManager.playSound(this._player.templet._path + tEventData.audioValue, 1, Laya.Handler.create(this, this._onAniSoundStoped));
                             Laya.SoundManager.playbackRate = this._player.playbackRate;
                             _soundChannel && this._soundChannelArr.push(_soundChannel);
                         }
                     }
                 }
-                else if (tEventData.time < this._player.playStart && this._playAudio && tEventData.audioValue && tEventData.audioValue !== "null" && tEventData.audioValue !== "undefined") {
+                else if (tEventData.time < this._player.playStart && this._playAudio && tEventData.audioValue && tEventData.audioValue !== "null") {
                     this._eventIndex++;
                     _soundChannel = Laya.SoundManager.playSound(this._player.templet._path + tEventData.audioValue, 1, Laya.Handler.create(this, this._onAniSoundStoped), null, (this._player.currentPlayTime - tEventData.time) / 1000);
                     Laya.SoundManager.playbackRate = this._player.playbackRate;
@@ -3283,10 +3329,11 @@
             Laya.ILaya.loader.load(this._loadList, Laya.Handler.create(this, this._textureComplete));
         }
         _textureComplete() {
+            var tTexture;
             var tTextureName;
             for (var i = 0, n = this._loadList.length; i < n; i++) {
                 tTextureName = this._loadList[i];
-                this._textureDic[tTextureName] = Laya.ILaya.Loader.getRes(tTextureName);
+                tTexture = this._textureDic[tTextureName] = Laya.ILaya.Loader.getRes(tTextureName);
             }
             this._parsePublicExtData();
         }
@@ -3763,8 +3810,8 @@
                 tSkinSlotDisplayData.destory();
             }
             this.skinSlotDisplayDataArr.length = 0;
-            if (this._relativeUrl) {
-                delete Templet.TEMPLET_DICTIONARY[this._relativeUrl];
+            if (this.url) {
+                delete Templet.TEMPLET_DICTIONARY[this.url];
             }
             super.destroy();
             Laya.ILaya.loader.clearRes(this._skBufferUrl);
@@ -4162,4 +4209,4 @@
     exports.Transform = Transform;
     exports.UVTools = UVTools;
 
-}(window.Laya = window.Laya || {}, Laya));
+}(window.Laya = window.Laya|| {}, Laya));
