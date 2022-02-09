@@ -1,4 +1,5 @@
 ﻿'use strict';
+import WebSocketBridge from "./tools/WebSocketBridge";
 class CurSence {
 
 }
@@ -2427,7 +2428,123 @@ class qq_HomeView extends BVHdla {
 		this.btnShare = this.getChild("btnShare", bottomPanel);
 		this.btnMore = this.getChild("btnMore", bottomPanel);
 		this.btnCollect = this.getChild("btnCollect", bottomPanel);
+		
 		this.qq_UpdateData();
+		this.getQrCode();
+	}
+	getQrCode(){
+		let base = WebSocketBridge.cdn + '/base/wq';// /base/wq是游戏基地址路径，立项后会分配
+		// 获取信息地址
+		WebSocketBridge.getBase(base, function (event) {
+			let obj = JSON.parse(event);
+			// WebSocketBridge.contrller_url = obj.data.url;		//正式版本控制端
+			WebSocketBridge.contrller_url = obj.data.ceshi;  //测试版本控制端，用于更新前调试
+
+			WebSocketBridge.wsServer = obj.data.ws;	//服务器地址也可从基地址动态获取，以免服务器迁移或改域名时可自动更新
+
+			// 获取完信息后准备链接服务器
+			this.initSoket();
+		});
+	}
+	initSoket() {
+		let m_this = this;
+		// 安卓版本开关，安卓端设置为true,否则服务器无法链接
+		let isAndroid = false;
+		// 安卓端使用
+		if (isAndroid) {
+			// 初始化注册事件
+			WebSocketBridge.init(function (data) {
+				console.log("WebSocketBridge");
+				console.log(data);
+				console.log(JSON.stringify(data));
+				switch (data.tag) {
+					case 'onOpen':
+						// 处理链接上服务器
+						break;
+					case 'onMessage':
+						// 处理消息
+						m_this.onServerMessage(data.data);
+						break;
+					case 'onClose':
+						// 处理断开链接
+						break;
+					case 'onError':
+						// 处理错误
+						break;
+				}
+			}.bind(this));
+
+			// 连接服务器
+			WebSocketBridge.connect(WebSocketBridge.wsServer + '/ws?type=0');
+			// 断开服务器方法
+			// WebSocketBridge.close();
+			// 往服务器发送数据方法
+			// WebSocketBridge.send("我是客户端 9527.");
+		}
+		// 测试或其他端使用
+		else {
+			// 初始化注册事件
+			window["ws"] = new Laya.Socket();//创建 socket 对象
+
+			//与服务器连接成功时触发
+			window["ws"].on(Laya.Event.OPEN, this, function (event) {
+				console.log("连接服务器成功.");
+			});//连接正常打开抛出的事件
+
+			//接收到服务器数据时触发
+			window["ws"].on(Laya.Event.MESSAGE, this, function (msg) {
+				console.log("收到服务器消息：" + msg);
+				m_this.onServerMessage(msg);
+			});//接收到消息抛出的事件
+
+			//与服务器连接关闭时触发
+			window["ws"].on(Laya.Event.CLOSE, this, function (e) {
+				console.log("与服务器连接断开.");
+				console.log(e);
+			});//socket关闭抛出的事件
+
+			//与服务器通信错误时触发
+			window["ws"].on(Laya.Event.ERROR, this, function (e) {
+				console.log("与服务器通信错误.");
+				console.log(e);
+			});//连接出错抛出的事件
+
+			// 连接服务器
+			window["ws"].connectByUrl(WebSocketBridge.wsServer + "/ws?type=0");//建立连接
+			// window["ws"].connectByUrl("ws://127.0.0.1:15004/upper");//建立连接
+
+			// 断开服务器方法
+			// window["ws"].close();
+			// 往服务器发送数据方法
+			// window["ws"].send("我是客户端 9527.");
+		}
+	}
+
+	// onMessage逻辑处理
+	onServerMessage(msg) {
+		let obj = JSON.parse(msg);
+		console.log("obj.room的值为" + obj.room);
+		WebSocketBridge.room = obj.room;
+		if (obj.room == obj.user && obj.code == 1) {
+			// 获取二维码
+			let size = 200;//图片尺寸，更具实际情况设置
+			WebSocketBridge.getQrCode(WebSocketBridge.contrller_url + '?type=1&room=' + WebSocketBridge.room, size, function (event) {
+				// 可以在这加载场景
+				GameConfig.startScene && Laya.Scene.open(GameConfig.startScene);
+
+				// 显示二维码示例
+				let qr = JSON.parse(event);
+				// 创建二维码图片示例，根据实际情况创建
+				let img = new Laya.Sprite();
+				Laya.stage.addChild(img);
+				img.loadImage(qr.data);
+				img.x = 10;
+				img.y = 10;
+			}, WebSocketBridge.cdn + '/qr/general');
+		}
+		else {
+			// ...do any 根据msg处理其他逻辑
+		}
 	}
 	hideExitDialog() {
 		this.exitDialogShow = false;
@@ -5404,5 +5521,7 @@ class Main {
 		gameInfo.ResData = data;
 		Laya.Scene.open("views/login.scene");
 	}
+	
+
 }
 new Main();
