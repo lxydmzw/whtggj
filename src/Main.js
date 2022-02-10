@@ -1,5 +1,5 @@
 ﻿'use strict';
-import WebSocketBridge from "./tools/WebSocketBridge";
+
 class CurSence {
 
 }
@@ -326,10 +326,9 @@ class StorageMgr {
 	setPlaySound(isPlaySound) {
 		this._userData.isPlaySound = isPlaySound;
 		this.writeStorage();
-		if (isPlaySound)
-			{
-				LayaSample.soundMgr.playBGM();
-			}
+		if (isPlaySound) {
+			LayaSample.soundMgr.playBGM();
+		}
 		else
 			LayaSample.soundMgr.stopBGM();
 	}
@@ -2428,22 +2427,38 @@ class qq_HomeView extends BVHdla {
 		this.btnShare = this.getChild("btnShare", bottomPanel);
 		this.btnMore = this.getChild("btnMore", bottomPanel);
 		this.btnCollect = this.getChild("btnCollect", bottomPanel);
-		
+		this.qr="";
+		// 显示二维码
+		this.codeBg = new Laya.Image("res/qrcode_bg.png");
+		this.codeBg.x = 1100;
+		this.codeBg.y = 46;
+		Laya.stage.addChild(this.codeBg);
+		this.notCont = new Laya.Image("res/qrcode_not_connect.png");
+		this.notCont.x = 18;
+		this.notCont.y = 42;
+		this.codeBg.addChild(this.notCont);
+
+		// 创建二维码图片示例，根据实际情况创建		
+		this.img = new Laya.Sprite();
+		this.codeBg.addChild(this.img);
+		this.img.scaleX=0.8;
+		this.img.scaleY=0.8;
+		this.img.x = 50;
+		this.img.y = 45;
+		this.codeBg.visible=false;
 		this.qq_UpdateData();
 		this.getQrCode();
 	}
-	getQrCode(){
+	getQrCode() {
+		let m_this = this;
 		let base = WebSocketBridge.cdn + '/base/wq';// /base/wq是游戏基地址路径，立项后会分配
 		// 获取信息地址
 		WebSocketBridge.getBase(base, function (event) {
 			let obj = JSON.parse(event);
-			// WebSocketBridge.contrller_url = obj.data.url;		//正式版本控制端
-			WebSocketBridge.contrller_url = obj.data.ceshi;  //测试版本控制端，用于更新前调试
-
+			WebSocketBridge.contrller_url = obj.data.url;	//正式
+			// WebSocketBridge.contrller_url = obj.data.ceshi;  //测试版本控制端，用于更新前调试
 			WebSocketBridge.wsServer = obj.data.ws;	//服务器地址也可从基地址动态获取，以免服务器迁移或改域名时可自动更新
-
-			// 获取完信息后准备链接服务器
-			this.initSoket();
+			m_this.initSoket();
 		});
 	}
 	initSoket() {
@@ -2522,24 +2537,17 @@ class qq_HomeView extends BVHdla {
 
 	// onMessage逻辑处理
 	onServerMessage(msg) {
+		let m_this=this;
 		let obj = JSON.parse(msg);
 		console.log("obj.room的值为" + obj.room);
 		WebSocketBridge.room = obj.room;
 		if (obj.room == obj.user && obj.code == 1) {
 			// 获取二维码
-			let size = 200;//图片尺寸，更具实际情况设置
+			let size = 120;//图片尺寸，更具实际情况设置
 			WebSocketBridge.getQrCode(WebSocketBridge.contrller_url + '?type=1&room=' + WebSocketBridge.room, size, function (event) {
-				// 可以在这加载场景
-				GameConfig.startScene && Laya.Scene.open(GameConfig.startScene);
-
-				// 显示二维码示例
-				let qr = JSON.parse(event);
-				// 创建二维码图片示例，根据实际情况创建
-				let img = new Laya.Sprite();
-				Laya.stage.addChild(img);
-				img.loadImage(qr.data);
-				img.x = 10;
-				img.y = 10;
+				m_this.qr = JSON.parse(event);
+				m_this.img.loadImage(m_this.qr.data);
+				m_this.codeBg.visible=true;
 			}, WebSocketBridge.cdn + '/qr/general');
 		}
 		else {
@@ -2671,10 +2679,10 @@ class qq_HomeView extends BVHdla {
 	}
 	onPlayGameClick() {
 		var skeleton = new Laya.Skeleton();
-//添加到舞台
-this.addChild(skeleton);
-//通过加载直接创建动画
-skeleton.load("res/xstc.sk");
+		//添加到舞台
+		this.addChild(skeleton);
+		//通过加载直接创建动画
+		skeleton.load("res/xstc.sk");
 		// this.setSound(true);
 		// Laya.Scene.open("qq_views/qq_TrySkinFree.scene", false, Laya.Handler.create(this, v => {
 		// 	this.close();
@@ -3588,13 +3596,13 @@ class DY_TypeSkinView extends BVHdla {
 			case 13:
 			case 23:
 			case 66:
-				if(this.isTipShow){
+				if (this.isTipShow) {
 					this.tipDialog.close();
 					this.isTipShow = false;
 					Laya.Scene.open("qq_views/newGudie.scene", false, Laya.Handler.create(this, view => {
 						this.close();
 					}));
-				}else{
+				} else {
 					this.onVideoClick();
 				}
 				break;
@@ -3637,12 +3645,12 @@ class DY_TypeSkinView extends BVHdla {
 			this.tipDialog.addChild(bg);
 			this.tipDialog.popup();
 			this.isTipShow = true;
-		} else{
+		} else {
 			Laya.Scene.open("qq_views/newGudie.scene", false, Laya.Handler.create(this, view => {
 				this.close();
 			}));
 		}
-		
+
 	}
 	onVideoCloseEvent(evt) {
 		console.log("看视频回调：", evt);
@@ -5231,7 +5239,72 @@ class AIScript extends Laya.Script3D {
 		Laya.timer.clearAll(this);
 	}
 }
+class WebSocketBridge { }
+// 服务器信息
+WebSocketBridge.cdn = 'http://gserver.popapps.cn:15006';
+WebSocketBridge.wsServer = 'wss://gserver.popapps.cn:15008';
+// 控制端部署地址，通过基地址获取
+WebSocketBridge.contrller_url = '';
+WebSocketBridge.room = '';
 
+WebSocketBridge.bridge = null;
+WebSocketBridge.isConnect = false;
+
+WebSocketBridge.init = function () {
+	WebSocketBridge.setCallFun(call);
+	if (window["PlatformClass"] != null) {
+		this.bridge = window["PlatformClass"].createClass("cn.popapps.ws.JWebSocketBridge");
+	}
+}
+
+WebSocketBridge.setCallFun = function () {
+	window["natvieCallJs"] = call;
+}
+
+WebSocketBridge.connect = function (ws) {
+	if (this.bridge) {
+		this.bridge.call("connect", ws);
+	}
+}
+
+WebSocketBridge.send = function (msg) {
+	if (this.bridge) {
+		this.bridge.call("send", msg);
+	}
+}
+
+WebSocketBridge.close = function () {
+	if (this.bridge) {
+		this.bridge.call("close");
+	}
+}
+
+WebSocketBridge.getBase = function (url, callback) {
+	let xhr = new Laya.HttpRequest();
+	xhr.http.timeout = 10000;
+	xhr.once(Laya.Event.COMPLETE, this, function (event) {
+		callback(event);
+	});
+	xhr.once(Laya.Event.ERROR, this, function (event) {
+		callback("");
+	});
+	xhr.send(url, "", "get", "text");
+}
+
+WebSocketBridge.getQrCode = function (msg, size, callback, url = 'http://81.68.175.16:15006/qr/general') {
+	let qr_url = url + '?msg=' + encodeURIComponent(msg) + '&size=' + size;
+	// console.log(next_url);
+	let xhr = new Laya.HttpRequest();
+	xhr.http.timeout = 10000;
+
+	xhr.once(Laya.Event.COMPLETE, this, function (event) {
+		callback(event)
+	});
+	xhr.once(Laya.Event.ERROR, this, function (event) {
+		callback("");
+	});
+	xhr.send(qr_url, "", "get", "text");
+}
 class GameUI extends ui.views.mainGameUI {
 	constructor() {
 		super();
@@ -5475,6 +5548,7 @@ class GameConfig {
 		reg("scripts/views/ClearingView.ts", ClearingView);
 		reg("scripts/views/LoginView.ts", LoginView);
 		reg("scripts/views/GameView.ts", GameUI);
+		reg("tools/WebSocketBridge.ts", WebSocketBridge);
 	}
 }
 GameConfig.width = 1334;
@@ -5521,7 +5595,7 @@ class Main {
 		gameInfo.ResData = data;
 		Laya.Scene.open("views/login.scene");
 	}
-	
+
 
 }
 new Main();

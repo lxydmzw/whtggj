@@ -44,6 +44,11 @@ P 905CD5C9 bg_tomenu.png
 P 271E51E9 cancel.png
 P 45B18DCE confirm.png
 R 390C350E play_tips.png
+P 7544D433 qrcode_bg.png
+R A28725DE qrcode_connect_ok.png
+R FE3DEB67 qrcode_hold_on.png
+P BF0D68ED qrcode_not_connect.png
+P 3B779BED qrcode_ok.png
 P E2B780B4 sign.png
 P A824ABF4 skin.png
 P 7F9FFA87 start.png
