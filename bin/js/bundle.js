@@ -2441,6 +2441,12 @@
 			this.notCont.y = 42;
 			this.codeBg.addChild(this.notCont);
 
+			this.contOk = new Laya.Image("res/qrcode_connect_ok.png");
+			this.contOk.x = 18;
+			this.contOk.y = 42;
+			this.contOk.visible=false;
+			this.codeBg.addChild(this.contOk);
+
 			// 创建二维码图片示例，根据实际情况创建		
 			this.img = new Laya.Sprite();
 			this.codeBg.addChild(this.img);
@@ -2554,6 +2560,75 @@
 				}, WebSocketBridge.cdn + '/qr/general');
 			}
 			else {
+				let dsf=obj.data;
+				switch(dsf){
+					case "undefined/Up/KeyUp":
+						break;
+						case "undefined/Down/KeyUp":
+						break;
+						case "undefined/Left/KeyUp":
+						break;
+						case "undefined/Right/KeyUp":
+						break;
+						case "undefined/Enter/KeyUp":
+							const ke = new KeyboardEvent('keyup', {
+								bubbles: true, cancelable: true, keyCode: 13
+							});
+							document.body.dispatchEvent(ke);
+						break;
+				}
+				// if(obj.data.indexOf("Enter")!=-1){
+				// 	// let keyCoke = 13;
+				// 	// let keyboardEvent = document.createEvent("KeyboardEvent");
+				// 	// let initMethod = typeof keyboardEvent.initKeyboardEvent !== "undefined" ? "initKeyboardEvent" : "initKeyEvent";
+				// 	// keyboardEvent[initMethod]('keyup', true, true, window, false, false, false, false, keyCoke, 0);
+				// 	// document.dispatchEvent(keyboardEvent);
+				// 	const ke = new KeyboardEvent('keyup', {
+				// 		bubbles: true, cancelable: true, keyCode: 13
+				// 	});
+				// 	document.body.dispatchEvent(ke);
+				// }else if(obj.data.indexOf("/Left")!=-1){//左
+				// 	// let keyCoke = 13;
+				// 	// let keyboardEvent = document.createEvent("KeyboardEvent");
+				// 	// let initMethod = typeof keyboardEvent.initKeyboardEvent !== "undefined" ? "initKeyboardEvent" : "initKeyEvent";
+				// 	// keyboardEvent[initMethod]('keyup', true, true, window, false, false, false, false, keyCoke, 0);
+				// 	// document.dispatchEvent(keyboardEvent);
+				// 	const ke = new KeyboardEvent('keyup', {
+				// 		bubbles: true, cancelable: true, keyCode: 13
+				// 	});
+				// 	document.body.dispatchEvent(ke);
+				// }else if(obj.data.indexOf("Right")!=-1){//左
+				// 	// let keyCoke = 13;
+				// 	// let keyboardEvent = document.createEvent("KeyboardEvent");
+				// 	// let initMethod = typeof keyboardEvent.initKeyboardEvent !== "undefined" ? "initKeyboardEvent" : "initKeyEvent";
+				// 	// keyboardEvent[initMethod]('keyup', true, true, window, false, false, false, false, keyCoke, 0);
+				// 	// document.dispatchEvent(keyboardEvent);
+				// 	const ke = new KeyboardEvent('keyup', {
+				// 		bubbles: true, cancelable: true, keyCode: 13
+				// 	});
+				// 	document.body.dispatchEvent(ke);
+				// }
+				// else if(obj.data.indexOf("Right")!=-1){//左
+				// 	// let keyCoke = 13;
+				// 	// let keyboardEvent = document.createEvent("KeyboardEvent");
+				// 	// let initMethod = typeof keyboardEvent.initKeyboardEvent !== "undefined" ? "initKeyboardEvent" : "initKeyEvent";
+				// 	// keyboardEvent[initMethod]('keyup', true, true, window, false, false, false, false, keyCoke, 0);
+				// 	// document.dispatchEvent(keyboardEvent);
+				// 	const ke = new KeyboardEvent('keyup', {
+				// 		bubbles: true, cancelable: true, keyCode: 13
+				// 	});
+				// 	document.body.dispatchEvent(ke);
+				// }else if(obj.data.indexOf("Right")!=-1){//左
+				// 	// let keyCoke = 13;
+				// 	// let keyboardEvent = document.createEvent("KeyboardEvent");
+				// 	// let initMethod = typeof keyboardEvent.initKeyboardEvent !== "undefined" ? "initKeyboardEvent" : "initKeyEvent";
+				// 	// keyboardEvent[initMethod]('keyup', true, true, window, false, false, false, false, keyCoke, 0);
+				// 	// document.dispatchEvent(keyboardEvent);
+				// 	const ke = new KeyboardEvent('keyup', {
+				// 		bubbles: true, cancelable: true, keyCode: 13
+				// 	});
+				// 	document.body.dispatchEvent(ke);
+				// }
 				// ...do any 根据msg处理其他逻辑
 			}
 		}
@@ -2583,6 +2658,7 @@
 			this.exitDialogShow = true;
 		}
 		onKeyUp(e) {
+			console.log(e);
 			if (CurSence.curSence != "qq_HomeView") {
 				return;
 			}
@@ -2681,15 +2757,16 @@
 			}
 		}
 		onPlayGameClick() {
-			var skeleton = new Laya.Skeleton();
-			//添加到舞台
-			this.addChild(skeleton);
-			//通过加载直接创建动画
-			skeleton.load("res/xstc.sk");
-			// this.setSound(true);
-			// Laya.Scene.open("qq_views/qq_TrySkinFree.scene", false, Laya.Handler.create(this, v => {
-			// 	this.close();
-			// }));
+			console.log(">--onPlayGameClick");
+			// var skeleton = new Laya.Skeleton();
+			// //添加到舞台
+			// this.addChild(skeleton);
+			// //通过加载直接创建动画
+			// skeleton.load("res/xstc.sk");
+			this.setSound(true);
+			Laya.Scene.open("qq_views/qq_TrySkinFree.scene", false, Laya.Handler.create(this, v => {
+				this.close();
+			}));
 		}
 		setSound(status) {
 			let statusStr = status ? "kai.png" : "guan.png";
