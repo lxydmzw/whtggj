@@ -2316,6 +2316,24 @@ class newGuide extends BVHdla {
 		CurSence.curSence = "newGuide";
 		Laya.stage.offAll(Laya.Event.KEY_UP);
 		Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
+		var aTimeStr = Laya.LocalStorage.getItem("remainTipTimes");//操作提示框展示次数（3次后不再展示）
+		if (aTimeStr == null) {
+			Laya.LocalStorage.setItem("remainTipTimes", "3");
+			aTimeStr = Laya.LocalStorage.getItem("remainTipTimes");
+		}
+		var aTime = parseInt(aTimeStr);
+		if (aTime > 0) {
+			aTime--;
+			Laya.LocalStorage.setItem("remainTipTimes", aTime.toString());
+			this.tipDialog = new Laya.Dialog();
+			var bg = new Laya.Image("res/play_tips.png");
+			bg.scale(0.7, 0.7);
+			bg.pos(-GameConfig.width / 2, -GameConfig.height / 2);
+			this.tipDialog.addChild(bg);
+			this.tipDialog.popup();
+			this.isTipShow = true;
+		}
+
 	}
 	initEvent() {
 
@@ -2329,6 +2347,10 @@ class newGuide extends BVHdla {
 			case 13:
 			case 23:
 			case 66:
+				if (this.isTipShow) {
+					this.isTipShow = false;
+					this.tipDialog.close();
+				}
 				this.startPlay();
 				break;
 		}
@@ -2427,9 +2449,16 @@ class qq_HomeView extends BVHdla {
 		this.btnShare = this.getChild("btnShare", bottomPanel);
 		this.btnMore = this.getChild("btnMore", bottomPanel);
 		this.btnCollect = this.getChild("btnCollect", bottomPanel);
-		this.qr="";
-		// 显示二维码
+		this.qr = "";
+
+		this.qq_UpdateData();
+
+
+
+
+		// // 显示二维码
 		this.codeBg = new Laya.Image("res/qrcode_bg.png");
+		this.codeBg.zOrder = 4;
 		this.codeBg.x = 1100;
 		this.codeBg.y = 46;
 		Laya.stage.addChild(this.codeBg);
@@ -2438,21 +2467,19 @@ class qq_HomeView extends BVHdla {
 		this.notCont.y = 42;
 		this.codeBg.addChild(this.notCont);
 
-		this.contOk = new Laya.Image("res/qrcode_connect_ok.png");
-		this.contOk.x = 18;
-		this.contOk.y = 42;
-		this.contOk.visible=false;
+		this.contOk = new Laya.Image("res/qrcode_ok.png");
+		this.contOk.x = 31;
+		this.contOk.y = 18;
 		this.codeBg.addChild(this.contOk);
-
+		this.contOk.visible = false;
 		// 创建二维码图片示例，根据实际情况创建		
-		this.img = new Laya.Sprite();
-		this.codeBg.addChild(this.img);
-		this.img.scaleX=0.8;
-		this.img.scaleY=0.8;
-		this.img.x = 50;
-		this.img.y = 45;
-		this.codeBg.visible=false;
-		this.qq_UpdateData();
+		this.qrCodeImg = new Laya.Sprite();
+		this.codeBg.addChild(this.qrCodeImg);
+		this.qrCodeImg.scaleX = 0.8;
+		this.qrCodeImg.scaleY = 0.8;
+		this.qrCodeImg.x = 50;
+		this.qrCodeImg.y = 45;
+		this.codeBg.visible = false;
 		this.getQrCode();
 	}
 	getQrCode() {
@@ -2461,8 +2488,8 @@ class qq_HomeView extends BVHdla {
 		// 获取信息地址
 		WebSocketBridge.getBase(base, function (event) {
 			let obj = JSON.parse(event);
-			WebSocketBridge.contrller_url = obj.data.url;	//正式
-			// WebSocketBridge.contrller_url = obj.data.ceshi;  //测试版本控制端，用于更新前调试
+			// WebSocketBridge.contrller_url = obj.data.url;	//正式
+			WebSocketBridge.contrller_url = obj.data.ceshi;  //测试版本控制端，用于更新前调试
 			WebSocketBridge.wsServer = obj.data.ws;	//服务器地址也可从基地址动态获取，以免服务器迁移或改域名时可自动更新
 			m_this.initSoket();
 		});
@@ -2501,9 +2528,7 @@ class qq_HomeView extends BVHdla {
 			// WebSocketBridge.close();
 			// 往服务器发送数据方法
 			// WebSocketBridge.send("我是客户端 9527.");
-		}
-		// 测试或其他端使用
-		else {
+		} else {// 测试或其他端使用
 			// 初始化注册事件
 			window["ws"] = new Laya.Socket();//创建 socket 对象
 
@@ -2540,93 +2565,107 @@ class qq_HomeView extends BVHdla {
 			// window["ws"].send("我是客户端 9527.");
 		}
 	}
-
-	// onMessage逻辑处理
+	checkAndShowSk() {
+		var aTime = this.getRemainUseTeachTipTimes();
+		if (aTime > 0) {
+			aTime--;
+			Laya.LocalStorage.setItem("useTeachTipTimes", aTime.toString());
+			this.skeleton = new Laya.Skeleton();
+			this.skeleton.scale(0.7, 0.7);
+			this.skeleton.pos((1334 - this.skeleton.width) / 2, (750 - this.skeleton.height) / 2);
+			Laya.stage.addChild(this.skeleton);
+			this.skeleton.load("res/xstc.sk");
+			this.skeletionVisible = true;
+		}
+	}
+	getRemainUseTeachTipTimes() {
+		var aTimeStr = Laya.LocalStorage.getItem("useTeachTipTimes");
+		if (aTimeStr == null) {
+			Laya.LocalStorage.setItem("useTeachTipTimes", "3");
+			aTimeStr = Laya.LocalStorage.getItem("useTeachTipTimes");
+		}
+		return parseInt(aTimeStr);
+	}
+	hideSk() {
+		this.skeletionVisible = false;
+		Laya.stage.removeChild(this.skeleton);
+	}
 	onServerMessage(msg) {
-		let m_this=this;
+		let m_this = this;
 		let obj = JSON.parse(msg);
 		console.log("obj.room的值为" + obj.room);
 		WebSocketBridge.room = obj.room;
-		if (obj.room == obj.user && obj.code == 1) {
-			// 获取二维码
-			let size = 120;//图片尺寸，更具实际情况设置
-			WebSocketBridge.getQrCode(WebSocketBridge.contrller_url + '?type=1&room=' + WebSocketBridge.room, size, function (event) {
-				m_this.qr = JSON.parse(event);
-				m_this.img.loadImage(m_this.qr.data);
-				m_this.codeBg.visible=true;
-			}, WebSocketBridge.cdn + '/qr/general');
-		}
-		else {
-			let dsf=obj.data;
-			switch(dsf){
-				case "undefined/Up/KeyUp":
-					break;
-					case "undefined/Down/KeyUp":
-					break;
-					case "undefined/Left/KeyUp":
-					break;
-					case "undefined/Right/KeyUp":
-					break;
-					case "undefined/Enter/KeyUp":
-						const ke = new KeyboardEvent('keyup', {
-							bubbles: true, cancelable: true, keyCode: 13
-						});
-						document.body.dispatchEvent(ke);
-					break;
+		if (!m_this.codeBg.visible) {
+			if (obj.room == obj.user && obj.code == 1) {
+				// 获取二维码
+				let size = 120;//图片尺寸，更具实际情况设置
+				WebSocketBridge.getQrCode(WebSocketBridge.contrller_url + '?type=1&room=' + WebSocketBridge.room, size, function (event) {
+					m_this.qr = JSON.parse(event);
+					m_this.qrCodeImg.loadImage(m_this.qr.data);
+					m_this.codeBg.visible = true;
+				}, WebSocketBridge.cdn + '/qr/general');
 			}
-			// if(obj.data.indexOf("Enter")!=-1){
-			// 	// let keyCoke = 13;
-			// 	// let keyboardEvent = document.createEvent("KeyboardEvent");
-			// 	// let initMethod = typeof keyboardEvent.initKeyboardEvent !== "undefined" ? "initKeyboardEvent" : "initKeyEvent";
-			// 	// keyboardEvent[initMethod]('keyup', true, true, window, false, false, false, false, keyCoke, 0);
-			// 	// document.dispatchEvent(keyboardEvent);
-			// 	const ke = new KeyboardEvent('keyup', {
-			// 		bubbles: true, cancelable: true, keyCode: 13
-			// 	});
-			// 	document.body.dispatchEvent(ke);
-			// }else if(obj.data.indexOf("/Left")!=-1){//左
-			// 	// let keyCoke = 13;
-			// 	// let keyboardEvent = document.createEvent("KeyboardEvent");
-			// 	// let initMethod = typeof keyboardEvent.initKeyboardEvent !== "undefined" ? "initKeyboardEvent" : "initKeyEvent";
-			// 	// keyboardEvent[initMethod]('keyup', true, true, window, false, false, false, false, keyCoke, 0);
-			// 	// document.dispatchEvent(keyboardEvent);
-			// 	const ke = new KeyboardEvent('keyup', {
-			// 		bubbles: true, cancelable: true, keyCode: 13
-			// 	});
-			// 	document.body.dispatchEvent(ke);
-			// }else if(obj.data.indexOf("Right")!=-1){//左
-			// 	// let keyCoke = 13;
-			// 	// let keyboardEvent = document.createEvent("KeyboardEvent");
-			// 	// let initMethod = typeof keyboardEvent.initKeyboardEvent !== "undefined" ? "initKeyboardEvent" : "initKeyEvent";
-			// 	// keyboardEvent[initMethod]('keyup', true, true, window, false, false, false, false, keyCoke, 0);
-			// 	// document.dispatchEvent(keyboardEvent);
-			// 	const ke = new KeyboardEvent('keyup', {
-			// 		bubbles: true, cancelable: true, keyCode: 13
-			// 	});
-			// 	document.body.dispatchEvent(ke);
-			// }
-			// else if(obj.data.indexOf("Right")!=-1){//左
-			// 	// let keyCoke = 13;
-			// 	// let keyboardEvent = document.createEvent("KeyboardEvent");
-			// 	// let initMethod = typeof keyboardEvent.initKeyboardEvent !== "undefined" ? "initKeyboardEvent" : "initKeyEvent";
-			// 	// keyboardEvent[initMethod]('keyup', true, true, window, false, false, false, false, keyCoke, 0);
-			// 	// document.dispatchEvent(keyboardEvent);
-			// 	const ke = new KeyboardEvent('keyup', {
-			// 		bubbles: true, cancelable: true, keyCode: 13
-			// 	});
-			// 	document.body.dispatchEvent(ke);
-			// }else if(obj.data.indexOf("Right")!=-1){//左
-			// 	// let keyCoke = 13;
-			// 	// let keyboardEvent = document.createEvent("KeyboardEvent");
-			// 	// let initMethod = typeof keyboardEvent.initKeyboardEvent !== "undefined" ? "initKeyboardEvent" : "initKeyEvent";
-			// 	// keyboardEvent[initMethod]('keyup', true, true, window, false, false, false, false, keyCoke, 0);
-			// 	// document.dispatchEvent(keyboardEvent);
-			// 	const ke = new KeyboardEvent('keyup', {
-			// 		bubbles: true, cancelable: true, keyCode: 13
-			// 	});
-			// 	document.body.dispatchEvent(ke);
-			// }
-			// ...do any 根据msg处理其他逻辑
+		} else {
+			if (obj.code == 1) {//连上设备
+				m_this.contOk.visible = true;
+				m_this.notCont.visible = false;
+				m_this.qrCodeImg.visible = false;
+				this.checkAndShowSk();
+			} else if (obj.code == "2") {//断开设备
+				m_this.contOk.visible = false;
+				m_this.notCont.visible = true;
+				m_this.qrCodeImg.visible = true;
+			}
+			var aTime = this.getRemainUseTeachTipTimes();
+			if (m_this.skeletionVisible) {
+				if (obj.data.indexOf("/Enter") != -1 && obj.data.indexOf("/KeyUp") == -1) {//回车
+					m_this.hideSk();
+					return;
+				}
+			}
+			if (!m_this.skeletionVisible) {
+				if (obj.data.indexOf("/Enter/KeyDown") != -1) {//回车
+					const ke = new KeyboardEvent('keyup', {
+						keyCode: 13
+					});
+					document.body.dispatchEvent(ke);
+					return;
+				}
+			}
+			if (obj.data.indexOf("/KeyUp") == -1) {//如果是keydown，直接return
+				return;
+			}
+			if (obj.data.indexOf("/Enter") != -1) {//回车
+				const ke = new KeyboardEvent('keyup', {
+					keyCode: 13
+				});
+				document.body.dispatchEvent(ke);
+			} else if (obj.data.indexOf("/Up") != -1) {//上
+				const ke = new KeyboardEvent('keyup', {
+					keyCode: 38
+				});
+				document.body.dispatchEvent(ke);
+			} else if (obj.data.indexOf("/Down") != -1) {//下
+				const ke = new KeyboardEvent('keyup', {
+					keyCode: 40
+				});
+				document.body.dispatchEvent(ke);
+			} else if (obj.data.indexOf("/Left") != -1) {//左
+				const ke = new KeyboardEvent('keyup', {
+					keyCode: 37
+				});
+				document.body.dispatchEvent(ke);
+			} else if (obj.data.indexOf("/Right") != -1) {//右
+				const ke = new KeyboardEvent('keyup', {
+					keyCode: 39
+				});
+				document.body.dispatchEvent(ke);
+			} else if (obj.data.indexOf("/Esc") != -1) {//返回
+				const ke = new KeyboardEvent('keyup', {
+					keyCode: 8
+				});
+				document.body.dispatchEvent(ke);
+			}
 		}
 	}
 	hideExitDialog() {
@@ -2735,14 +2774,14 @@ class qq_HomeView extends BVHdla {
 		}
 	}
 	initEvent() {
-		LayaSample.utils.addClickEvent(this.btnVibrate, this, this.onVibrateClick);
-		LayaSample.utils.addClickEvent(this.btnSound, this, this.onSoundClick);
-		LayaSample.utils.addClickEvent(this.btnMore, this, this.onMoreClick);
-		LayaSample.utils.addClickEvent(this.btnCollect, this, this.onCollectClick);
-		LayaSample.utils.addClickEvent(this.btnGameL, this, this.onWxgameClick);
-		LayaSample.utils.addClickEvent(this.btnGameR, this, this.onWxgameClick);
-		this.btnGameL2 && LayaSample.utils.addClickEvent(this.btnGameL2, this, this.onWxgameClick);
-		this.btnGameR2 && LayaSample.utils.addClickEvent(this.btnGameR2, this, this.onWxgameClick);
+		// LayaSample.utils.addClickEvent(this.btnVibrate, this, this.onVibrateClick);
+		// LayaSample.utils.addClickEvent(this.btnSound, this, this.onSoundClick);
+		// LayaSample.utils.addClickEvent(this.btnMore, this, this.onMoreClick);
+		// LayaSample.utils.addClickEvent(this.btnCollect, this, this.onCollectClick);
+		// LayaSample.utils.addClickEvent(this.btnGameL, this, this.onWxgameClick);
+		// LayaSample.utils.addClickEvent(this.btnGameR, this, this.onWxgameClick);
+		// this.btnGameL2 && LayaSample.utils.addClickEvent(this.btnGameL2, this, this.onWxgameClick);
+		// this.btnGameR2 && LayaSample.utils.addClickEvent(this.btnGameR2, this, this.onWxgameClick);
 	}
 	onBtnClick() {
 		if (this.focusView == "btnPlay") {
@@ -2755,11 +2794,6 @@ class qq_HomeView extends BVHdla {
 	}
 	onPlayGameClick() {
 		console.log(">--onPlayGameClick");
-		// var skeleton = new Laya.Skeleton();
-		// //添加到舞台
-		// this.addChild(skeleton);
-		// //通过加载直接创建动画
-		// skeleton.load("res/xstc.sk");
 		this.setSound(true);
 		Laya.Scene.open("qq_views/qq_TrySkinFree.scene", false, Laya.Handler.create(this, v => {
 			this.close();
@@ -3437,9 +3471,9 @@ class QQ_RewardView extends BVHdla {
 	}
 	initEvent() {
 		// LayaSample.utils.addClickEvent(this.btnGet, this, this.onGetClick);
-		LayaSample.utils.addClickEvent(this.btnRecord, this, this.onRecClick);
-		LayaSample.utils.addClickEvent(this.btnRecordOut, this, this.onRecOutClick);
-		LayaSample.utils.addClickEvent(this.btnTips2, this, this.onTipsClick);
+		// LayaSample.utils.addClickEvent(this.btnRecord, this, this.onRecClick);
+		// LayaSample.utils.addClickEvent(this.btnRecordOut, this, this.onRecOutClick);
+		// LayaSample.utils.addClickEvent(this.btnTips2, this, this.onTipsClick);
 		LayaSample.glEvent.on("ad_video_close_event", this, this.onVideoCloseEvent);
 	}
 	onRecOutClick() {
@@ -3548,7 +3582,7 @@ class DY_SigninView extends BVHdla {
 			case 13:
 			case 23:
 			case 66:
-				if (this.btnGet.visible) {
+				if (LayaSample.storageMgr.qq_GetNotSignin()) {
 					this.onSigninClick();
 				} else {
 					this.cancelClick();
@@ -3577,10 +3611,10 @@ class DY_SigninView extends BVHdla {
 		}
 	}
 	initEvent() {
-		LayaSample.utils.addClickEvent(this.btnClose, this, this.cancelClick);
-		LayaSample.utils.addClickEvent(this.btnTips, this, this.onTipsClick);
-		LayaSample.utils.addClickEvent(this.btnTips2, this, this.onTipsClick);
-		LayaSample.glEvent.on("ad_video_close_event", this, this.onVideoCloseEvent);
+		// LayaSample.utils.addClickEvent(this.btnClose, this, this.cancelClick);
+		// LayaSample.utils.addClickEvent(this.btnTips, this, this.onTipsClick);
+		// LayaSample.utils.addClickEvent(this.btnTips2, this, this.onTipsClick);
+		// LayaSample.glEvent.on("ad_video_close_event", this, this.onVideoCloseEvent);
 	}
 	onTipsClick() {
 		this.isUsingBtnTips = !this.isUsingBtnTips;
@@ -3657,7 +3691,7 @@ class DY_TypeSkinView extends BVHdla {
 	initEvent() {
 		// LayaSample.utils.addClickEvent(this.btnTypeSkin, this, this.onVideoClick);
 		// LayaSample.utils.addClickEvent(this.btnBack, this, this.onBackClick);
-		LayaSample.utils.addClickEvent(this.btnTips, this, this.onTipsClick);
+		// LayaSample.utils.addClickEvent(this.btnTips, this, this.onTipsClick);
 		LayaSample.glEvent.on("ad_video_close_event", this, this.onVideoCloseEvent);
 	}
 	onTipsClick() {
@@ -3673,15 +3707,7 @@ class DY_TypeSkinView extends BVHdla {
 			case 13:
 			case 23:
 			case 66:
-				if (this.isTipShow) {
-					this.tipDialog.close();
-					this.isTipShow = false;
-					Laya.Scene.open("qq_views/newGudie.scene", false, Laya.Handler.create(this, view => {
-						this.close();
-					}));
-				} else {
-					this.onVideoClick();
-				}
+				this.onVideoClick();
 				break;
 			case 8:
 			case 4:
@@ -3707,26 +3733,9 @@ class DY_TypeSkinView extends BVHdla {
 	}
 	changeSkin() {
 		LayaSample.glEvent.event("change_skin_event", { index: this.itemIndex });
-		var aTimeStr = Laya.LocalStorage.getItem("remainTipTimes");//操作提示框展示次数（3次后不再展示）
-		if (aTimeStr == null) {
-			Laya.LocalStorage.setItem("remainTipTimes", "3");
-		}
-		var aTime = parseInt(aTimeStr);
-		if (aTime > 0) {
-			aTime--;
-			Laya.LocalStorage.setItem("remainTipTimes", aTime.toString());
-			this.tipDialog = new Laya.Dialog();
-			var bg = new Laya.Image("res/play_tips.png");
-			bg.scaleX = 0.5;
-			bg.scaleY = 0.5;
-			this.tipDialog.addChild(bg);
-			this.tipDialog.popup();
-			this.isTipShow = true;
-		} else {
-			Laya.Scene.open("qq_views/newGudie.scene", false, Laya.Handler.create(this, view => {
-				this.close();
-			}));
-		}
+		Laya.Scene.open("qq_views/newGudie.scene", false, Laya.Handler.create(this, view => {
+			this.close();
+		}));
 
 	}
 	onVideoCloseEvent(evt) {
@@ -5672,7 +5681,7 @@ class Main {
 		gameInfo.ResData = data;
 		Laya.Scene.open("views/login.scene");
 	}
-
+	
 
 }
 new Main();

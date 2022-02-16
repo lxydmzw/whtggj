@@ -42,7 +42,7 @@
                         "skin": "ui/qq_ui/common/bg_tongyong_tangchuang.png",
                         "sizeGrid": "160,42,57,38",
                         "name": "BG",
-                        "height": 767
+                        "height": 750
                     },
                     "compId": 3
                 },
