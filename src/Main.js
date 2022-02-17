@@ -2033,8 +2033,9 @@ class QQ_SkinView extends BVHdla {
 		switch (e.keyCode) {
 			case 8:
 			case 4:
-				this.close();
-				CurSence.curSence = "qq_HomeView";
+				Laya.Scene.open("qq_views/qq_HomeView.scene", false, Laya.Handler.create(this, v => {
+					this.close();
+				}));
 				break;
 			case 38:
 			case 19://上
@@ -2058,8 +2059,10 @@ class QQ_SkinView extends BVHdla {
 				if (this.btnBuy.focus) {
 					this.onBuyRandomSkinClick();
 				} else if (this.btnBack.focus) {
-					this.close();
-					CurSence.curSence = "qq_HomeView";
+					// this.close();
+					Laya.Scene.open("qq_views/qq_HomeView.scene", false, Laya.Handler.create(this, v => {
+						this.close();
+					}));
 				}
 				break;
 		}
@@ -2392,7 +2395,6 @@ class qq_HomeView extends BVHdla {
 		super(...arguments);
 		this.soundSkin = "ui/qq_ui/homeView/btn_shengying_";
 		this.vibrateSkin = "ui/qq_ui/homeView/btn_zhengdong_";
-		this.isSkinClick = false;
 		this.exitDialogShow = false;
 	}
 	onAwake() {
@@ -2424,6 +2426,8 @@ class qq_HomeView extends BVHdla {
 		this.btnGameR = this.getChild("button_GameR", topPanel);
 		this.btnGameL2 = this.getChild("btnGameL2", topPanel);
 		this.btnGameR2 = this.getChild("btnGameR2", topPanel);
+		//当前小手指指向的按钮下标（签到0  开始游戏1 皮肤商店2  默认1）
+		this.focusBtnIndex=1;
 		this.btnGameL.visible = false;
 		this.btnGameR.visible = false;
 		this.btnGameL2.visible = false;
@@ -2438,7 +2442,6 @@ class qq_HomeView extends BVHdla {
 		this.btnPointer.scaleY = 0.3;
 		this.btnPointer.pos(this.btnPlayX + this.btnOffsetPointX, this.btnPlayY + this.btnOffsetPointY);
 		bottomPanel.addChild(this.btnPointer);
-		this.focusView = "btnPlay";
 		this.btnRank = this.getChild("btnRank", bottomPanel);
 		this.btnSkin = this.getChild("btnSkin", bottomPanel);
 		this.btnSkinX = parseInt(this.btnSkin.x);
@@ -2750,25 +2753,25 @@ class qq_HomeView extends BVHdla {
 	}
 	changeFocus(toRight) {
 		if (toRight) {
-			if (this.focusView == "btnPlay") {
-				this.focusView = "btnSkin";
+			if (this.focusBtnIndex == 1) {
+				this.focusBtnIndex= 2;
 				this.btnPointer.pos(this.btnSkinX + this.btnOffsetPointX, this.btnSkinY + this.btnOffsetPointY);
-			} else if (this.focusView == "btnSkin") {
-				this.focusView = "btnSign";
+			} else if (this.focusBtnIndex == 2) {
+				this.focusBtnIndex = 0;
 				this.btnPointer.pos(this.btnSignX + this.btnOffsetPointX, this.btnSignY + this.btnOffsetPointY);
 			} else {
-				this.focusView = "btnPlay";
+				this.focusBtnIndex = 1;
 				this.btnPointer.pos(this.btnPlayX + this.btnOffsetPointX, this.btnPlayY + this.btnOffsetPointY);
 			}
 		} else {
-			if (this.focusView == "btnPlay") {
-				this.focusView = "btnSign";
+			if (this.focusBtnIndex == 1) {
+				this.focusBtnIndex = 0;
 				this.btnPointer.pos(this.btnSignX + this.btnOffsetPointX, this.btnSignY + this.btnOffsetPointY);
-			} else if (this.focusView == "btnSkin") {
-				this.focusView = "btnPlay";
+			} else if (this.focusBtnIndex == 2) {
+				this.focusBtnIndex = 1;
 				this.btnPointer.pos(this.btnPlayX + this.btnOffsetPointX, this.btnPlayY + this.btnOffsetPointY);
 			} else {
-				this.focusView = "btnSkin";
+				this.focusBtnIndex = 2;
 				this.btnPointer.pos(this.btnSkinX + this.btnOffsetPointX, this.btnSkinY + this.btnOffsetPointY);
 			}
 		}
@@ -2784,9 +2787,9 @@ class qq_HomeView extends BVHdla {
 		// this.btnGameR2 && LayaSample.utils.addClickEvent(this.btnGameR2, this, this.onWxgameClick);
 	}
 	onBtnClick() {
-		if (this.focusView == "btnPlay") {
+		if (this.focusBtnIndex == 1) {
 			this.onPlayGameClick();
-		} else if (this.focusView == "btnSkin") {
+		} else if (this.focusBtnIndex == 2) {
 			this.onSkinClick();
 		} else {
 			this.onSiginInClick();
@@ -2830,15 +2833,10 @@ class qq_HomeView extends BVHdla {
 	}
 	onSkinClick() {
 		console.log("打开皮肤页");
-		if (this.isSkinClick == true)
-			return;
-		this.isSkinClick = true;
 		let data = {};
 		data.target = "qq_views/qq_HomeView.scene";
 		Laya.Scene.open("qq_views/dy_SkinView.scene", false, data, Laya.Handler.create(this, v => {
-			LayaSample.adMgr.hideBannerAd();
-			this.isSkinClick = false;
-			// this.close();
+			this.close();
 		}));
 	}
 	onSiginInClick() {
@@ -2847,7 +2845,7 @@ class qq_HomeView extends BVHdla {
 		let data = {};
 		data.target = "qq_views/qq_HomeView.scene";
 		Laya.Scene.open("qq_views/qq_SiginIn.scene", false, data, Laya.Handler.create(this, v => {
-			// this.close();
+			this.close();
 		}));
 	}
 	onMoreClick() {
@@ -2934,7 +2932,6 @@ class qq_HomeView extends BVHdla {
 		});
 	}
 }
-
 class DY_OverView extends BVHdla {
 	constructor() {
 		super(...arguments);
@@ -3576,8 +3573,9 @@ class DY_SigninView extends BVHdla {
 		switch (e.keyCode) {
 			case 8:
 			case 4:
-				this.close();
-				CurSence.curSence = "qq_HomeView";
+				Laya.Scene.open("qq_views/qq_HomeView.scene", false, Laya.Handler.create(this, view => {
+					this.close();
+				}));
 				break;
 			case 13:
 			case 23:
@@ -3645,13 +3643,19 @@ class DY_SigninView extends BVHdla {
 		LayaSample.storageMgr.qq_SaveSigninDayTime();
 		LayaSample.storageMgr.qq_SetNotSignin(false);
 		LayaSample.storageMgr.qq_AddSigninLevel();
-		this.close();
+		// this.close();
+		Laya.Scene.open("qq_views/qq_HomeView.scene", false, Laya.Handler.create(this, view => {
+			this.close();
+		}));
 		LayaSample.adMgr.showBannerAd();
 	}
 	cancelClick() {
 		LayaSample.commonData.isNoAds = false;
 		LayaSample.adMgr.hideBannerAd();
-		this.close();
+		// this.close();
+		Laya.Scene.open("qq_views/qq_HomeView.scene", false, Laya.Handler.create(this, view => {
+			this.close();
+		}));
 		LayaSample.adMgr.showBannerAd();
 	}
 }
