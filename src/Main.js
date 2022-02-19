@@ -2482,9 +2482,9 @@ class qq_HomeView extends BVHdla {
 		this.codeBg.addChild(this.cdBg);
 		this.cdBg.visible = false;
 
-		this.numImg = new Laya.Image("res/shuzi_1.png");
-		this.codeBg.addChild(this.numImg);
-		this.numImg.visible = false;
+		// this.numImg = new Laya.Image("res/shuzi_1.png");
+		// this.codeBg.addChild(this.numImg);
+		// this.numImg.visible = false;
 
 		// 创建二维码图片示例，根据实际情况创建		
 		this.qrCodeImg = new Laya.Sprite();
@@ -2521,7 +2521,7 @@ class qq_HomeView extends BVHdla {
 	computeCountDownTime() {
 		this.countDownTime--;
 		if (this.countDownTime > 0) {
-			
+
 		} else {
 			Laya.timer.clear(this, this.computeCountDownTime);
 			this.getQrCode();
@@ -2636,7 +2636,7 @@ class qq_HomeView extends BVHdla {
 					m_this.qr = JSON.parse(event);
 					m_this.codeBg.visible = true;
 					m_this.qrCodeImg.loadImage(m_this.qr.data);
-					
+
 				}, WebSocketBridge.cdn + '/qr/general');
 			}
 		} else {
@@ -4226,6 +4226,7 @@ class camera extends Laya.Script3D {
 	}
 }
 
+
 class roleScript extends Laya.Script3D {
 	constructor() {
 		super();
@@ -4246,7 +4247,7 @@ class roleScript extends Laya.Script3D {
 	}
 	onAwake() {
 		Laya.stage.on("PLAYGAME", this, this.onPlayGame);
-		// gameInfo.gameView.on(Laya.Event.MOUSE_DOWN, this, this.onDownStage);
+		gameInfo.gameView.on(Laya.Event.MOUSE_DOWN, this, this.onDownStage);
 		this.parent = this.owner.parent.parent;
 		this.teXiao = this.parent.getChildByName("teXiao");
 	}
@@ -4293,7 +4294,6 @@ class roleScript extends Laya.Script3D {
 		console.log("this", this.owner);
 	}
 	onUpdate() {
-
 		this.isJumeLad = this.owner.transform.position.y - this.jumeSeep;
 		this.jumeSeep = this.owner.transform.position.y;
 		gameInfo.RolePos = this.owner.transform.position;
@@ -5612,9 +5612,10 @@ class GameUI extends ui.views.mainGameUI {
 	onPlayGame() {
 		gameInfo.isPlayGame = true;
 		gameInfo.roleDie = false;
-		if (CurSence.curSence != "GameUI") {
+		if (CurSence.curSence != "GameUI"){
 			CurSence.curSence = "GameUI";
 			Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
+			
 		}
 		Laya.stage.event("PLAYGAME");
 		this.jumebarBox.visible = true;

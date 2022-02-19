@@ -166,7 +166,9 @@
 	        this.resetLayoutY();
 	    }
 	    _onParentResize() {
-	        if (this.resetLayoutX() || this.resetLayoutY())
+	        var flagX = this.resetLayoutX();
+	        var flagY = this.resetLayoutY();
+	        if (flagX || flagY)
 	            this.owner.event(Laya.Event.RESIZE);
 	    }
 	    resetLayoutX() {
@@ -652,7 +654,7 @@
 	        this.skin = skin;
 	    }
 	    destroy(destroyChild = true) {
-	        super.destroy(true);
+	        super.destroy(destroyChild);
 	        this._bitmap && this._bitmap.destroy();
 	        this._bitmap = null;
 	    }
@@ -1575,8 +1577,8 @@
 	Laya.ClassUtils.regClass("Laya.Clip", Clip);
 
 	class ColorPicker extends UIComponent {
-	    constructor() {
-	        super(...arguments);
+	    constructor(createChildren = true) {
+	        super(false);
 	        this._gridSize = 11;
 	        this._bgColor = "#ffffff";
 	        this._borderColor = "#000000";
@@ -1584,8 +1586,14 @@
 	        this._inputBgColor = "#efefef";
 	        this._colors = [];
 	        this._selectedColor = "#000000";
+	        if (createChildren) {
+	            this.preinitialize();
+	            this.createChildren();
+	            this.initialize();
+	        }
 	    }
 	    destroy(destroyChild = true) {
+	        Laya.ILaya.stage.off(Laya.Event.MOUSE_DOWN, this, this.removeColorBox);
 	        super.destroy(destroyChild);
 	        this._colorPanel && this._colorPanel.destroy(destroyChild);
 	        this._colorButton && this._colorButton.destroy(destroyChild);
@@ -4424,11 +4432,11 @@
 	        this.callLater(this.changeScroll);
 	    }
 	    destroy(destroyChild = true) {
-	        super.destroy(destroyChild);
 	        this._vScrollBar && this._vScrollBar.destroy();
 	        this._hScrollBar && this._hScrollBar.destroy();
 	        this._vScrollBar = null;
 	        this._hScrollBar = null;
+	        super.destroy(destroyChild);
 	    }
 	    initialize() {
 	        this.width = 180;
@@ -4939,7 +4947,8 @@
 	    }
 	    getArray() {
 	        var arr = [];
-	        for (let item of this._source) {
+	        for (let key in this._source) {
+	            let item = this._source[key];
 	            if (this.getParentOpenStatus(item)) {
 	                item.x = this._spaceLeft * this.getDepth(item);
 	                arr.push(item);
@@ -5035,7 +5044,8 @@
 	        if (!isRoot) {
 	            obj = {};
 	            var list2 = xml.attributes;
-	            for (let attrs of list2) {
+	            for (let key in list2) {
+	                var attrs = list2[key];
 	                var prop = attrs.nodeName;
 	                var value = attrs.nodeValue;
 	                obj[prop] = value == "true" ? true : value == "false" ? false : value;
@@ -5579,11 +5589,11 @@
 	    constructor() {
 	        super();
 	        this.maskLayer = new Laya.Sprite();
-	        this.popupEffect = function (dialog) {
+	        this.popupEffect = (dialog) => {
 	            dialog.scale(1, 1);
 	            dialog._effectTween = Laya.Tween.from(dialog, { x: Laya.ILaya.stage.width / 2, y: Laya.ILaya.stage.height / 2, scaleX: 0, scaleY: 0 }, 300, Laya.Ease.backOut, Laya.Handler.create(this, this.doOpen, [dialog]), 0, false, false);
 	        };
-	        this.closeEffect = function (dialog) {
+	        this.closeEffect = (dialog) => {
 	            dialog._effectTween = Laya.Tween.to(dialog, { x: Laya.ILaya.stage.width / 2, y: Laya.ILaya.stage.height / 2, scaleX: 0, scaleY: 0 }, 300, Laya.Ease.strongOut, Laya.Handler.create(this, this.doClose, [dialog]), 0, false, false);
 	        };
 	        this.popupEffectHandler = new Laya.Handler(this, this.popupEffect);
@@ -5968,7 +5978,10 @@
 	        Laya.Laya.timer.clear(this, this._onLoop);
 	    }
 	    _onLoop() {
-	        this.texture.bitmap.loadImageSource(window.sharedCanvas);
+	        let _canvas = window.sharedCanvas;
+	        this.texture.sourceWidth = _canvas.width;
+	        this.texture.sourceHeight = _canvas.height;
+	        this.texture.bitmap.loadImageSource(_canvas);
 	    }
 	    set width(value) {
 	        super.width = value;
@@ -5986,7 +5999,7 @@
 	        this.callLater(this._postMsg);
 	    }
 	    get height() {
-	        return super.width;
+	        return super.height;
 	    }
 	    set x(value) {
 	        super.x = value;
@@ -6066,4 +6079,4 @@
 	exports.WXOpenDataViewer = WXOpenDataViewer;
 	exports.Widget = Widget;
 
-}(window.Laya = window.Laya|| {}, Laya));
+}(window.Laya = window.Laya || {}, Laya));
