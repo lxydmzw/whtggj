@@ -2314,6 +2314,10 @@ class QQ_SkinView extends BVHdla {
 class newGuide extends BVHdla {
 	onAwake() {
 		super.onAwake();
+		this.tipDialog = new Laya.Dialog();
+		var bg = new Laya.Image("res/play_tips.png");
+		bg.scale(0.5, 0.5);
+		this.tipDialog.addChild(bg);
 	}
 	initUI() {
 		CurSence.curSence = "newGuide";
@@ -2328,13 +2332,12 @@ class newGuide extends BVHdla {
 		if (aTime > 0) {
 			aTime--;
 			Laya.LocalStorage.setItem("remainTipTimes", aTime.toString());
-			this.tipDialog = new Laya.Dialog();
-			var bg = new Laya.Image("res/play_tips.png");
-			bg.scale(0.7, 0.7);
-			bg.pos(-GameConfig.width / 2, -GameConfig.height / 2);
-			this.tipDialog.addChild(bg);
-			this.tipDialog.popup();
-			this.isTipShow = true;
+			Laya.timer.once(200,this,()=>{
+				// this.tipDialog.width=960;
+				// this.tipDialog.height = 540;
+				this.tipDialog.popup();
+				this.isTipShow = true;
+			});
 		}
 
 	}
@@ -2427,7 +2430,7 @@ class qq_HomeView extends BVHdla {
 		this.btnGameL2 = this.getChild("btnGameL2", topPanel);
 		this.btnGameR2 = this.getChild("btnGameR2", topPanel);
 		//当前小手指指向的按钮下标（签到0  开始游戏1 皮肤商店2  默认1）
-		this.focusBtnIndex=1;
+		this.focusBtnIndex = 1;
 		this.btnGameL.visible = false;
 		this.btnGameR.visible = false;
 		this.btnGameL2.visible = false;
@@ -2619,14 +2622,16 @@ class qq_HomeView extends BVHdla {
 				m_this.notCont.visible = true;
 				m_this.qrCodeImg.visible = true;
 			}
-			var aTime = this.getRemainUseTeachTipTimes();
 			if (m_this.skeletionVisible) {
-				if (obj.data.indexOf("/Enter") != -1 && obj.data.indexOf("/KeyUp") == -1) {//回车
+				if (obj.data.indexOf("/Enter/KeyDown") != -1) {//回车
 					m_this.hideSk();
 					return;
 				}
-			}
-			if (!m_this.skeletionVisible) {
+				if (obj.data.indexOf("/Enter/KeyUp") != -1) {//回车
+					m_this.hideSk();
+					return;
+				}
+			} else {
 				if (obj.data.indexOf("/Enter/KeyDown") != -1) {//回车
 					const ke = new KeyboardEvent('keyup', {
 						keyCode: 13
@@ -2634,41 +2639,34 @@ class qq_HomeView extends BVHdla {
 					document.body.dispatchEvent(ke);
 					return;
 				}
+				if (obj.data.indexOf("/Up/KeyUp") != -1) {//上
+					const ke = new KeyboardEvent('keyup', {
+						keyCode: 38
+					});
+					document.body.dispatchEvent(ke);
+				} else if (obj.data.indexOf("/Down/KeyUp") != -1) {//下
+					const ke = new KeyboardEvent('keyup', {
+						keyCode: 40
+					});
+					document.body.dispatchEvent(ke);
+				} else if (obj.data.indexOf("/Left/KeyUp") != -1) {//左
+					const ke = new KeyboardEvent('keyup', {
+						keyCode: 37
+					});
+					document.body.dispatchEvent(ke);
+				} else if (obj.data.indexOf("/Right/KeyUp") != -1) {//右
+					const ke = new KeyboardEvent('keyup', {
+						keyCode: 39
+					});
+					document.body.dispatchEvent(ke);
+				} else if (obj.data.indexOf("/Esc/KeyUp") != -1) {//返回
+					const ke = new KeyboardEvent('keyup', {
+						keyCode: 8
+					});
+					document.body.dispatchEvent(ke);
+				}
 			}
-			if (obj.data.indexOf("/KeyUp") == -1) {//如果是keydown，直接return
-				return;
-			}
-			if (obj.data.indexOf("/Enter") != -1) {//回车
-				const ke = new KeyboardEvent('keyup', {
-					keyCode: 13
-				});
-				document.body.dispatchEvent(ke);
-			} else if (obj.data.indexOf("/Up") != -1) {//上
-				const ke = new KeyboardEvent('keyup', {
-					keyCode: 38
-				});
-				document.body.dispatchEvent(ke);
-			} else if (obj.data.indexOf("/Down") != -1) {//下
-				const ke = new KeyboardEvent('keyup', {
-					keyCode: 40
-				});
-				document.body.dispatchEvent(ke);
-			} else if (obj.data.indexOf("/Left") != -1) {//左
-				const ke = new KeyboardEvent('keyup', {
-					keyCode: 37
-				});
-				document.body.dispatchEvent(ke);
-			} else if (obj.data.indexOf("/Right") != -1) {//右
-				const ke = new KeyboardEvent('keyup', {
-					keyCode: 39
-				});
-				document.body.dispatchEvent(ke);
-			} else if (obj.data.indexOf("/Esc") != -1) {//返回
-				const ke = new KeyboardEvent('keyup', {
-					keyCode: 8
-				});
-				document.body.dispatchEvent(ke);
-			}
+
 		}
 	}
 	hideExitDialog() {
@@ -2754,7 +2752,7 @@ class qq_HomeView extends BVHdla {
 	changeFocus(toRight) {
 		if (toRight) {
 			if (this.focusBtnIndex == 1) {
-				this.focusBtnIndex= 2;
+				this.focusBtnIndex = 2;
 				this.btnPointer.pos(this.btnSkinX + this.btnOffsetPointX, this.btnSkinY + this.btnOffsetPointY);
 			} else if (this.focusBtnIndex == 2) {
 				this.focusBtnIndex = 0;
@@ -5685,7 +5683,7 @@ class Main {
 		gameInfo.ResData = data;
 		Laya.Scene.open("views/login.scene");
 	}
-	
+
 
 }
 new Main();
