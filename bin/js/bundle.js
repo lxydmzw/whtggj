@@ -2317,10 +2317,6 @@
 	class newGuide extends BVHdla {
 		onAwake() {
 			super.onAwake();
-			this.tipDialog = new Laya.Dialog();
-			var bg = new Laya.Image("res/play_tips.png");
-			bg.scale(0.5, 0.5);
-			this.tipDialog.addChild(bg);
 		}
 		initUI() {
 			CurSence.curSence = "newGuide";
@@ -2335,7 +2331,11 @@
 			if (aTime > 0) {
 				aTime--;
 				Laya.LocalStorage.setItem("remainTipTimes", aTime.toString());
-				Laya.timer.once(200,this,()=>{
+				this.tipDialog = new Laya.Dialog();
+				var bg = new Laya.Image("res/play_tips.png");
+				bg.scale(0.5, 0.5);
+				this.tipDialog.addChild(bg);
+				Laya.timer.once(50,this,()=>{
 					// this.tipDialog.width=960;
 					// this.tipDialog.height = 540;
 					this.tipDialog.popup();
