@@ -2332,7 +2332,7 @@ class newGuide extends BVHdla {
 			var bg = new Laya.Image("res/play_tips.png");
 			bg.scale(0.5, 0.5);
 			this.tipDialog.addChild(bg);
-			Laya.timer.once(50,this,()=>{
+			Laya.timer.once(50, this, () => {
 				this.tipDialog.popup();
 				this.isTipShow = true;
 			});
@@ -2476,6 +2476,16 @@ class qq_HomeView extends BVHdla {
 		this.contOk.y = 18;
 		this.codeBg.addChild(this.contOk);
 		this.contOk.visible = false;
+
+
+		this.cdBg = new Laya.Image("res/qrcode_count_down_bg.png");
+		this.codeBg.addChild(this.cdBg);
+		this.cdBg.visible = false;
+
+		this.numImg = new Laya.Image("res/shuzi_1.png");
+		this.codeBg.addChild(this.numImg);
+		this.numImg.visible = false;
+
 		// 创建二维码图片示例，根据实际情况创建		
 		this.qrCodeImg = new Laya.Sprite();
 		this.codeBg.addChild(this.qrCodeImg);
@@ -2487,16 +2497,35 @@ class qq_HomeView extends BVHdla {
 		this.getQrCode();
 	}
 	getQrCode() {
-		let m_this = this;
-		let base = WebSocketBridge.cdn + '/base/wq';// /base/wq是游戏基地址路径，立项后会分配
-		// 获取信息地址
-		WebSocketBridge.getBase(base, function (event) {
-			let obj = JSON.parse(event);
-			// WebSocketBridge.contrller_url = obj.data.url;	//正式
-			WebSocketBridge.contrller_url = obj.data.ceshi;  //测试版本控制端，用于更新前调试
-			WebSocketBridge.wsServer = obj.data.ws;	//服务器地址也可从基地址动态获取，以免服务器迁移或改域名时可自动更新
-			m_this.initSoket();
-		});
+		if (window.navigator.onLine) {
+			let m_this = this;
+			let base = WebSocketBridge.cdn + '/base/wq';// /base/wq是游戏基地址路径，立项后会分配
+			// 获取信息地址
+			WebSocketBridge.getBase(base, function (event) {
+				let obj = JSON.parse(event);
+				// WebSocketBridge.contrller_url = obj.data.url;	//正式
+				WebSocketBridge.contrller_url = obj.data.ceshi;  //测试版本控制端，用于更新前调试
+				WebSocketBridge.wsServer = obj.data.ws;	//服务器地址也可从基地址动态获取，以免服务器迁移或改域名时可自动更新
+				m_this.initSoket();
+			});
+		} else {
+			this.codeBg.visible = true;
+			this.cdBg.visible = true;
+			this.numImg.visible = true;
+			this.countDownTime = 5;
+			//5秒倒计时定时器
+			Laya.timer.loop(1000, this, this.computeCountDownTime);
+		}
+
+	}
+	computeCountDownTime() {
+		this.countDownTime--;
+		if (this.countDownTime > 0) {
+			
+		} else {
+			Laya.timer.clear(this, this.computeCountDownTime);
+			this.getQrCode();
+		}
 	}
 	initSoket() {
 		let m_this = this;
@@ -2605,8 +2634,9 @@ class qq_HomeView extends BVHdla {
 				let size = 120;//图片尺寸，更具实际情况设置
 				WebSocketBridge.getQrCode(WebSocketBridge.contrller_url + '?type=1&room=' + WebSocketBridge.room, size, function (event) {
 					m_this.qr = JSON.parse(event);
-					m_this.qrCodeImg.loadImage(m_this.qr.data);
 					m_this.codeBg.visible = true;
+					m_this.qrCodeImg.loadImage(m_this.qr.data);
+					
 				}, WebSocketBridge.cdn + '/qr/general');
 			}
 		} else {
