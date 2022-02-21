@@ -1,5 +1,5 @@
 ﻿'use strict';
-
+import WebSocketBridge from "./tools/WebSocketBridge";
 class CurSence {
 
 }
@@ -2458,7 +2458,7 @@ class qq_HomeView extends BVHdla {
 			this.qq_UpdateData();
 			// // 显示二维码
 			this.codeBg = new Laya.Image("res/qrcode_bg.png");
-			this.codeBg.zOrder = 4;
+			this.codeBg.zOrder = 999;
 			this.codeBg.x = 1073;
 			this.codeBg.y = 46;
 			Laya.stage.addChild(this.codeBg);
@@ -2498,9 +2498,122 @@ class qq_HomeView extends BVHdla {
 			this.qrCodeImg.x = 50;
 			this.qrCodeImg.y = 45;
 			this.qrCodeImg.visible = false;
-			this.base = WebSocketBridge.cdn + '/base/wq';// /base/wq是游戏基地址路径，立项后会分配
-			this.getQrCode();
+			// this.getQrCode();
+			this.getQrCodeNew();
 		}
+	}
+	getQrCodeNew() {
+		let m_this = this;
+		// 
+		let wsBridge = new WebSocketBridge();
+		// 设置为全局（一个游戏只能有一个链接，唯一）
+		window['wsBridge'] = wsBridge;
+		// 游戏基地址，立项后会分配，示例是通用路径，可直接使用
+		wsBridge.base = '/base/tgty';
+		// 安卓版本开关，安卓端需要设置为true,否则服务器无法链接,其他平台（包括测试）设置为false
+		wsBridge.isAndroid = false;
+
+		// 回调逻辑--------------------------------------------------------------------------------------------------------------------------------------------------START
+		wsBridge.setOpen(function (event) {
+			// 连接信息
+			// 写你的逻辑
+		});
+
+		wsBridge.setMessage(function (msg) {
+			let m_this = this;
+			let obj = JSON.parse(msg);
+			console.log("obj.room的值为" + obj.room);
+			WebSocketBridge.room = obj.room;
+			if (Laya.LocalStorage.getItem("isDeviceConnected") == "1") {
+				if (obj.code == 2) {//断开设备
+					m_this.contOk.visible = false;
+					m_this.notCont.visible = true;
+					m_this.qrCodeImg.visible = true;
+					m_this.isDeviceConnected = false;
+					Laya.LocalStorage.setItem("isDeviceConnected", "0");
+					return;
+				}
+				if (m_this.skeletionVisible) {
+					if (obj.data.indexOf("/Enter/KeyDown") != -1) {//回车
+						m_this.hideSk();
+						return;
+					}
+					if (obj.data.indexOf("/Enter/KeyUp") != -1) {//回车
+						m_this.hideSk();
+						return;
+					}
+				} else {
+					if (obj.data.indexOf("/Enter/KeyDown") != -1) {//回车
+						const ke = new KeyboardEvent('keyup', {
+							keyCode: 13
+						});
+						document.body.dispatchEvent(ke);
+						return;
+					}
+					if (obj.data.indexOf("/Up/KeyUp") != -1) {//上
+						const ke = new KeyboardEvent('keyup', {
+							keyCode: 38
+						});
+						document.body.dispatchEvent(ke);
+					} else if (obj.data.indexOf("/Down/KeyUp") != -1) {//下
+						const ke = new KeyboardEvent('keyup', {
+							keyCode: 40
+						});
+						document.body.dispatchEvent(ke);
+					} else if (obj.data.indexOf("/Left/KeyUp") != -1) {//左
+						const ke = new KeyboardEvent('keyup', {
+							keyCode: 37
+						});
+						document.body.dispatchEvent(ke);
+					} else if (obj.data.indexOf("/Right/KeyUp") != -1) {//右
+						const ke = new KeyboardEvent('keyup', {
+							keyCode: 39
+						});
+						document.body.dispatchEvent(ke);
+					} else if (obj.data.indexOf("/Esc/KeyUp") != -1) {//返回
+						const ke = new KeyboardEvent('keyup', {
+							keyCode: 8
+						});
+						document.body.dispatchEvent(ke);
+					}
+				}
+			} else {
+				if (!m_this.qrCodeImg.visible) {
+					if (obj.room == obj.user && obj.code == 1) {
+						// 获取二维码
+						let size = 120;//图片尺寸，更具实际情况设置
+						WebSocketBridge.getQrCode(WebSocketBridge.contrller_url + '?type=1&room=' + WebSocketBridge.room, size, function (event) {
+							m_this.qr = JSON.parse(event);
+							m_this.qrCodeImg.visible = true;
+							m_this.qrCodeImg.loadImage(m_this.qr.data);
+
+						}, WebSocketBridge.cdn + '/qr/general');
+					}
+				} else if (obj.code == 1) {//连上设备
+					m_this.contOk.visible = true;
+					m_this.notCont.visible = false;
+					m_this.qrCodeImg.visible = false;
+					Laya.LocalStorage.setItem("isDeviceConnected", "1");
+					this.checkAndShowSk();
+
+				}
+			}
+		});
+
+		wsBridge.setClose(function (event) {
+			// 断开信息
+			// 写你的逻辑
+		});
+
+		wsBridge.setError(function (event) {
+			// 错误信息
+			// 写你的逻辑
+		});
+		// 回调逻辑--------------------------------------------------------------------------------------------------------------------------------------------------END
+
+
+		// 开始链接
+		wsBridge.startConnect(true);
 	}
 	getQrCode() {
 		let m_this = this;
@@ -2535,77 +2648,7 @@ class qq_HomeView extends BVHdla {
 			this.getQrCode();
 		}
 	}
-	initSoket() {
-		let m_this = this;
-		// 安卓版本开关，安卓端设置为true,否则服务器无法链接
-		let isAndroid = false;
-		// 安卓端使用
-		if (isAndroid) {
-			// 初始化注册事件
-			WebSocketBridge.init(function (data) {
-				console.log("WebSocketBridge");
-				console.log(data);
-				console.log(JSON.stringify(data));
-				switch (data.tag) {
-					case 'onOpen':
-						// 处理链接上服务器
-						break;
-					case 'onMessage':
-						// 处理消息
-						m_this.onServerMessage(data.data);
-						break;
-					case 'onClose':
-						// 处理断开链接
-						break;
-					case 'onError':
-						// 处理错误
-						break;
-				}
-			}.bind(this));
-
-			// 连接服务器
-			WebSocketBridge.connect(WebSocketBridge.wsServer + '/ws?type=0');
-			// 断开服务器方法
-			// WebSocketBridge.close();
-			// 往服务器发送数据方法
-			// WebSocketBridge.send("我是客户端 9527.");
-		} else {// 测试或其他端使用
-			// 初始化注册事件
-			window["ws"] = new Laya.Socket();//创建 socket 对象
-
-			//与服务器连接成功时触发
-			window["ws"].on(Laya.Event.OPEN, this, function (event) {
-				console.log("连接服务器成功.");
-			});//连接正常打开抛出的事件
-
-			//接收到服务器数据时触发
-			window["ws"].on(Laya.Event.MESSAGE, this, function (msg) {
-				console.log("收到服务器消息：" + msg);
-				m_this.onServerMessage(msg);
-			});//接收到消息抛出的事件
-
-			//与服务器连接关闭时触发
-			window["ws"].on(Laya.Event.CLOSE, this, function (e) {
-				console.log("与服务器连接断开.");
-				console.log(e);
-			});//socket关闭抛出的事件
-
-			//与服务器通信错误时触发
-			window["ws"].on(Laya.Event.ERROR, this, function (e) {
-				console.log("与服务器通信错误.");
-				console.log(e);
-			});//连接出错抛出的事件
-
-			// 连接服务器
-			window["ws"].connectByUrl(WebSocketBridge.wsServer + "/ws?type=0");//建立连接
-			// window["ws"].connectByUrl("ws://127.0.0.1:15004/upper");//建立连接
-
-			// 断开服务器方法
-			// window["ws"].close();
-			// 往服务器发送数据方法
-			// window["ws"].send("我是客户端 9527.");
-		}
-	}
+	
 	checkAndShowSk() {
 		var aTime = this.getRemainUseTeachTipTimes();
 		if (aTime > 0) {
@@ -2631,86 +2674,7 @@ class qq_HomeView extends BVHdla {
 		this.skeletionVisible = false;
 		Laya.stage.removeChild(this.skeleton);
 	}
-	onServerMessage(msg) {
-		let m_this = this;
-		let obj = JSON.parse(msg);
-		console.log("obj.room的值为" + obj.room);
-		WebSocketBridge.room = obj.room;
-		if (Laya.LocalStorage.getItem("isDeviceConnected") == "1") {
-			if (obj.code == 2) {//断开设备
-				m_this.contOk.visible = false;
-				m_this.notCont.visible = true;
-				m_this.qrCodeImg.visible = true;
-				m_this.isDeviceConnected = false;
-				Laya.LocalStorage.setItem("isDeviceConnected", "0");
-				return;
-			}
-			if (m_this.skeletionVisible) {
-				if (obj.data.indexOf("/Enter/KeyDown") != -1) {//回车
-					m_this.hideSk();
-					return;
-				}
-				if (obj.data.indexOf("/Enter/KeyUp") != -1) {//回车
-					m_this.hideSk();
-					return;
-				}
-			} else {
-				if (obj.data.indexOf("/Enter/KeyDown") != -1) {//回车
-					const ke = new KeyboardEvent('keyup', {
-						keyCode: 13
-					});
-					document.body.dispatchEvent(ke);
-					return;
-				}
-				if (obj.data.indexOf("/Up/KeyUp") != -1) {//上
-					const ke = new KeyboardEvent('keyup', {
-						keyCode: 38
-					});
-					document.body.dispatchEvent(ke);
-				} else if (obj.data.indexOf("/Down/KeyUp") != -1) {//下
-					const ke = new KeyboardEvent('keyup', {
-						keyCode: 40
-					});
-					document.body.dispatchEvent(ke);
-				} else if (obj.data.indexOf("/Left/KeyUp") != -1) {//左
-					const ke = new KeyboardEvent('keyup', {
-						keyCode: 37
-					});
-					document.body.dispatchEvent(ke);
-				} else if (obj.data.indexOf("/Right/KeyUp") != -1) {//右
-					const ke = new KeyboardEvent('keyup', {
-						keyCode: 39
-					});
-					document.body.dispatchEvent(ke);
-				} else if (obj.data.indexOf("/Esc/KeyUp") != -1) {//返回
-					const ke = new KeyboardEvent('keyup', {
-						keyCode: 8
-					});
-					document.body.dispatchEvent(ke);
-				}
-			}
-		} else {
-			if (!m_this.qrCodeImg.visible) {
-				if (obj.room == obj.user && obj.code == 1) {
-					// 获取二维码
-					let size = 120;//图片尺寸，更具实际情况设置
-					WebSocketBridge.getQrCode(WebSocketBridge.contrller_url + '?type=1&room=' + WebSocketBridge.room, size, function (event) {
-						m_this.qr = JSON.parse(event);
-						m_this.qrCodeImg.visible = true;
-						m_this.qrCodeImg.loadImage(m_this.qr.data);
 
-					}, WebSocketBridge.cdn + '/qr/general');
-				}
-			} else if (obj.code == 1) {//连上设备
-				m_this.contOk.visible = true;
-				m_this.notCont.visible = false;
-				m_this.qrCodeImg.visible = false;
-				Laya.LocalStorage.setItem("isDeviceConnected", "1");
-				this.checkAndShowSk();
-
-			}
-		}
-	}
 	hideExitDialog() {
 		this.exitDialogShow = false;
 		this.exitDialog.close();
@@ -5368,72 +5332,6 @@ class AIScript extends Laya.Script3D {
 		this.rigibody.isKinematic = false;
 		Laya.timer.clearAll(this);
 	}
-}
-class WebSocketBridge { }
-// 服务器信息
-WebSocketBridge.cdn = 'http://gserver.popapps.cn:15006';
-WebSocketBridge.wsServer = 'wss://gserver.popapps.cn:15008';
-// 控制端部署地址，通过基地址获取
-WebSocketBridge.contrller_url = '';
-WebSocketBridge.room = '';
-
-WebSocketBridge.bridge = null;
-WebSocketBridge.isConnect = false;
-
-WebSocketBridge.init = function () {
-	WebSocketBridge.setCallFun(call);
-	if (window["PlatformClass"] != null) {
-		this.bridge = window["PlatformClass"].createClass("cn.popapps.ws.JWebSocketBridge");
-	}
-}
-
-WebSocketBridge.setCallFun = function () {
-	window["natvieCallJs"] = call;
-}
-
-WebSocketBridge.connect = function (ws) {
-	if (this.bridge) {
-		this.bridge.call("connect", ws);
-	}
-}
-
-WebSocketBridge.send = function (msg) {
-	if (this.bridge) {
-		this.bridge.call("send", msg);
-	}
-}
-
-WebSocketBridge.close = function () {
-	if (this.bridge) {
-		this.bridge.call("close");
-	}
-}
-
-WebSocketBridge.getBase = function (url, callback) {
-	let xhr = new Laya.HttpRequest();
-	xhr.http.timeout = 10000;
-	xhr.once(Laya.Event.COMPLETE, this, function (event) {
-		callback(event);
-	});
-	xhr.once(Laya.Event.ERROR, this, function (event) {
-		callback("");
-	});
-	xhr.send(url, "", "get", "text");
-}
-
-WebSocketBridge.getQrCode = function (msg, size, callback, url = 'http://81.68.175.16:15006/qr/general') {
-	let qr_url = url + '?msg=' + encodeURIComponent(msg) + '&size=' + size;
-	// console.log(next_url);
-	let xhr = new Laya.HttpRequest();
-	xhr.http.timeout = 10000;
-
-	xhr.once(Laya.Event.COMPLETE, this, function (event) {
-		callback(event)
-	});
-	xhr.once(Laya.Event.ERROR, this, function (event) {
-		callback("");
-	});
-	xhr.send(qr_url, "", "get", "text");
 }
 class GameUI extends ui.views.mainGameUI {
 	constructor() {
