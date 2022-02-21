@@ -2454,74 +2454,82 @@ class qq_HomeView extends BVHdla {
 		this.btnMore = this.getChild("btnMore", bottomPanel);
 		this.btnCollect = this.getChild("btnCollect", bottomPanel);
 		this.qr = "";
+		if (Laya.LocalStorage.getItem("isDeviceConnected") != "1") {
+			this.qq_UpdateData();
+			// // 显示二维码
+			this.codeBg = new Laya.Image("res/qrcode_bg.png");
+			this.codeBg.zOrder = 4;
+			this.codeBg.x = 1073;
+			this.codeBg.y = 46;
+			Laya.stage.addChild(this.codeBg);
+			this.notCont = new Laya.Image("res/qrcode_not_connect.png");
+			this.notCont.x = 18;
+			this.notCont.y = 42;
+			this.codeBg.addChild(this.notCont);
 
-		this.qq_UpdateData();
+			this.noContTip = new Laya.Image("res/qrcode_not_cont_tip.png");
+			this.noContTip.x = 980;
+			this.noContTip.y = 18;
+			Laya.stage.addChild(this.noContTip);
+			this.noContTip.visible = false;
+
+			this.contOk = new Laya.Image("res/qrcode_ok.png");
+			this.contOk.x = 31;
+			this.contOk.y = 18;
+			this.codeBg.addChild(this.contOk);
+			this.contOk.visible = false;
 
 
+			this.cdBg = new Laya.Image("res/qrcode_count_down_bg.png");
+			this.codeBg.addChild(this.cdBg);
+			this.cdBg.visible = false;
 
+			this.numImg = new Laya.Image();
+			this.numImg.x = 78;
+			this.numImg.y = 66;
+			this.codeBg.addChild(this.numImg);
+			this.numImg.visible = false;
 
-		// // 显示二维码
-		this.codeBg = new Laya.Image("res/qrcode_bg.png");
-		this.codeBg.zOrder = 4;
-		this.codeBg.x = 1100;
-		this.codeBg.y = 46;
-		Laya.stage.addChild(this.codeBg);
-		this.notCont = new Laya.Image("res/qrcode_not_connect.png");
-		this.notCont.x = 18;
-		this.notCont.y = 42;
-		this.codeBg.addChild(this.notCont);
-
-		this.contOk = new Laya.Image("res/qrcode_ok.png");
-		this.contOk.x = 31;
-		this.contOk.y = 18;
-		this.codeBg.addChild(this.contOk);
-		this.contOk.visible = false;
-
-
-		this.cdBg = new Laya.Image("res/qrcode_count_down_bg.png");
-		this.codeBg.addChild(this.cdBg);
-		this.cdBg.visible = false;
-
-		// this.numImg = new Laya.Image("res/shuzi_1.png");
-		// this.codeBg.addChild(this.numImg);
-		// this.numImg.visible = false;
-
-		// 创建二维码图片示例，根据实际情况创建		
-		this.qrCodeImg = new Laya.Sprite();
-		this.codeBg.addChild(this.qrCodeImg);
-		this.qrCodeImg.scaleX = 0.8;
-		this.qrCodeImg.scaleY = 0.8;
-		this.qrCodeImg.x = 50;
-		this.qrCodeImg.y = 45;
-		this.codeBg.visible = false;
-		this.getQrCode();
+			// 创建二维码图片示例，根据实际情况创建		
+			this.qrCodeImg = new Laya.Sprite();
+			this.codeBg.addChild(this.qrCodeImg);
+			this.qrCodeImg.scaleX = 0.8;
+			this.qrCodeImg.scaleY = 0.8;
+			this.qrCodeImg.x = 50;
+			this.qrCodeImg.y = 45;
+			this.qrCodeImg.visible = false;
+			this.base = WebSocketBridge.cdn + '/base/wq';// /base/wq是游戏基地址路径，立项后会分配
+			this.getQrCode();
+		}
 	}
 	getQrCode() {
-		if (window.navigator.onLine) {
-			let m_this = this;
-			let base = WebSocketBridge.cdn + '/base/wq';// /base/wq是游戏基地址路径，立项后会分配
-			// 获取信息地址
-			WebSocketBridge.getBase(base, function (event) {
+		let m_this = this;
+		// 获取信息地址
+		WebSocketBridge.getBase(this.base, function (event) {
+			if (event == "") {
+				m_this.cdBg.visible = true;
+				m_this.numImg.visible = true;
+				m_this.noContTip.visible = true;
+				m_this.countDownTime = 5;
+				m_this.numImg.loadImage("res/num_" + m_this.countDownTime + ".png");
+				//5秒倒计时定时器
+				Laya.timer.loop(1000, m_this, m_this.computeCountDownTime);
+			} else {
+				m_this.cdBg.visible = false;
+				m_this.numImg.visible = false;
+				m_this.noContTip.visible = false;
 				let obj = JSON.parse(event);
 				// WebSocketBridge.contrller_url = obj.data.url;	//正式
 				WebSocketBridge.contrller_url = obj.data.ceshi;  //测试版本控制端，用于更新前调试
 				WebSocketBridge.wsServer = obj.data.ws;	//服务器地址也可从基地址动态获取，以免服务器迁移或改域名时可自动更新
 				m_this.initSoket();
-			});
-		} else {
-			this.codeBg.visible = true;
-			this.cdBg.visible = true;
-			this.numImg.visible = true;
-			this.countDownTime = 5;
-			//5秒倒计时定时器
-			Laya.timer.loop(1000, this, this.computeCountDownTime);
-		}
-
+			}
+		});
 	}
 	computeCountDownTime() {
-		this.countDownTime--;
-		if (this.countDownTime > 0) {
-
+		if (this.countDownTime > 1) {
+			this.countDownTime--;
+			this.numImg.loadImage("res/num_" + this.countDownTime + ".png");
 		} else {
 			Laya.timer.clear(this, this.computeCountDownTime);
 			this.getQrCode();
@@ -2628,27 +2636,14 @@ class qq_HomeView extends BVHdla {
 		let obj = JSON.parse(msg);
 		console.log("obj.room的值为" + obj.room);
 		WebSocketBridge.room = obj.room;
-		if (!m_this.codeBg.visible) {
-			if (obj.room == obj.user && obj.code == 1) {
-				// 获取二维码
-				let size = 120;//图片尺寸，更具实际情况设置
-				WebSocketBridge.getQrCode(WebSocketBridge.contrller_url + '?type=1&room=' + WebSocketBridge.room, size, function (event) {
-					m_this.qr = JSON.parse(event);
-					m_this.codeBg.visible = true;
-					m_this.qrCodeImg.loadImage(m_this.qr.data);
-
-				}, WebSocketBridge.cdn + '/qr/general');
-			}
-		} else {
-			if (obj.code == 1) {//连上设备
-				m_this.contOk.visible = true;
-				m_this.notCont.visible = false;
-				m_this.qrCodeImg.visible = false;
-				this.checkAndShowSk();
-			} else if (obj.code == "2") {//断开设备
+		if (Laya.LocalStorage.getItem("isDeviceConnected") == "1") {
+			if (obj.code == 2) {//断开设备
 				m_this.contOk.visible = false;
 				m_this.notCont.visible = true;
 				m_this.qrCodeImg.visible = true;
+				m_this.isDeviceConnected = false;
+				Laya.LocalStorage.setItem("isDeviceConnected", "0");
+				return;
 			}
 			if (m_this.skeletionVisible) {
 				if (obj.data.indexOf("/Enter/KeyDown") != -1) {//回车
@@ -2694,7 +2689,26 @@ class qq_HomeView extends BVHdla {
 					document.body.dispatchEvent(ke);
 				}
 			}
+		} else {
+			if (!m_this.qrCodeImg.visible) {
+				if (obj.room == obj.user && obj.code == 1) {
+					// 获取二维码
+					let size = 120;//图片尺寸，更具实际情况设置
+					WebSocketBridge.getQrCode(WebSocketBridge.contrller_url + '?type=1&room=' + WebSocketBridge.room, size, function (event) {
+						m_this.qr = JSON.parse(event);
+						m_this.qrCodeImg.visible = true;
+						m_this.qrCodeImg.loadImage(m_this.qr.data);
 
+					}, WebSocketBridge.cdn + '/qr/general');
+				}
+			} else if (obj.code == 1) {//连上设备
+				m_this.contOk.visible = true;
+				m_this.notCont.visible = false;
+				m_this.qrCodeImg.visible = false;
+				Laya.LocalStorage.setItem("isDeviceConnected", "1");
+				this.checkAndShowSk();
+
+			}
 		}
 	}
 	hideExitDialog() {
@@ -5612,10 +5626,10 @@ class GameUI extends ui.views.mainGameUI {
 	onPlayGame() {
 		gameInfo.isPlayGame = true;
 		gameInfo.roleDie = false;
-		if (CurSence.curSence != "GameUI"){
+		if (CurSence.curSence != "GameUI") {
 			CurSence.curSence = "GameUI";
 			Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
-			
+
 		}
 		Laya.stage.event("PLAYGAME");
 		this.jumebarBox.visible = true;
